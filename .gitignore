@@ -42,3 +42,4 @@ out/
 /src/main/resources/application.yml
 /gradle/wrapper/
 /build.gradle
+/settings.gradle
