@@ -35,3 +35,8 @@ out/
 
 ### VS Code ###
 .vscode/
+
+### 내가 추가함 ###
+.yml
+.bat
+!**/src/resources/static/**/
