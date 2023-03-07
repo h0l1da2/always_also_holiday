@@ -37,6 +37,8 @@ out/
 .vscode/
 
 ### 내가 추가함 ###
-*.yml
 *.bat
-!**/src/resources/static/**/
+/src/main/resources/static/
+/src/main/resources/application.yml
+/gradle/wrapper/
+/build.gradle
