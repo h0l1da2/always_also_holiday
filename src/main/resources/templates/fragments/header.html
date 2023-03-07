@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="headerFragment(param1)">
+  <div class="header">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-3 col-md-3 col-sm-4 col-xs-12">
+          <div class="logo"> <a href="index.html"><img src="static/images/logo.png" alt=""></a> </div>
+        </div>
+        <div class="col-lg-9 col-md-9 col-sm-12 col-xs-12">
+          <div class="row">
+            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6">
+            </div>
+            <div class="col-lg-4 col-md-4 col-sm-5 col-xs-6">
+            </div>
+            <div class="col-lg-4 col-md-4 col-sm-3 col-xs-12">
+              <div class="top-btn"> <a href="contact.html" class="btn btn-default menu-title">가입</a> </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- navigation -->
+  <div class="navigation-wrapper">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+          <div class="navigation" id="navigation">
+            <ul>
+              <li><a href="testimonial.html" title="Features" class="animsition-link menu-title">휴일</a>
+                <ul>
+                  <li><a href="testimonial.html" title="Testimonial" class="animsition-link menu-title">소개</a></li>
+                </ul>
+              <li><a href="blog-default.html" title="Blog" class="animsition-link menu-title">흠</a>
+                <ul>
+                  <li><a href="blog-default.html" title="Blog" class="animsition-link menu-title">Blog Default</a></li>
+                  <li><a href="blog-single.html" title="Blog Single" class="animsition-link menu-title">Blog Single</a></li>
+                </ul>
+              </li>
+              </li>
+              <li><a href="pricing.html" title="Pricing" class="animsition-link menu-title">굿즈 장터</a></li>
+              <li><a href="contact.html" title="Contact Us" class="animsition-link menu-title">팬미팅 신청</a> </li>
+              <li><a href="style-guide.html" title="Style Guide" class="animsition-link menu-title">온리팬즈</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</th:block>
+</html>
