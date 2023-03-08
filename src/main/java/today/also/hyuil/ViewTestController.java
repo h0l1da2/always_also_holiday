@@ -10,4 +10,14 @@ public class ViewTestController {
     public String index() {
         return "index";
     }
+
+    @GetMapping("/marketList")
+    public String marketList() {
+        return "market/marketList";
+    }
+
+    @GetMapping("/hyuil/intro")
+    public String intro() {
+        return "hyuil/intro";
+    }
 }
