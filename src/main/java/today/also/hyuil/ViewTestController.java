@@ -15,9 +15,12 @@ public class ViewTestController {
     public String marketList() {
         return "market/marketList";
     }
-
     @GetMapping("/hyuil/intro")
     public String intro() {
         return "hyuil/intro";
+    }
+    @GetMapping("/hyuil/review")
+    public String review() {
+        return "hyuil/review";
     }
 }
