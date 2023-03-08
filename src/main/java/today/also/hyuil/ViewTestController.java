@@ -11,9 +11,13 @@ public class ViewTestController {
         return "index";
     }
 
-    @GetMapping("/marketList")
-    public String marketList() {
-        return "market/marketList";
+    @GetMapping("/market/buyList")
+    public String buyList() {
+        return "market/buyList";
+    }
+    @GetMapping("/market/sellList")
+    public String sellList() {
+        return "market/sellList";
     }
     @GetMapping("/hyuil/intro")
     public String intro() {
@@ -30,5 +34,9 @@ public class ViewTestController {
     @GetMapping("/hyuil/music")
     public String music() {
         return "hyuil/music";
+    }
+    @GetMapping("/fanBoard/list")
+    public String boardList() {
+        return "fanletter/boardList";
     }
 }
