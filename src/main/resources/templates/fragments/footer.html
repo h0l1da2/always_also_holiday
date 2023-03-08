@@ -6,7 +6,7 @@
             <div class="row">
                 <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
                     <div class="footer-widget bg-white pinside30 mb30">
-                        <div class="logo mb30"> <a href="static/images/logo.png"><img src="static/images/logo.png" class="static/img-responsive" alt=""></a> </div>
+                        <div class="logo mb30"> <a th:href="@{/static/images/logo.png}"><img th:src="@{/static/images/logo.png}" class="img-responsive" alt=""></a> </div>
                         <p class="mb30">내가 나를 사랑하고 싶어서 만든 사이트에 관심을 가져주셔서 감사합니다! 부디 행복하시고 휴일이도 많이 사랑해주시고 또 귀여워해주세요!</p>
                         <div class="footer-social"><a href="#"><i class="fa fa-twitter"></i></a><a href="#"><i class="fa fa-facebook"></i></a><a href="#"><i class="fa fa-google-plus"></i></a></div>
                     </div>
@@ -19,7 +19,7 @@
                                 <div class="row">
                                     <div class="col-md-2"><i class="fa fa-phone"></i></div>
                                     <div class="col-md-10">
-                                        <h4 class="call-no"><a href="contact.html">010 8346 8610</a></h4>
+                                        <h4 class="call-no"><a th:href="contact.html">010 8346 8610</a></h4>
                                     </div>
                                 </div>
                             </li>
@@ -27,7 +27,7 @@
                                 <div class="row">
                                     <div class="col-md-2"><i class="fa fa-envelope-o"></i></div>
                                     <div class="col-md-10">
-                                        <h4 class="mail-text"><a href="contact.html">whaleee@naver.com</a></h4>
+                                        <h4 class="mail-text"><a th:href="contact.html">whaleee@naver.com</a></h4>
                                     </div>
                                 </div>
                             </li>
@@ -35,7 +35,7 @@
                                 <div class="row">
                                     <div class="col-md-2"><i class="fa fa-clock-o"></i></div>
                                     <div class="col-md-10">
-                                        <h4 class="time-text"><a href="contact.html">스케쥴은 개인 문의</a></h4>
+                                        <h4 class="time-text"><a th:href="contact.html">스케쥴은 개인 문의</a></h4>
                                     </div>
                                 </div>
                             </li>
@@ -46,12 +46,12 @@
                     <div class="footer-widget">
                         <h2 class="footer-title">Quick Links</h2>
                         <ul class="listnone">
-                            <li><i class="fa fa-caret-right"></i><a href="/">메인</a></li>
-                            <li><i class="fa fa-caret-right"></i><a href="service-list.html">소개</a></li>
-                            <li><i class="fa fa-caret-right"></i><a href="testimonial.html">팬레터</a></li>
-                            <li><i class="fa fa-caret-right"></i><a href="blog-default.html">굿즈 장터</a></li>
-                            <li><i class="fa fa-caret-right"></i><a href="pricing.html">팬미팅 신청</a></li>
-                            <li><i class="fa fa-caret-right"></i><a href="contact.html">온리팬즈</a></li>
+                            <li><i class="fa fa-caret-right"></i><a th:href="@{/}">메인</a></li>
+                            <li><i class="fa fa-caret-right"></i><a th:href="service-list.html">소개</a></li>
+                            <li><i class="fa fa-caret-right"></i><a th:href="testimonial.html">팬레터</a></li>
+                            <li><i class="fa fa-caret-right"></i><a th:href="blog-default.html">굿즈 장터</a></li>
+                            <li><i class="fa fa-caret-right"></i><a th:href="pricing.html">팬미팅 신청</a></li>
+                            <li><i class="fa fa-caret-right"></i><a th:href="contact.html">온리팬즈</a></li>
                         </ul>
                     </div>
                 </div>
@@ -61,27 +61,27 @@
     <div class="tiny-footer">
         <div class="container">
             <div class="row">
-                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">Shared by <i class="fa fa-love"></i><a href="https://bootstrapthemes.co">BootstrapThemes</a></div>
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">Shared by <i class="fa fa-love"></i><a th:href="@{https://bootstrapthemes.co}">BootstrapThemes</a></div>
             </div>
         </div>
     </div>
     <!-- back to top icon -->
     <a href="#0" class="cd-top" title="Go to top">Top</a>
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-    <script src="static/js/jquery.min.js"></script>
+    <script th:src="@{/static/js/jquery.min.js}"></script>
     <!-- Include all compiled plugins (below), or include individual files as needed -->
-    <script src="static/js/bootstrap.min.js"></script>
-    <script src="static/js/menumaker.js"></script>
+    <script th:src="@{/static/js/bootstrap.min.js}"></script>
+    <script th:src="@{/static/js/menumaker.js}"></script>
     <!-- animsition -->
-    <script type="text/javascript" src="static/js/animsition.js"></script>
-    <script type="text/javascript" src="static/js/animsition-script.js"></script>
+    <script type="text/javascript" th:src="@{/static/js/animsition.js}"></script>
+    <script type="text/javascript" th:src="@{/static/js/animsition-script.js}"></script>
     <!-- sticky header -->
-    <script type="text/javascript" src="static/js/jquery.sticky.js"></script>
-    <script type="text/javascript" src="static/js/sticky-header.js"></script>
+    <script type="text/javascript" th:src="@{/static/js/jquery.sticky.js}"></script>
+    <script type="text/javascript" th:src="@{/static/js/sticky-header.js}"></script>
     <!-- testimonial-carousel-->
-    <script type="text/javascript" src="static/js/owl.carousel.min.js"></script>
-    <script type="text/javascript" src="static/js/testimonial-carousel.js"></script>
+    <script type="text/javascript" th:src="@{/static/js/owl.carousel.min.js}"></script>
+    <script type="text/javascript" th:src="@{/static/js/testimonial-carousel.js}"></script>
     <!-- Back to top script -->
-    <script src="static/js/back-to-top.js" type="text/javascript"></script>
+    <script th:src="@{/static/js/back-to-top.js}" type="text/javascript"></script>
 </th:block>
 </html>

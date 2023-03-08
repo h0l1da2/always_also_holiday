@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="layout/default_layout">
+<html lang="ko" xmlns:th="http://thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout/default_layout}">
 <th:block layout:fragment="content">
     <body class="animsition">
     <div class="hero-section">
@@ -17,7 +17,7 @@
                             안녕? 반가워요!<br>
                             오늘도 휴일이에요
                         </p>
-                        <a href="service-list.html" class="btn btn-default">휴일이 알아보기</a> </div>
+                        <a th:href="service-list.html" class="btn btn-default">휴일이 알아보기</a> </div>
                 </div>
             </div>
         </div>
@@ -26,7 +26,7 @@
         <div class="container">
             <div class="row">
                 <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
-                    <div class="about-img"><img src="static/images/about-img.jpg" class="img-responsive" alt=""></div>
+                    <div class="about-img"><img th:src="@{/static/images/about-img.jpg}" class="img-responsive" alt=""></div>
                 </div>
                 <div class="col-lg-8 col-md-8 col-sm-6 col-xs-12">
                     <div class="row">
@@ -49,7 +49,7 @@
                         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                             <div class="pdl40">
                                 <h4 class="about-name mb10">- 강휴일 <span class="about-meta"> Kang Hyuil(Holiday) </span></h4>
-                                <div class="about-sign"><img src="static/images/about-sign.png" class="img-responsive" alt=""> </div>
+                                <div class="about-sign"><img th:src="@{/static/images/about-sign.png}" class="img-responsive" alt=""> </div>
                             </div>
                         </div>
                     </div>
@@ -68,7 +68,7 @@
                                 휴일이 주변에는 휴일이를 사랑하는 사람들이 가득하답니다!<br>
                                 이들이 휴일이에게 어떤 사랑을 받고 있으며 또 사랑하고 있는지 알고 싶어요?
                             </p>
-                            <a href="testimonial.html" class="btn btn-default">정말 궁금해요!</a> </div>
+                            <a th:href="testimonial.html" class="btn btn-default">정말 궁금해요!</a> </div>
                     </div>
                 </div>
                 <div class="col-lg-offest-1 col-lg-8 col-md-offset-1 col-md-8 col-sm-12 col-xs-12">
@@ -86,7 +86,7 @@
                                     </div>
                                 </div>
                                 <div class="col-lg-offset-1 col-lg-4 col-md-offset-1  col-md-4 col-sm-5 col-xs-12">
-                                    <div class="testimonial-img"><img src="static/images/testimonial-1.jpg" class="img-responsive" alt=""></div>
+                                    <div class="testimonial-img"><img th:src="@{static/images/testimonial-1.jpg}" class="img-responsive" alt=""></div>
                                 </div>
                             </div>
                         </div>
@@ -103,7 +103,7 @@
                                     </div>
                                 </div>
                                 <div class="col-lg-offset-1 col-lg-4 col-md-offset-1  col-md-4 col-sm-5 col-xs-12">
-                                    <div class="testimonial-img"><img src="static/images/testimonial-2.jpg" class="img-responsive" alt=""></div>
+                                    <div class="testimonial-img"><img th:src="@{/static/images/testimonial-2.jpg}" class="img-responsive" alt=""></div>
                                 </div>
                             </div>
                         </div>
@@ -120,7 +120,7 @@
                                     </div>
                                 </div>
                                 <div class="col-lg-offset-1 col-lg-4 col-md-offset-1  col-md-4 col-sm-5 col-xs-12">
-                                    <div class="testimonial-img"><img src="static/images/testimonial-3.jpg" class="img-responsive" alt=""></div>
+                                    <div class="testimonial-img"><img th:src="@{/static/images/testimonial-3.jpg}" class="img-responsive" alt=""></div>
                                 </div>
                             </div>
                         </div>
@@ -145,7 +145,7 @@
                         <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
                             <div class="team-block mb30">
                                 <figure class="imghvr-fade">
-                                    <div class="team-img"><img src="static/images/team-1.jpg" class="img-responsive" alt=""></div>
+                                    <div class="team-img"><img th:src="@{/static/images/team-1.jpg}" class="img-responsive" alt=""></div>
                                     <figcaption>
                                         <div class="team-info">
                                             <h2 class="team-name">Connie Jenkins</h2>
@@ -158,7 +158,7 @@
                         <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
                             <div class="team-block mb30">
                                 <figure class="imghvr-fade">
-                                    <div class="team-img"><img src="static/images/team-2.jpg" class="img-responsive" alt=""></div>
+                                    <div class="team-img"><img th:src="@{/static/images/team-2.jpg}" class="img-responsive" alt=""></div>
                                     <figcaption>
                                         <div class="team-info">
                                             <h2 class="team-name">Ethel Kinney</h2>
@@ -192,18 +192,18 @@
                 <div class="col-lg-offest-1 col-lg-8 col-md-offset-1 col-md-8 col-sm-12 col-xs-12">
                     <div class="row">
                         <div class="col-lg-6 col-md-6 col-sm-6 co l-xs-12">
-                            <div class="portfoio-img"> <a href="#" class="imghover"><img src="static/images/portfolio-1.jpg" class="img-responsive" alt=""></a> </div>
+                            <div class="portfoio-img"> <a href="#" class="imghover"><img th:src="@{/static/images/portfolio-1.jpg}" class="img-responsive" alt=""></a> </div>
                         </div>
                         <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-                            <div class="portfoio-img"> <a href="#" class="imghover"><img src="static/images/portfolio-2.jpg" class="img-responsive" alt=""></a> </div>
+                            <div class="portfoio-img"> <a href="#" class="imghover"><img th:src="@{/static/images/portfolio-2.jpg}" class="img-responsive" alt=""></a> </div>
                         </div>
                     </div>
                 </div>
                 <div class="col-lg-8 col-md-8 col-sm-12 col-xs-12">
-                    <div class="portfoio-img"> <a href="#" class="imghover"><img src="static/images/portfolio-3.jpg" class="img-responsive" alt=""></a> </div>
+                    <div class="portfoio-img"> <a href="#" class="imghover"><img th:src="@{/static/images/portfolio-3.jpg}" class="img-responsive" alt=""></a> </div>
                 </div>
                 <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
-                    <div class="portfoio-img"> <a href="#" class="imghover"><img src="static/images/portfolio-4.jpg" class="img-responsive" alt=""></a> </div>
+                    <div class="portfoio-img"> <a href="#" class="imghover"><img th:src="@{/static/images/portfolio-4.jpg}" class="img-responsive" alt=""></a> </div>
                 </div>
             </div>
         </div>
