@@ -11,13 +11,36 @@ public class ViewTestController {
         return "index";
     }
 
-    @GetMapping("/marketList")
-    public String marketList() {
-        return "market/marketList";
+    @GetMapping("/market/buyList")
+    public String buyList() {
+        return "market/buyList";
     }
-
+    @GetMapping("/market/sellList")
+    public String sellList() {
+        return "market/sellList";
+    }
     @GetMapping("/hyuil/intro")
     public String intro() {
         return "hyuil/intro";
+    }
+    @GetMapping("/hyuil/review")
+    public String review() {
+        return "hyuil/review";
+    }
+    @GetMapping("/hyuil/picture")
+    public String picture() {
+        return "hyuil/picture";
+    }
+    @GetMapping("/hyuil/music")
+    public String music() {
+        return "hyuil/music";
+    }
+    @GetMapping("/fanBoard/list")
+    public String boardList() {
+        return "fanletter/boardList";
+    }
+    @GetMapping("/fanMeet")
+    public String fanMeet() {
+        return "fanmeet/fanMeetMain";
     }
 }
