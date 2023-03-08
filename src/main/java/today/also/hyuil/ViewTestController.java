@@ -39,4 +39,8 @@ public class ViewTestController {
     public String boardList() {
         return "fanletter/boardList";
     }
+    @GetMapping("/fanMeet")
+    public String fanMeet() {
+        return "fanmeet/fanMeetMain";
+    }
 }
