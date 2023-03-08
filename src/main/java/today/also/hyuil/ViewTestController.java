@@ -23,4 +23,8 @@ public class ViewTestController {
     public String review() {
         return "hyuil/review";
     }
+    @GetMapping("/hyuil/picture")
+    public String picture() {
+        return "hyuil/picture";
+    }
 }
