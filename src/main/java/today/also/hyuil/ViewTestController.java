@@ -10,4 +10,9 @@ public class ViewTestController {
     public String index() {
         return "index";
     }
+
+    @GetMapping("/marketList")
+    public String marketList() {
+        return "market/marketList";
+    }
 }
