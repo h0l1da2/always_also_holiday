@@ -27,4 +27,8 @@ public class ViewTestController {
     public String picture() {
         return "hyuil/picture";
     }
+    @GetMapping("/hyuil/music")
+    public String music() {
+        return "hyuil/music";
+    }
 }
