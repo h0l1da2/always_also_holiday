@@ -51,4 +51,8 @@ public class ViewTestController {
     public String viewPage() {
         return "fanletter/viewPage";
     }
+    @GetMapping("/market/write")
+    public String marketWrite() {
+        return "market/write";
+    }
 }
