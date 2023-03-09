@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="layout/default_layout">
+<th:block layout:fragment="content">
+<body>
+<div class="page-header page-caption">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <a href="pricing.html"><h1 class="page-title">오늘도 휴일</h1></a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="space-medium">
+  <div class="container">
+    <div class="row login-center" >
+      <div class="table-center"><h1 class="login-title">로그인</h1></div>
+      <form class="login-form">
+        <!-- Textarea -->
+        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+          <!-- Text input-->
+          <div class="form-group">
+            <label class=" control-label" for="name">아이디 :</label>
+            <input id="name" name="name" type="text" class="form-control login-input" placeholder=" " required>
+          </div>
+        </div>
+        <div class="market-div">
+          <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+            <!-- Text input-->
+            <div class="form-group">
+              <label class=" control-label" for="name">비밀번호 :</label>
+              <input id="name" name="name" type="text" class="form-control login-input" placeholder=" " required>
+            </div>
+            <!-- Button -->
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+              <div class="form-group">
+                <button id="singlebutton" name="singlebutton" class="btn btn-default btn-login">로그인</button>
+              </div>
+            </div>
+
+          </div>
+      </form>
+    </div>
+  </div>
+  <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+    <label class=" control-label sns-label" for="name">- SNS -</label>
+  </div>
+  <div class="sns-div">
+    <div class="sns-logo"> <a href="index.html"><img th:src="@{/static/images/twitter.png}" alt=""></a> </div>
+    <div class="sns-logo"> <a href="index.html"><img th:src="@{/static/images/facebook.png}" alt=""></a> </div>
+    <div class="sns-logo"> <a href="index.html"><img th:src="@{/static/images/google.png}" alt=""></a> </div>
+  </div>
+</div>
+</div>
+</body>
+</th:block>
+</html>
