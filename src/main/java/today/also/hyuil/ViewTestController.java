@@ -55,4 +55,10 @@ public class ViewTestController {
     public String marketWrite() {
         return "market/write";
     }
+    @GetMapping("/fanMeet/list")
+    public String fanMeetList() {
+        return "fanmeet/meetList";
+    }
+
+
 }
