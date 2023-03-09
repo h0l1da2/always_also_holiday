@@ -47,4 +47,8 @@ public class ViewTestController {
     public String boardWrite() {
         return "fanletter/writePage";
     }
+    @GetMapping("/fanBoard/page")
+    public String viewPage() {
+        return "fanletter/viewPage";
+    }
 }
