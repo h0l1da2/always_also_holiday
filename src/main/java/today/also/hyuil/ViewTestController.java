@@ -43,4 +43,8 @@ public class ViewTestController {
     public String fanMeet() {
         return "fanmeet/fanMeetMain";
     }
+    @GetMapping("/fanBoard/write")
+    public String boardWrite() {
+        return "fanletter/writePage";
+    }
 }
