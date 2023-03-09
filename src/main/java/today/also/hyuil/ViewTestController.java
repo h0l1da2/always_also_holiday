@@ -43,4 +43,30 @@ public class ViewTestController {
     public String fanMeet() {
         return "fanmeet/fanMeetMain";
     }
+    @GetMapping("/fanBoard/write")
+    public String boardWrite() {
+        return "fanletter/writePage";
+    }
+    @GetMapping("/fanBoard/page")
+    public String viewPage() {
+        return "fanletter/viewPage";
+    }
+    @GetMapping("/market/write")
+    public String marketWrite() {
+        return "market/write";
+    }
+    @GetMapping("/fanMeet/list")
+    public String fanMeetList() {
+        return "fanmeet/meetList";
+    }
+    @GetMapping("/loginForm")
+    public String loginForm() {
+        return "member/loginForm";
+    }
+    @GetMapping("/joinForm")
+    public String joinForm() {
+        return "member/joinForm";
+    }
+
+
 }
