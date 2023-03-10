@@ -73,19 +73,27 @@ public class ViewTestController {
     }
     @GetMapping("/infoForm")
     public String memberInfoForm() {
-        return "member/info/infoForm";
+        return "member/info/information/infoForm";
     }
     @GetMapping("/info/password")
     public String passwordForm() {
-        return "member/info/passwordForm";
+        return "member/info/information/passwordForm";
     }
     @GetMapping("/info/email")
     public String emailForm() {
-        return "member/info/emailForm";
+        return "member/info/information/emailForm";
     }
     @GetMapping("/info/phone")
     public String phoneForm() {
-        return "member/info/phoneForm";
+        return "member/info/information/phoneForm";
+    }
+    @GetMapping("/info/fanLetter")
+    public String fanLetterList() {
+        return "member/info/fanLetterList";
+    }
+    @GetMapping("/info/delivery")
+    public String deliveryList() {
+        return "member/info/delivery/main";
     }
 
 
