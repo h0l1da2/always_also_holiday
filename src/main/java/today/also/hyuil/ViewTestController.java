@@ -67,6 +67,26 @@ public class ViewTestController {
     public String joinForm() {
         return "member/joinForm";
     }
+    @GetMapping("/info")
+    public String memberInfo() {
+        return "member/info/infoMain";
+    }
+    @GetMapping("/infoForm")
+    public String memberInfoForm() {
+        return "member/info/infoForm";
+    }
+    @GetMapping("/info/password")
+    public String passwordForm() {
+        return "member/info/passwordForm";
+    }
+    @GetMapping("/info/email")
+    public String emailForm() {
+        return "member/info/emailForm";
+    }
+    @GetMapping("/info/phone")
+    public String phoneForm() {
+        return "member/info/phoneForm";
+    }
 
 
 }

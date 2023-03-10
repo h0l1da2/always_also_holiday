@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="layout/default_layout">
+<th:block layout:fragment="content">
+<body>
+<div class="page-header page-caption">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <h1 class="page-title">회원 정보</h1>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="space-medium">
+  <div class="container">
+    <div class="row">
+      <div class="table-center">
+        <div class="form-group">
+          <button id="singlebutton" name="singlebutton" class="btn btn-default info-btn-form">비밀번호 수정</button>
+          <button id="singlebutton" name="singlebutton" class="btn btn-default info-btn-form">이메일 수정</button>
+          <button id="singlebutton" name="singlebutton" class="btn btn-default info-btn-form">휴대폰 수정</button>
+        </div>
+      </div>
+
+      <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 outline pinside40 join-div">
+        <div class="row">
+          <form>
+            <!-- Textarea -->
+            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+              <!-- Text input-->
+              <div class="form-group join-input">
+                <label class=" control-label" for="name">아이디 : </label>
+                <input id="name" name="name" type="text" class="form-control" placeholder="5자 이상" required>
+                <label class=" control-label" for="name">이름 : </label>
+                <input id="name" name="name" type="text" class="form-control" placeholder="5자 이상" required>
+                <div class="form-group">
+                  <label class=" control-label" for="email">닉네임 :</label>
+                  <input id="email" name="email" type="password" class="form-control" placeholder="영문/숫자 포함 8자" required>
+                </div>
+                <div class="form-group">
+                  <label class=" control-label" for="email">이메일 :</label>
+                  <input id="email" name="email" type="password" class="form-control" placeholder="영문/숫자 포함 8자" required>
+                </div>
+                <label class=" control-label" for="email">휴대폰 :</label>
+                <input id="email" name="email" type="password" class="form-control" placeholder="영문/숫자 포함 8자" required>
+              </div>
+            </div>
+
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</th:block>
+</html>
