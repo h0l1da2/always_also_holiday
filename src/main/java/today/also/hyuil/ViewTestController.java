@@ -95,6 +95,14 @@ public class ViewTestController {
     public String deliveryList() {
         return "member/info/delivery/main";
     }
+    @GetMapping("/info/orderForm")
+    public String orderForm() {
+        return "member/info/delivery/orderForm";
+    }
+    @GetMapping("/info/marketList")
+    public String marketList() {
+        return "member/info/marketList";
+    }
 
 
 }
