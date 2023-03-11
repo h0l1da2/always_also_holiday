@@ -17,15 +17,22 @@ public class MemberJoinServiceImpl implements MemberJoinService {
 
     @Override
     public Member joinMember(Member member) {
-
-        memberRepository.insertMember(member);
-
-        return null;
+        return memberRepository.insertMember(member);
     }
 
     @Override
     public Member idDoubleCheck(String memberId) {
         return memberRepository.findByMemberId(memberId);
+    }
+
+    @Override
+    public Member nicknameCheck(String nickname) {
+        return memberRepository.findByNickname(nickname);
+    }
+
+    @Override
+    public Member phoneCheck(String phone) {
+        return memberRepository.findByPhone(phone);
     }
 
 
