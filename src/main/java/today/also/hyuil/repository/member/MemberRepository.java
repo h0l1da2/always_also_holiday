@@ -29,7 +29,8 @@ public class MemberRepository {
     }
 
     public Member findByMemberId(String memberId) {
-        Optional<Member> findMember = query.select(member)
+        Optional<Member> findMember = query
+                .select(member)
                 .from(member)
                 .where(member.memberId.eq(memberId))
                 .stream().findFirst();
@@ -37,4 +38,23 @@ public class MemberRepository {
         return findMember.orElse(null);
     }
 
+    public Member findByNickname(String nickname) {
+        Optional<Member> findMember = query
+                .select(member)
+                .from(member)
+                .where(member.nickname.eq(nickname))
+                .stream().findFirst();
+
+        return findMember.orElse(null);
+    }
+
+    public Member findByPhone(String phone) {
+        Optional<Member> findMember = query
+                .select(member)
+                .from(member)
+                .where(member.phone.eq(phone))
+                .stream().findFirst();
+
+        return findMember.orElse(null);
+    }
 }
