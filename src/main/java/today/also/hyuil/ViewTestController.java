@@ -103,6 +103,18 @@ public class ViewTestController {
     public String marketList() {
         return "member/info/marketList";
     }
+    @GetMapping("/info/delete")
+    public String deleteForm() {
+        return "member/info/deleteForm";
+    }
+    @GetMapping("/market/view1")
+    public String sellView() {
+        return "market/sellView";
+    }
+    @GetMapping("/market/view2")
+    public String buyView() {
+        return "market/buyView";
+    }
 
 
 }
