@@ -13,7 +13,7 @@ import javax.validation.constraints.Email;
 @ToString
 public class MemberJoinDto {
 
-    private String userId;
+    private String memberId;
     private String password;
     private String name;
     private String nickname;

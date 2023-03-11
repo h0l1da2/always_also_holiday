@@ -13,7 +13,7 @@ public class Member {
 
     @Id @GeneratedValue
     private Long id;
-    private String userId;
+    private String memberId;
     private String password;
     private String name;
     private String nickname;
@@ -39,7 +39,7 @@ public class Member {
     protected Member() {}
 
     public Member(MemberJoinDto memberJoinDto, Address address, Role role) {
-        this.userId = memberJoinDto.getUserId();
+        this.memberId = memberJoinDto.getMemberId();
         this.password = memberJoinDto.getPassword();
         this.name = memberJoinDto.getName();
         this.nickname = memberJoinDto.getNickname();
