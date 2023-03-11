@@ -1,10 +1,11 @@
-package today.also.hyuil.service;
+package today.also.hyuil.service.member;
 
 import org.springframework.stereotype.Service;
-import today.also.hyuil.domain.dto.MemberJoinDto;
+import org.springframework.transaction.annotation.Transactional;
 import today.also.hyuil.domain.member.Member;
 import today.also.hyuil.repository.member.MemberRepository;
 
+@Transactional
 @Service
 public class MemberJoinServiceImpl implements MemberJoinService {
 
@@ -20,6 +21,11 @@ public class MemberJoinServiceImpl implements MemberJoinService {
         memberRepository.insertMember(member);
 
         return null;
+    }
+
+    @Override
+    public Member idDoubleCheck(String memberId) {
+        return memberRepository.findByMemberId(memberId);
     }
 
 

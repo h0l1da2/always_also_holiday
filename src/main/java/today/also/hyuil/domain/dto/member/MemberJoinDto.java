@@ -1,4 +1,4 @@
-package today.also.hyuil.domain.dto;
+package today.also.hyuil.domain.dto.member;
 
 import lombok.Getter;
 import lombok.Setter;
