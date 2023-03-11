@@ -87,8 +87,8 @@ public class MemberJoinController {
             return "확인 불가";
         }
 
-        code = mailService.joinEmailCode(doubleCheckDto.getEmail());
-        return null;
+        code = mailService.joinCodeSend(doubleCheckDto.getEmail());
+        return code;
     }
 
     @PostMapping("/complete")

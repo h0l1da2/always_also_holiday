@@ -1,6 +1,10 @@
 package today.also.hyuil.service.member;
 
-public interface MailService {
+import javax.mail.internet.MimeMessage;
 
-    String joinEmailCode(String email);
+public interface MailService {
+    String joinCodeSend(String toEmail);
+    MimeMessage joinMailForm(String toEmail);
+    String contextJoin(String code);
+
 }
