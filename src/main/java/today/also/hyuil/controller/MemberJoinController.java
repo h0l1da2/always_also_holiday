@@ -3,6 +3,7 @@ package today.also.hyuil.controller;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import today.also.hyuil.domain.dto.member.LoginDto;
 import today.also.hyuil.domain.dto.member.MemberJoinDto;
@@ -11,7 +12,9 @@ import today.also.hyuil.domain.member.Member;
 import today.also.hyuil.domain.member.Role;
 import today.also.hyuil.service.member.MemberJoinService;
 
+
 @Controller
+@RequestMapping("/join")
 public class MemberJoinController {
 
     private final MemberJoinService memberJoinService;
@@ -21,7 +24,7 @@ public class MemberJoinController {
     }
 
     @ResponseBody
-    @PostMapping
+    @PostMapping("/idCheck")
     public String idDoubleCheck(@RequestBody LoginDto loginDto) {
         String memberId = loginDto.getMemberId();
         if (memberId == null) {
