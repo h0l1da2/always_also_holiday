@@ -1,10 +1,7 @@
 package today.also.hyuil.controller.member;
 
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import today.also.hyuil.domain.dto.member.DoubleCheckDto;
 import today.also.hyuil.domain.dto.member.MemberJoinDto;
 import today.also.hyuil.domain.member.Address;
@@ -18,7 +15,7 @@ import today.also.hyuil.service.member.MemberJoinService;
 @RequestMapping("/join")
 public class MemberJoinController {
 
-    private String code;
+    private String randomCode;
     private final MemberJoinService memberJoinService;
     private final MailService mailService;
 
@@ -87,12 +84,26 @@ public class MemberJoinController {
             return "확인 불가";
         }
 
-        code = mailService.joinCodeSend(doubleCheckDto.getEmail());
-        return code;
+        randomCode = mailService.joinCodeSend(doubleCheckDto.getEmail());
+        return randomCode;
+    }
+
+    @ResponseBody
+    @PostMapping("/codeCheck")
+    public String codeCheck(@RequestBody DoubleCheckDto doubleCheckDto) {
+        String code = doubleCheckDto.getCode();
+        if (stringNullCheck(code)) {
+            return "확인 불가";
+        }
+
+        if (code.equals(randomCode)) {
+            return "코드 일치";
+        }
+        return "코드 불일치";
     }
 
     @PostMapping("/complete")
-    public String joinMember(MemberJoinDto memberJoinDto) {
+    public String joinMember(@ModelAttribute MemberJoinDto memberJoinDto) {
 
         Member member = new Member(memberJoinDto,
                 new Address(memberJoinDto), new Role(memberJoinDto));

@@ -16,14 +16,14 @@ import static javax.mail.Message.RecipientType;
 
 @Service
 @PropertySource("classpath:application.yml")
-public class MailServiceImpl implements MailService{
+public class MailServiceImpl implements MailService {
 
     private final JavaMailSender mailSender;
     private final SpringTemplateEngine templateEngine; //타임리프를 사용하기 위한 객체
+    private MimeMessage message;
     @Value("${mail.id}")
     private String fromEmail;
 
-    private MimeMessage message;
     private String title;
     private String randomCode;
     private String randomPwd;
