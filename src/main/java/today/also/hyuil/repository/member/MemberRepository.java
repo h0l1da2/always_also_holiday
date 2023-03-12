@@ -66,8 +66,11 @@ public class MemberRepository {
                 .where(member.memberId.eq(memberId))
                 .stream().findFirst();
 
+        System.out.println("전");
         Member member = findMember.orElse(null);
+        System.out.println("후");
         member.getRole();
+        System.out.println("권한");
         return member;
     }
 }

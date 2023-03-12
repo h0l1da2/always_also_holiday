@@ -37,7 +37,7 @@ public class MemberJoinServiceImpl implements MemberJoinService {
 
     @Override
     public Member memberIdLogin(String memberId) {
-        return memberRepository.findByMemberId(memberId);
+        return memberRepository.findByMemberIdRole(memberId);
     }
 
 

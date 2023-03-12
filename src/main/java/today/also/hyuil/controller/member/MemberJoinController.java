@@ -115,7 +115,7 @@ public class MemberJoinController {
     @PostMapping("/complete")
     public String joinMember(@ModelAttribute MemberJoinDto memberJoinDto) {
         memberJoinDto.setPassword(passwordEncoder.encode(memberJoinDto.getPassword()));
-        memberJoinDto.setRoleName(Name.USER);
+        memberJoinDto.setRoleName(Name.ROLE_USER);
         Member member =
                 new Member(memberJoinDto,
                 new Address(memberJoinDto),
