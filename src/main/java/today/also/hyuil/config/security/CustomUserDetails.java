@@ -7,6 +7,7 @@ import today.also.hyuil.domain.member.Member;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 
 public class CustomUserDetails implements UserDetails {
 
@@ -38,21 +39,21 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public boolean isAccountNonExpired() {
-        return true;
+        return member.getPwdModifyDate().after(new Date());
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return false;
+        return member.getStopDate() == null ? true : false;
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean isEnabled() {
-        return false;
+        return member.getRemoveDate() == null ? true : false;
     }
 }

@@ -33,6 +33,7 @@ public class Member {
     private Date stopDate;
     private Date lastLogin;
     private Date joinDate;
+    private Date pwdModifyDate;
     private String whyStop;
     @Enumerated(EnumType.STRING)
     private Sns sns;
@@ -55,5 +56,6 @@ public class Member {
         this.sns = memberJoinDto.getSns();
         this.lastLogin = new Date();
         this.joinDate = new Date();
+        this.pwdModifyDate = new Date();
     }
 }

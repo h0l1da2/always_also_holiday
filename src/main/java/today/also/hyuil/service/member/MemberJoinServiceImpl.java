@@ -35,5 +35,10 @@ public class MemberJoinServiceImpl implements MemberJoinService {
         return memberRepository.findByPhone(phone);
     }
 
+    @Override
+    public Member memberIdLogin(String memberId) {
+        return memberRepository.findByMemberId(memberId);
+    }
+
 
 }

@@ -7,4 +7,5 @@ public interface MemberJoinService {
     Member idDoubleCheck(String memberId);
     Member nicknameCheck(String nickname);
     Member phoneCheck(String phone);
+    Member memberIdLogin(String memberId);
 }

@@ -8,10 +8,10 @@ import today.also.hyuil.domain.dto.member.DoubleCheckDto;
 import today.also.hyuil.domain.dto.member.MemberJoinDto;
 import today.also.hyuil.domain.member.Address;
 import today.also.hyuil.domain.member.Member;
+import today.also.hyuil.domain.member.Name;
 import today.also.hyuil.domain.member.Role;
 import today.also.hyuil.service.member.MailService;
 import today.also.hyuil.service.member.MemberJoinService;
-
 
 @Controller
 @RequestMapping("/join")
@@ -114,10 +114,12 @@ public class MemberJoinController {
 
     @PostMapping("/complete")
     public String joinMember(@ModelAttribute MemberJoinDto memberJoinDto) {
-
         memberJoinDto.setPassword(passwordEncoder.encode(memberJoinDto.getPassword()));
-        Member member = new Member(memberJoinDto,
-                new Address(memberJoinDto), new Role(memberJoinDto));
+        memberJoinDto.setRoleName(Name.USER);
+        Member member =
+                new Member(memberJoinDto,
+                new Address(memberJoinDto),
+                        new Role(memberJoinDto));
         memberJoinService.joinMember(member);
         return "member/joinComplete";
     }
