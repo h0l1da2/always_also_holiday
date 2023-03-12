@@ -1,6 +1,7 @@
 package today.also.hyuil.controller.member;
 
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import today.also.hyuil.domain.dto.member.DoubleCheckDto;
 import today.also.hyuil.domain.dto.member.MemberJoinDto;
@@ -24,6 +25,12 @@ public class MemberJoinController {
         this.mailService = mailService;
     }
 
+    @GetMapping
+    public String joinForm(Model model) {
+        model.addAttribute("member", new MemberJoinDto());
+        return "member/joinForm";
+    }
+
     @ResponseBody
     @PostMapping("/idCheck")
     public String idDoubleCheck(@RequestBody DoubleCheckDto doubleCheckDto) {
@@ -36,7 +43,7 @@ public class MemberJoinController {
                 doubleCheckDto.getMemberId()
         );
 
-        if (member != null) {
+        if (memberNullCheck(member)) {
             return "중복";
         }
         return "가입 가능";
@@ -51,7 +58,7 @@ public class MemberJoinController {
         }
 
         Member member = memberJoinService.nicknameCheck(
-                doubleCheckDto.getMemberId()
+                doubleCheckDto.getNickname()
         );
         if (memberNullCheck(member)) {
             return "중복";
@@ -68,7 +75,7 @@ public class MemberJoinController {
         }
 
         Member member = memberJoinService.phoneCheck(
-                doubleCheckDto.getMemberId()
+                doubleCheckDto.getPhone()
         );
         if (memberNullCheck(member)) {
             return "중복";
@@ -118,14 +125,14 @@ public class MemberJoinController {
         if (str.equals("")) {
             return true;
         }
-        if (str.equals(" ")) {
+        if (str.contains(" ")) {
             return true;
         }
         return false;
     }
 
     private boolean memberNullCheck(Member member) {
-        if (member == null) {
+        if (member != null) {
             return true;
         }
         return false;

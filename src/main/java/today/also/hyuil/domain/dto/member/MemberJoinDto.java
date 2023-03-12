@@ -19,6 +19,7 @@ public class MemberJoinDto {
     private String nickname;
     @Email
     private String email;
+    private String code;
     private String phone;
     private String address;
     private String autoRoadAddress;
