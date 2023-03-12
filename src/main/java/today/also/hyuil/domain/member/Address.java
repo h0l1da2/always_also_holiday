@@ -14,16 +14,16 @@ public class Address {
     @Id @GeneratedValue
     private Long id;
     private String address;
-    private String autoRoadAddress;
-    private String zonecode;
+    private String extraAddress;
+    private String postcode;
     private String detail;
 
     protected Address() {}
 
     public Address(MemberJoinDto memberJoinDto) {
         this.address = memberJoinDto.getAddress();
-        this.autoRoadAddress = memberJoinDto.getAutoRoadAddress();
-        this.zonecode = memberJoinDto.getZonecode();
+        this.extraAddress = memberJoinDto.getExtraAddress();
+        this.postcode = memberJoinDto.getPostcode();
         this.detail = memberJoinDto.getDetail();
     }
 }

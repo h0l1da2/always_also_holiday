@@ -1,5 +1,6 @@
 package today.also.hyuil.controller.member;
 
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -7,10 +8,10 @@ import today.also.hyuil.domain.dto.member.DoubleCheckDto;
 import today.also.hyuil.domain.dto.member.MemberJoinDto;
 import today.also.hyuil.domain.member.Address;
 import today.also.hyuil.domain.member.Member;
+import today.also.hyuil.domain.member.Name;
 import today.also.hyuil.domain.member.Role;
 import today.also.hyuil.service.member.MailService;
 import today.also.hyuil.service.member.MemberJoinService;
-
 
 @Controller
 @RequestMapping("/join")
@@ -19,10 +20,12 @@ public class MemberJoinController {
     private String randomCode;
     private final MemberJoinService memberJoinService;
     private final MailService mailService;
+    private final BCryptPasswordEncoder passwordEncoder;
 
-    public MemberJoinController(MemberJoinService memberJoinService, MailService mailService) {
+    public MemberJoinController(MemberJoinService memberJoinService, MailService mailService, BCryptPasswordEncoder passwordEncoder) {
         this.memberJoinService = memberJoinService;
         this.mailService = mailService;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @GetMapping
@@ -111,9 +114,12 @@ public class MemberJoinController {
 
     @PostMapping("/complete")
     public String joinMember(@ModelAttribute MemberJoinDto memberJoinDto) {
-
-        Member member = new Member(memberJoinDto,
-                new Address(memberJoinDto), new Role(memberJoinDto));
+        memberJoinDto.setPassword(passwordEncoder.encode(memberJoinDto.getPassword()));
+        memberJoinDto.setRoleName(Name.ROLE_USER);
+        Member member =
+                new Member(memberJoinDto,
+                new Address(memberJoinDto),
+                        new Role(memberJoinDto));
         memberJoinService.joinMember(member);
         return "member/joinComplete";
     }

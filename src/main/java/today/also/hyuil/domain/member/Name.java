@@ -1,5 +1,5 @@
 package today.also.hyuil.domain.member;
 
 public enum Name {
-    HOLIDAY, ADMIN, USER
+    ROLE_HOLIDAY, ROLE_ADMIN, ROLE_USER
 }

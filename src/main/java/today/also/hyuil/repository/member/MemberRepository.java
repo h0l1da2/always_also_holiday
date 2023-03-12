@@ -5,7 +5,6 @@ import org.springframework.stereotype.Repository;
 import today.also.hyuil.domain.member.Member;
 
 import javax.persistence.EntityManager;
-
 import java.util.Optional;
 
 import static today.also.hyuil.domain.member.QMember.member;
@@ -49,12 +48,29 @@ public class MemberRepository {
     }
 
     public Member findByPhone(String phone) {
-        Optional<Member> findMember = query
+        Optional<Member> findMember =
+                query
                 .select(member)
                 .from(member)
                 .where(member.phone.eq(phone))
                 .stream().findFirst();
 
         return findMember.orElse(null);
+    }
+
+    public Member findByMemberIdRole(String memberId) {
+        Optional<Member> findMember =
+                query
+                .select(member)
+                .from(member)
+                .where(member.memberId.eq(memberId))
+                .stream().findFirst();
+
+        System.out.println("전");
+        Member member = findMember.orElse(null);
+        System.out.println("후");
+        member.getRole();
+        System.out.println("권한");
+        return member;
     }
 }
