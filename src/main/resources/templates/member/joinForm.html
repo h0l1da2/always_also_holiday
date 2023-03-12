@@ -42,9 +42,10 @@
                 <input th:field="*{name}" type="text" class="form-control" placeholder=" " required>
                 <div class="form-group">
                   <label class=" control-label" for="nickname">닉네임 :</label>
-                  <input th:field="*{nickname}" type="text" class="form-control" placeholder="한글/영문/숫자 3자 이상"
+                  <input th:field="*{nickname}" type="text" class="form-control" placeholder="한글/영문/숫자 3자 이상(특수문자 미포함)"
                          minlength="3" required>
                   <div ><span id="nickDouble" class="join-alarm">닉네임이 중복입니다</span></div>
+                  <div ><span id="rightNick" class="join-alarm">닉네임 양식을 확인해주세요</span></div>
                 </div>
                 <div class="form-group">
                   <label class=" control-label" for="email">이메일 :</label>
@@ -94,9 +95,17 @@
 <script th:inline="javascript">
 
   function checkMemberId(str){
-    let regUserId = /[ㄱ-ㅎ|ㅏ-ㅣ|가-힣]/;
+    let regMemberId = /[ㄱ-ㅎ|ㅏ-ㅣ|가-힣]/;
     let reg = /[`~!@#$%^&*()_|+\-=?;:'",.<>\{\}\[\]\\\/ ]/gim;
-    if(regUserId.test(str) || reg.test(str)) {
+    if(regMemberId.test(str) || reg.test(str)) {
+      return false;
+    }else {
+      return true;
+    }
+  }
+  function checkNickname(str){
+    let reg = /[`~!@#$%^&*()_|+\-=?;:'",.<>\{\}\[\]\\\/ ]/gim;
+    if(reg.test(str)) {
       return false;
     }else {
       return true;
@@ -104,8 +113,18 @@
   }
 
   let idCheck = 0;
+  let nicknameCheck = 0;
+
   $( document ).ready( function() {
+
     $('#passwordCheck').on("propertychange change keyup paste input", function (frm) {
+      $('#difPwd').css('display', 'block');
+      if(document.getElementById('password').value == document.getElementById('passwordCheck').value) {
+        $('#difPwd').css('display', 'none');
+        return false;
+      }
+    });
+    $('#password').on("propertychange change keyup paste input", function (frm) {
       $('#difPwd').css('display', 'block');
       if(document.getElementById('password').value == document.getElementById('passwordCheck').value) {
         $('#difPwd').css('display', 'none');
@@ -118,6 +137,11 @@
       $('#rightId').css('display', 'none');
       $('#idDouble').css('display', 'none');
       idCheck = 0;
+    })
+    $('#nickname').on("propertychange change keyup paste input", function (frm) {
+      $('#nickDouble').css('display', 'none');
+      $('#rightNick').css('display', 'none');
+      nicknameCheck = 0;
     })
 
     $('#idCheckBtn').click(function () {
@@ -153,9 +177,29 @@
     })
     $('#nickCheckBtn').click(function () {
       let nickname = document.getElementById("nickname").value;
-      if (nickname == "" | nickname == " ") {
-        $('#nickDouble').css('display', 'block');
+      if (nickname == "" | nickname == " " | !checkNickname(nickname)) {
+        $('#rightNick').css('display', 'block');
+        return false;
       }
+
+      $.ajax({
+        type: 'POST',
+        url: '/join/nicknameCheck',
+        contentType: "application/json",
+        data: JSON.stringify({nickname:nickname}),
+        dataType: 'text',
+        success: function (result) {
+          if(result=="가입 가능") {
+            alert("중복이 아닙니다");
+            nicknameCheck=1;
+          } else {
+            alert(result);
+            document.getElementById('nickname').focus();
+          }
+        },
+        error: function(result) {
+          alert("확인실패");
+        }});
     })
     $('#emailSendBtn').click(function () {
       let nickname = document.getElementById("nickname").value;
