@@ -1,6 +1,7 @@
 package today.also.hyuil.controller.member;
 
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import today.also.hyuil.domain.dto.member.DoubleCheckDto;
 import today.also.hyuil.domain.dto.member.MemberJoinDto;
@@ -22,6 +23,12 @@ public class MemberJoinController {
     public MemberJoinController(MemberJoinService memberJoinService, MailService mailService) {
         this.memberJoinService = memberJoinService;
         this.mailService = mailService;
+    }
+
+    @GetMapping
+    public String joinForm(Model model) {
+        model.addAttribute("member", new MemberJoinDto());
+        return "member/joinForm";
     }
 
     @ResponseBody
