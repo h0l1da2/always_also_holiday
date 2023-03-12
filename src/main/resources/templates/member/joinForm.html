@@ -49,11 +49,11 @@
                 </div>
                 <div class="form-group">
                   <label class=" control-label" for="address">주소 :</label>
-                  <input type="text" class="form-control" th:field="*{postcode}" placeholder="우편번호">
+                  <input type="text" class="form-control" th:field="*{postcode}" placeholder="우편번호" readonly>
                   <input type="button" class="form-control" onclick="execDaumPostcode()" value="우편번호 찾기"><br>
-                  <input type="text" class="form-control" th:field="*{address}" placeholder="주소">
+                  <input type="text" class="form-control" th:field="*{address}" placeholder="주소" readonly>
                   <input type="text" class="form-control" th:field="*{detail}" placeholder="상세주소">
-                  <input type="text" class="form-control" th:field="*{extraAddress}" placeholder="참고항목">
+                  <input type="text" class="form-control" th:field="*{extraAddress}" placeholder="참고항목" readonly>
                 </div>
                 <div class="form-group">
                   <label class=" control-label" for="email">이메일 :</label>
@@ -74,19 +74,19 @@
             </div>
 
             <div class="form-group join-div-btn">
-              <button id="idCheckBtn" name="singlebutton" class="btn btn-default btn-join">중복 확인</button>
+              <button id="idCheckBtn" type="button" name="singlebutton" class="btn btn-default btn-join">중복 확인</button>
             </div>
             <div class="form-group join-div-btn">
-              <button id="nickCheckBtn" name="singlebutton" class="btn btn-default btn-join">중복 확인</button>
+              <button id="nickCheckBtn" type="button" name="singlebutton" class="btn btn-default btn-join">중복 확인</button>
             </div>
             <div class="form-group join-div-btn">
-              <button id="emailSendBtn" name="singlebutton" class="btn btn-default btn-join">코드 전송</button>
+              <button id="emailSendBtn" type="button" name="singlebutton" class="btn btn-default btn-join">코드 전송</button>
             </div>
             <div class="form-group join-div-btn">
-              <button id="codeCheckBtn" name="singlebutton" class="btn btn-default btn-join">코드 확인</button>
+              <button id="codeCheckBtn" type="button" name="singlebutton" class="btn btn-default btn-join">코드 확인</button>
             </div>
             <div class="form-group join-div-btn">
-              <button id="phoneCheckBtn" name="singlebutton" class="btn btn-default btn-join">중복 확인</button>
+              <button id="phoneCheckBtn" type="button" name="singlebutton" class="btn btn-default btn-join">중복 확인</button>
             </div>
 
             <!-- Button -->
@@ -149,9 +149,20 @@
       return false;
     }
   }
+  function checkPassword(str){
+    let regex = /^[A-Za-z0-9]{6,12}$/;
+    if(regex.test(str)) {
+      return true;
+    } else {
+      return false;
+    }
+  }
 
   function formCheck(form) {
     let name = document.getElementById("name").value;
+    let address = document.getElementById("address").value;
+    let detail = document.getElementById("detail").value;
+    let password = document.getElementById("password").value;
     if (idCheck == 0) {
       alert('ID 중복확인은 필수입니다');
       return false;
@@ -171,10 +182,22 @@
     if ($('#difPwd').css('display') == 'block' |
             $('#pwdForm').css('display') == 'block') {
       alert('비밀번호를 제대로 확인해주세요');
+      document.getElementById('password').focus();
       return false;
     }
     if (!checkName(name)) {
       alert('이름을 제대로 써주세요');
+      document.getElementById('name').focus();
+      return false;
+    }
+    if (address == '' | detail == '') {
+      alert('주소를 입력해주세요');
+      document.getElementById('detail').focus();
+      return false;
+    }
+    if (!checkPassword(password)) {
+      alert('비밀번호 양식을 맞춰주세요');
+      document.getElementById('password').focus();
       return false;
     }
   }
