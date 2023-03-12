@@ -18,18 +18,21 @@
 
       <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 outline pinside40 join-div">
         <div class="row">
-          <form th:object="${member}">
+          <form action="function joinAction()" th:object="${member}" method="POST">
             <!-- Textarea -->
             <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
               <!-- Text input-->
               <div class="form-group join-input">
                 <label class=" control-label" for="memberId">아이디 : </label>
-                <input th:field="*{memberId}" type="text" class="form-control" placeholder="5~20글자(영문 대소문자 또는 숫자)" required>
+                <input th:field="*{memberId}" type="text" class="form-control" placeholder="5~20글자(영문 대소문자 또는 숫자)"
+                       minlength="5" maxlength="20" required>
                 <div><span id="idDouble" class="join-alarm">아이디가 중복입니다</span></div>
                 <div><span id="writeId" class="join-alarm">아이디를 입력해주세요</span></div>
+                <div><span id="rightId" class="join-alarm">아이디를 양식을 확인해주세요</span></div>
                 <div class="form-group">
                   <label class=" control-label" for="password">비밀번호 :</label>
-                  <input th:field="*{password}" type="password" class="form-control" placeholder="6~20글자 영문 대소문자+숫자" required>
+                  <input th:field="*{password}" type="password" class="form-control" placeholder="6~20글자 영문 대소문자+숫자"
+                         minlength="6" maxlength="20" required>
                   <div ><span id="pwdForm" class="join-alarm">비밀번호는 6자 이상, 영문 대소문자+숫자 포함이어야 합니다</span></div>
                 </div>
                 <label class=" control-label" for="passwordCheck">비밀번호 확인 :</label>
@@ -39,7 +42,8 @@
                 <input th:field="*{name}" type="text" class="form-control" placeholder=" " required>
                 <div class="form-group">
                   <label class=" control-label" for="nickname">닉네임 :</label>
-                  <input th:field="*{nickname}" type="text" class="form-control" placeholder="한글 2자 또는 영문 3자 이상" required>
+                  <input th:field="*{nickname}" type="text" class="form-control" placeholder="한글/영문/숫자 3자 이상"
+                         minlength="3" required>
                   <div ><span id="nickDouble" class="join-alarm">닉네임이 중복입니다</span></div>
                 </div>
                 <div class="form-group">
@@ -65,7 +69,7 @@
               <button id="nickCheckBtn" name="singlebutton" class="btn btn-default btn-join">중복 확인</button>
             </div>
             <div class="form-group join-div-btn">
-              <button id="codeSendBtn" name="singlebutton" class="btn btn-default btn-join">코드 전송</button>
+              <button id="emailSendBtn" name="singlebutton" class="btn btn-default btn-join">코드 전송</button>
             </div>
             <div class="form-group join-div-btn">
               <button id="codeCheckBtn" name="singlebutton" class="btn btn-default btn-join">코드 확인</button>
@@ -87,6 +91,92 @@
     </div>
   </div>
 </div>
+<script th:inline="javascript">
+
+  function checkMemberId(str){
+    let regUserId = /[ㄱ-ㅎ|ㅏ-ㅣ|가-힣]/;
+    let reg = /[`~!@#$%^&*()_|+\-=?;:'",.<>\{\}\[\]\\\/ ]/gim;
+    if(regUserId.test(str) || reg.test(str)) {
+      return false;
+    }else {
+      return true;
+    }
+  }
+
+  let idCheck = 0;
+  $( document ).ready( function() {
+    $('#passwordCheck').on("propertychange change keyup paste input", function (frm) {
+      $('#difPwd').css('display', 'block');
+      if(document.getElementById('password').value == document.getElementById('passwordCheck').value) {
+        $('#difPwd').css('display', 'none');
+        return false;
+      }
+    });
+
+    $('#memberId').on("propertychange change keyup paste input", function (frm) {
+      $('#writeId').css('display', 'none');
+      $('#rightId').css('display', 'none');
+      $('#idDouble').css('display', 'none');
+      idCheck = 0;
+    })
+
+    $('#idCheckBtn').click(function () {
+      let memberId = document.getElementById("memberId").value;
+      if (memberId == "" | memberId == " ") {
+        $('#writeId').css('display', 'block');
+        return false;
+      }
+      if (!checkMemberId(memberId)) {
+        $('#rightId').css('display', 'block');
+        return false;
+      }
+
+      $.ajax({
+        type: 'POST',
+        url: '/join/idCheck',
+        contentType: "application/json",
+        data: JSON.stringify({memberId:memberId}),
+        dataType: 'text',
+        success: function (result) {
+          if(result=="가입 가능") {
+            alert("중복이 아닙니다");
+            idCheck=1;
+          } else {
+            alert(result);
+            document.getElementById('memberId').focus();
+          }
+        },
+        error: function(result) {
+          alert("확인실패");
+        }});
+
+    })
+    $('#nickCheckBtn').click(function () {
+      let nickname = document.getElementById("nickname").value;
+      if (nickname == "" | nickname == " ") {
+        $('#nickDouble').css('display', 'block');
+      }
+    })
+    $('#emailSendBtn').click(function () {
+      let nickname = document.getElementById("nickname").value;
+      if (nickname == "" | nickname == " ") {
+        $('#nickDouble').css('display', 'block');
+      }
+    })
+    $('#codeCheckBtn').click(function () {
+      let nickname = document.getElementById("nickname").value;
+      if (nickname == "" | nickname == " ") {
+        $('#nickDouble').css('display', 'block');
+      }
+    })
+    $('#phoneCheckBtn').click(function () {
+      let nickname = document.getElementById("nickname").value;
+      if (nickname == "" | nickname == " ") {
+        $('#nickDouble').css('display', 'block');
+      }
+    })
+  })
+</script>
 </body>
 </th:block>
 </html>
