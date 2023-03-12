@@ -22,8 +22,8 @@ public class MemberJoinDto {
     private String code;
     private String phone;
     private String address;
-    private String autoRoadAddress;
-    private String zonecode;
+    private String extraAddress;
+    private String postcode;
     private String detail;
     private Name roleName;
     private Sns sns;
