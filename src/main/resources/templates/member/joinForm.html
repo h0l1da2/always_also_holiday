@@ -28,7 +28,7 @@
                        minlength="5" maxlength="20" required>
                 <div><span id="idDouble" class="join-alarm">아이디가 중복입니다</span></div>
                 <div><span id="writeId" class="join-alarm">아이디를 입력해주세요</span></div>
-                <div><span id="rightId" class="join-alarm">아이디를 양식을 확인해주세요</span></div>
+                <div><span id="wrongId" class="join-alarm">아이디를 양식을 확인해주세요</span></div>
                 <div class="form-group">
                   <label class=" control-label" for="password">비밀번호 :</label>
                   <input th:field="*{password}" type="password" class="form-control" placeholder="6~20글자 영문 대소문자+숫자"
@@ -45,12 +45,13 @@
                   <input th:field="*{nickname}" type="text" class="form-control" placeholder="한글/영문/숫자 3자 이상(특수문자 미포함)"
                          minlength="3" required>
                   <div ><span id="nickDouble" class="join-alarm">닉네임이 중복입니다</span></div>
-                  <div ><span id="rightNick" class="join-alarm">닉네임 양식을 확인해주세요</span></div>
+                  <div ><span id="wrongNick" class="join-alarm">닉네임 양식을 확인해주세요</span></div>
                 </div>
                 <div class="form-group">
                   <label class=" control-label" for="email">이메일 :</label>
                   <input th:field="*{email}" type="email" class="form-control" placeholder=" " required>
                   <div ><span id="codeSend" class="join-alarm">이메일로 코드를 발송했습니다</span></div>
+                  <div ><span id="wrongEmail" class="join-alarm">이메일을 제대로 입력해주세요</span></div>
                 </div>
                 <div class="form-group">
                   <label class=" control-label" for="code">코드 :</label>
@@ -60,6 +61,7 @@
                 <label class=" control-label" for="phone">휴대폰 :</label>
                 <input th:field="*{phone}" type="text" class="form-control" placeholder="예시) 01012341234" required>
                 <div ><span id="phoneDouble" class="join-alarm">번호가 중복입니다</span></div>
+                <div ><span id="wrongPhone" class="join-alarm">번호를 제대로 입력하세요</span></div>
               </div>
             </div>
 
@@ -94,6 +96,14 @@
 </div>
 <script th:inline="javascript">
 
+  function checkEmail(str){
+    let regEmail = /^([0-9a-zA-Z_\.-]+)@([0-9a-zA-Z_-]+)(\.[0-9a-zA-Z_-]+){1,2}$/;
+    if(!regEmail.test(str)) {
+      return false;
+    }else {
+      return true;
+    }
+  }
   function checkMemberId(str){
     let regMemberId = /[ㄱ-ㅎ|ㅏ-ㅣ|가-힣]/;
     let reg = /[`~!@#$%^&*()_|+\-=?;:'",.<>\{\}\[\]\\\/ ]/gim;
@@ -104,16 +114,27 @@
     }
   }
   function checkNickname(str){
+    let regNickname = /[ㄱ-ㅎ|ㅏ-ㅣ]/;
     let reg = /[`~!@#$%^&*()_|+\-=?;:'",.<>\{\}\[\]\\\/ ]/gim;
-    if(reg.test(str)) {
+    if(reg.test(str) | regNickname.test(str)) {
       return false;
     }else {
       return true;
+    }
+  }  function checkPhone(str){
+    let reg = /^(01[016789]{1})-?[0-9]{3,4}-?[0-9]{4}$/;
+    if(reg.test(str)) {
+      return true;
+    }else {
+      return false;
     }
   }
 
   let idCheck = 0;
   let nicknameCheck = 0;
+  let emailCheck = 0;
+  let codeCheck = 0;
+  let phoneCheck = 0;
 
   $( document ).ready( function() {
 
@@ -134,14 +155,23 @@
 
     $('#memberId').on("propertychange change keyup paste input", function (frm) {
       $('#writeId').css('display', 'none');
-      $('#rightId').css('display', 'none');
+      $('#wrongId').css('display', 'none');
       $('#idDouble').css('display', 'none');
       idCheck = 0;
     })
     $('#nickname').on("propertychange change keyup paste input", function (frm) {
       $('#nickDouble').css('display', 'none');
-      $('#rightNick').css('display', 'none');
+      $('#wrongNick').css('display', 'none');
       nicknameCheck = 0;
+    })
+    $('#email').on("propertychange change keyup paste input", function (frm) {
+      $('#wrongEmail').css('display', 'none');
+      emailCheck = 0;
+      codeCheck = 0;
+    })
+    $('#phone').on("propertychange change keyup paste input", function (frm) {
+      $('#wrongPhone').css('display', 'none');
+      phoneCheck = 0;
     })
 
     $('#idCheckBtn').click(function () {
@@ -151,7 +181,7 @@
         return false;
       }
       if (!checkMemberId(memberId)) {
-        $('#rightId').css('display', 'block');
+        $('#wrongId').css('display', 'block');
         return false;
       }
 
@@ -178,7 +208,7 @@
     $('#nickCheckBtn').click(function () {
       let nickname = document.getElementById("nickname").value;
       if (nickname == "" | nickname == " " | !checkNickname(nickname)) {
-        $('#rightNick').css('display', 'block');
+        $('#wrongNick').css('display', 'block');
         return false;
       }
 
@@ -192,6 +222,7 @@
           if(result=="가입 가능") {
             alert("중복이 아닙니다");
             nicknameCheck=1;
+            $('#wrongNick').css('display', 'none');
           } else {
             alert(result);
             document.getElementById('nickname').focus();
@@ -202,22 +233,77 @@
         }});
     })
     $('#emailSendBtn').click(function () {
-      let nickname = document.getElementById("nickname").value;
-      if (nickname == "" | nickname == " ") {
-        $('#nickDouble').css('display', 'block');
+      let email = document.getElementById("email").value;
+      if (!checkEmail(email)) {
+        $('#wrongEmail').css('display', 'block');
+        return false;
       }
+      $.ajax({
+        type: 'POST',
+        url: '/join/emailSend',
+        contentType: "application/json",
+        data: JSON.stringify({email:email}),
+        dataType: 'text',
+        success: function (result) {
+          if(result=="확인 불가") {
+            alert(result);
+            document.getElementById('email').focus();
+          } else {
+            emailCheck = 1;
+            document.getElementById('code').focus();
+            $('#codeSend').css('display', 'block');
+      }
+        },
+        error: function(result) {
+          alert("확인실패");
+        }});
     })
     $('#codeCheckBtn').click(function () {
-      let nickname = document.getElementById("nickname").value;
-      if (nickname == "" | nickname == " ") {
-        $('#nickDouble').css('display', 'block');
-      }
+      let code = document.getElementById("code").value;
+      $.ajax({
+        type: 'POST',
+        url: '/join/codeCheck',
+        contentType: "application/json",
+        data: JSON.stringify({code:code}),
+        dataType: 'text',
+        success: function (result) {
+          if(result=="코드 일치") {
+            $('#codeSend').css('display', 'none');
+            $('#difCode').css('display', 'none');
+            alert(result);
+            codeCheck = 1;
+          } else {
+            $('#difCode').css('display', 'block');
+          }
+        },
+        error: function(result) {
+          alert("확인실패");
+        }});
     })
     $('#phoneCheckBtn').click(function () {
-      let nickname = document.getElementById("nickname").value;
-      if (nickname == "" | nickname == " ") {
-        $('#nickDouble').css('display', 'block');
+      let phone = document.getElementById("phone").value;
+      if (!checkPhone(phone)) {
+        $('#wrongPhone').css('display', 'block');
+        return false;
       }
+      $.ajax({
+        type: 'POST',
+        url: '/join/phoneCheck',
+        contentType: "application/json",
+        data: JSON.stringify({phone:phone}),
+        dataType: 'text',
+        success: function (result) {
+          if(result=="가입 가능") {
+            alert("중복이 아닙니다");
+            phoneCheck=1;
+          } else {
+            alert(result);
+            document.getElementById('phone').focus();
+          }
+        },
+        error: function(result) {
+          alert("확인실패");
+        }});
     })
   })
 </script>
