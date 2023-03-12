@@ -30,11 +30,16 @@ public class Member {
     @JoinColumn(name = "role_id")
     private Role role;
     private Date removeDate;
-    private Long stopAdmin;
     private Date stopDate;
+    private Date lastLogin;
+    private Date joinDate;
     private String whyStop;
     @Enumerated(EnumType.STRING)
     private Sns sns;
+
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "stop_admin")
+    private Admin admin;
 
     protected Member() {}
 
@@ -48,5 +53,7 @@ public class Member {
         this.address = address;
         this.role = role;
         this.sns = memberJoinDto.getSns();
+        this.lastLogin = new Date();
+        this.joinDate = new Date();
     }
 }
