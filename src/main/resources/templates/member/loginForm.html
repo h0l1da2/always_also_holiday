@@ -16,40 +16,44 @@
   <div class="container">
     <div class="row login-center" >
       <div class="table-center"><h1 class="login-title">로그인</h1></div>
-      <form class="login-form">
+      <form th:object="${loginForm}" class="login-form">
         <!-- Textarea -->
         <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
           <!-- Text input-->
           <div class="form-group">
-            <label class=" control-label" for="name">아이디 :</label>
-            <input id="name" name="name" type="text" class="form-control login-input" placeholder=" " required>
+            <label class=" control-label" for="memberId">아이디 :</label>
+            <input th:field="*{memberId}" type="text" class="form-control login-input" placeholder=" " required>
           </div>
         </div>
         <div class="market-div">
           <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
             <!-- Text input-->
             <div class="form-group">
-              <label class=" control-label" for="name">비밀번호 :</label>
-              <input id="name" name="name" type="text" class="form-control login-input" placeholder=" " required>
+              <label class=" control-label" for="password">비밀번호 :</label>
+              <input th:field="*{password}" type="password" class="form-control login-input" placeholder=" " required>
             </div>
             <!-- Button -->
             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
               <div class="form-group">
-                <button id="singlebutton" name="singlebutton" class="btn btn-default btn-login">로그인</button>
+                <button type="submit" id="loginBtn" name="singlebutton" class="btn btn-default btn-login">로그인</button>
               </div>
             </div>
-
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+              <div class="form-group">
+                <button id="signBtn" onclick="location.href='/joinForm'" name="singlebutton" class="btn btn-default btn-login btn-login-join">회원가입</button>
+              </div>
+            </div>
           </div>
       </form>
     </div>
   </div>
   <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-    <label class=" control-label sns-label" for="name">- SNS -</label>
+    <label class=" control-label sns-label" for="sns">- SNS -</label>
   </div>
   <div class="sns-div">
-    <div class="sns-logo"> <a href="index.html"><img th:src="@{/static/images/twitter.png}" alt=""></a> </div>
-    <div class="sns-logo"> <a href="index.html"><img th:src="@{/static/images/facebook.png}" alt=""></a> </div>
-    <div class="sns-logo"> <a href="index.html"><img th:src="@{/static/images/google.png}" alt=""></a> </div>
+    <div class="sns-logo"> <a href="index.html"><img th:src="@{/static/images/twitter.png}" alt="kakao"></a> </div>
+    <div class="sns-logo"> <a href="index.html"><img th:src="@{/static/images/facebook.png}" alt="facebook"></a> </div>
+    <div class="sns-logo"> <a href="index.html"><img th:src="@{/static/images/google.png}" alt="google"></a> </div>
   </div>
 </div>
 </div>

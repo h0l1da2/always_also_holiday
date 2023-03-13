@@ -51,10 +51,6 @@ public class ViewTestController {
     public String fanMeetList() {
         return "fanmeet/meetList";
     }
-    @GetMapping("/loginForm")
-    public String loginForm() {
-        return "member/loginForm";
-    }
     @GetMapping("/info")
     public String memberInfo() {
         return "member/info/infoMain";
