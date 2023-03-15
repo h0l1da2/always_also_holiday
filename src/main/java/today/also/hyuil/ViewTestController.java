@@ -35,33 +35,21 @@ public class ViewTestController {
     public String music() {
         return "hyuil/music";
     }
-    @GetMapping("/fanBoard/list")
-    public String boardList() {
-        return "fanletter/boardList";
-    }
-    @GetMapping("/fanMeet")
-    public String fanMeet() {
-        return "fanmeet/fanMeetMain";
-    }
-    @GetMapping("/fanBoard/write")
-    public String boardWrite() {
-        return "fanletter/writePage";
-    }
-    @GetMapping("/fanBoard/page")
-    public String viewPage() {
-        return "fanletter/viewPage";
-    }
-    @GetMapping("/market/write")
-    public String marketWrite() {
-        return "market/write";
-    }
+//    @GetMapping("/fanMeet")
+//    public String fanMeet() {
+//        return "fanmeet/fanMeetMain";
+//    }
+//    @GetMapping("/fanBoard/page")
+//    public String viewPage() {
+//        return "fanletter/viewPage";
+//    }
+//    @GetMapping("/market/write")
+//    public String marketWrite() {
+//        return "market/write";
+//    }
     @GetMapping("/fanMeet/list")
     public String fanMeetList() {
         return "fanmeet/meetList";
-    }
-    @GetMapping("/loginForm")
-    public String loginForm() {
-        return "member/loginForm";
     }
     @GetMapping("/info")
     public String memberInfo() {
