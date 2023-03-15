@@ -1,6 +1,7 @@
 package today.also.hyuil.config.security.jwt;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
@@ -8,6 +9,8 @@ import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
+import today.also.hyuil.domain.security.Token;
+import today.also.hyuil.repository.security.JwtTokenRepository;
 
 import java.security.Key;
 import java.util.Date;
@@ -18,21 +21,30 @@ public class JwtTokenProvider {
 
     @Value("${token.valid.time}")
     private int tokenValidTime;
-    private final String accessToken = "access_token";
-    private final String refreshToken = "refresh_token";
-    private final Key key;
+    @Value("${token.access}")
 
-    public JwtTokenProvider(@Value("${token.secret.key}") String secretKey) {
+    private String accessToken;
+    @Value("${token.refresh}")
+
+    private String refreshToken;
+    private final Key key;
+    private final JwtParser jwtParser;
+    private final JwtTokenRepository jwtTokenRepository;
+
+    public JwtTokenProvider(@Value("${token.secret.key}") String secretKey, JwtParser jwtParser, JwtTokenRepository jwtTokenRepository) {
+        this.jwtParser = jwtParser;
+        this.jwtTokenRepository = jwtTokenRepository;
         // secretKey base64로 디코딩
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         // key 객체로 변환
         this.key = Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public String createToken(String memberId, String role) {
+    public String createAccessToken(String memberId, String role, Long refreshId) {
         Claims claims = getClaims(accessToken, tokenValidTime);
 
         claims.put("memberId", memberId);
+        claims.put("refreshId", refreshId);
         claims.put("role", role);
 
         return Jwts.builder()
@@ -51,6 +63,10 @@ public class JwtTokenProvider {
                 .compact();
     }
 
+    public Token saveRefreshInDB(Token refreshToken) {
+        return jwtTokenRepository.insertRefreshToken(refreshToken);
+    }
+
     private Claims getClaims(String tokenType,int tokenValidTime) {
         Date now = new Date();
 
@@ -61,6 +77,14 @@ public class JwtTokenProvider {
 
     }
 
+
+    public String reCreateJwtToken(String token, Long refreshId) {
+        Claims claims = jwtParser.parseClaimsJwt(token).getBody();
+
+        String memberId = claims.get("memberId", String.class);
+        String role = claims.get("role", String.class);
+        return createAccessToken(memberId, role, refreshId);
+    }
 
 }
 
