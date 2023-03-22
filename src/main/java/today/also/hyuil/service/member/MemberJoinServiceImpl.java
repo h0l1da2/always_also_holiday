@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import today.also.hyuil.domain.member.Member;
 import today.also.hyuil.repository.member.MemberRepository;
+import today.also.hyuil.service.member.inter.MemberJoinService;
 
 @Transactional
 @Service
@@ -35,10 +36,7 @@ public class MemberJoinServiceImpl implements MemberJoinService {
         return memberRepository.findByPhone(phone);
     }
 
-    @Override
-    public Member memberIdLogin(String memberId) {
-        return memberRepository.findByMemberIdRole(memberId);
-    }
+
 
 
 }

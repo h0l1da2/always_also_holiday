@@ -1,9 +1,6 @@
 package today.also.hyuil.config.security.jwt;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.JwtParser;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
@@ -32,11 +29,9 @@ public class JwtTokenProvider {
 
     private String refreshToken;
     private final Key key;
-    private final JwtParser jwtParser;
     private final JwtTokenRepository jwtTokenRepository;
 
-    public JwtTokenProvider(@Value("${token.secret.key}") String secretKey, JwtParser jwtParser, JwtTokenRepository jwtTokenRepository) {
-        this.jwtParser = jwtParser;
+    public JwtTokenProvider(@Value("${token.secret.key}") String secretKey, JwtTokenRepository jwtTokenRepository) {
         this.jwtTokenRepository = jwtTokenRepository;
         // secretKey base64로 디코딩
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
@@ -82,7 +77,13 @@ public class JwtTokenProvider {
 
 
     public String reCreateJwtToken(String token) {
-        Claims claims = jwtParser.parseClaimsJwt(token).getBody();
+        Jwt<Header, Claims> headerClaimsJwt =
+                Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJwt(token);
+
+        Claims claims = headerClaimsJwt.getBody();
 
         String memberId = claims.get("memberId", String.class);
         String role = claims.get("role", String.class);
@@ -99,5 +100,12 @@ public class JwtTokenProvider {
         return authorities;
     }
 
+    public Token duplicationTokenDB(String memberId) {
+        return jwtTokenRepository.findByMemberId(memberId);
+    }
+
+    public Token setNewToken(Token token) {
+        return jwtTokenRepository.updateNewToken(token);
+    }
 }
 

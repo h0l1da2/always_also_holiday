@@ -4,19 +4,19 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import today.also.hyuil.domain.member.Member;
-import today.also.hyuil.service.member.MemberJoinService;
+import today.also.hyuil.repository.member.MemberRepository;
 
 public class CustomUserDetailsService implements UserDetailsService {
 
-    private final MemberJoinService memberJoinService;
+    private final MemberRepository memberRepository;
 
-    public CustomUserDetailsService(MemberJoinService memberJoinService) {
-        this.memberJoinService = memberJoinService;
+    public CustomUserDetailsService(MemberRepository memberRepository) {
+        this.memberRepository = memberRepository;
     }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Member member = memberJoinService.memberIdLogin(username);
+        Member member = memberRepository.findByMemberIdRole(username);
 
         if (member == null) {
             throw new UsernameNotFoundException("아이디가 없음");

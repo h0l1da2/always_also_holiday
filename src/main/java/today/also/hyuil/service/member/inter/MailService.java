@@ -1,4 +1,4 @@
-package today.also.hyuil.service.member;
+package today.also.hyuil.service.member.inter;
 
 import javax.mail.internet.MimeMessage;
 

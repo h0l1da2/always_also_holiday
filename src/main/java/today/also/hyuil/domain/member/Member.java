@@ -1,6 +1,7 @@
 package today.also.hyuil.domain.member;
 
 import lombok.Getter;
+import today.also.hyuil.domain.dto.member.LoginDto;
 import today.also.hyuil.domain.dto.member.MemberJoinDto;
 
 import javax.persistence.*;
@@ -57,5 +58,10 @@ public class Member {
         this.lastLogin = new Date();
         this.joinDate = new Date();
         this.pwdModifyDate = new Date();
+    }
+
+    public Member(LoginDto loginDto) {
+        this.memberId = loginDto.getMemberId();
+        this.password = loginDto.getPassword();
     }
 }

@@ -6,6 +6,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring5.SpringTemplateEngine;
+import today.also.hyuil.service.member.inter.MailService;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;

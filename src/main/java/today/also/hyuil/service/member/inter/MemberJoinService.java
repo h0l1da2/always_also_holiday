@@ -1,4 +1,4 @@
-package today.also.hyuil.service.member;
+package today.also.hyuil.service.member.inter;
 
 import today.also.hyuil.domain.member.Member;
 
@@ -7,5 +7,4 @@ public interface MemberJoinService {
     Member idDoubleCheck(String memberId);
     Member nicknameCheck(String nickname);
     Member phoneCheck(String phone);
-    Member memberIdLogin(String memberId);
 }
