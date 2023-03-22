@@ -8,11 +8,15 @@ import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 import today.also.hyuil.domain.security.Token;
 import today.also.hyuil.repository.security.JwtTokenRepository;
 
 import java.security.Key;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 
 @Component
@@ -40,11 +44,10 @@ public class JwtTokenProvider {
         this.key = Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public String createAccessToken(String memberId, String role, Long refreshId) {
+    public String createAccessToken(String memberId, Collection<? extends GrantedAuthority> role) {
         Claims claims = getClaims(accessToken, tokenValidTime);
 
         claims.put("memberId", memberId);
-        claims.put("refreshId", refreshId);
         claims.put("role", role);
 
         return Jwts.builder()
@@ -78,12 +81,22 @@ public class JwtTokenProvider {
     }
 
 
-    public String reCreateJwtToken(String token, Long refreshId) {
+    public String reCreateJwtToken(String token) {
         Claims claims = jwtParser.parseClaimsJwt(token).getBody();
 
         String memberId = claims.get("memberId", String.class);
         String role = claims.get("role", String.class);
-        return createAccessToken(memberId, role, refreshId);
+
+        return createAccessToken(memberId, getAuthorities(role));
+    }
+
+    private Collection<GrantedAuthority> getAuthorities(String role) {
+        Collection<GrantedAuthority> authorities = new ArrayList<>();
+        authorities.add(
+                new SimpleGrantedAuthority(
+                        String.valueOf(role)
+                ));
+        return authorities;
     }
 
 }
