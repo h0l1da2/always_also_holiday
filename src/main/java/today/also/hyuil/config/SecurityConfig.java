@@ -8,16 +8,16 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import today.also.hyuil.config.security.CustomUserDetailsService;
-import today.also.hyuil.service.member.MemberJoinService;
+import today.also.hyuil.repository.member.MemberRepository;
 
 @EnableWebSecurity
 @Configuration
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-    private final MemberJoinService memberJoinService;
+    private final MemberRepository memberRepository;
 
-    public SecurityConfig(MemberJoinService memberJoinService) {
-        this.memberJoinService = memberJoinService;
+    public SecurityConfig(MemberRepository memberRepository) {
+        this.memberRepository = memberRepository;
     }
 
     @Override
@@ -38,10 +38,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Bean
     public UserDetailsService userDetailsService() {
-        return new CustomUserDetailsService(memberJoinService);
+        return new CustomUserDetailsService(memberRepository);
     }
     @Bean
     public BCryptPasswordEncoder bCryptPasswordEncoder() {
         return new BCryptPasswordEncoder();
     }
+
 }

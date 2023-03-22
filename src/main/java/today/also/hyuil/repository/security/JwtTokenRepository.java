@@ -35,11 +35,12 @@ public class JwtTokenRepository {
         return token.orElse(null);
     }
 
-    public void updateToken(String memberId, String newToken) {
-        query.update(token1)
-                .set(token1.token, newToken)
-                .where(token1.memberId.eq(memberId))
-                .execute();
+    public Token updateNewToken(Token token) {
+        Token original = em.find(Token.class, token.getId());
+        original.changeToken(token);
+        em.close();
+
+        return original;
     }
 
 

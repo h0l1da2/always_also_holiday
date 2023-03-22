@@ -1,26 +1,26 @@
 package today.also.hyuil.controller.member;
 
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
-import today.also.hyuil.config.security.CustomUserDetailsService;
+import org.springframework.web.bind.annotation.ResponseBody;
 import today.also.hyuil.domain.dto.member.LoginDto;
+import today.also.hyuil.domain.member.Member;
+import today.also.hyuil.service.member.inter.MemberLoginService;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.Map;
 
 @Controller
 public class MemberLoginController {
 
-    private final CustomUserDetailsService userDetailsService;
-    private final BCryptPasswordEncoder passwordEncoder;
+    private final MemberLoginService memberLoginService;
 
-    public MemberLoginController(CustomUserDetailsService userDetailsService, BCryptPasswordEncoder passwordEncoder) {
-        this.userDetailsService = userDetailsService;
-        this.passwordEncoder = passwordEncoder;
+    public MemberLoginController(MemberLoginService memberLoginService) {
+        this.memberLoginService = memberLoginService;
     }
 
     @GetMapping("/loginForm")
@@ -29,19 +29,28 @@ public class MemberLoginController {
         return "member/loginForm";
     }
 
-    @PostMapping
-    public String login(@ModelAttribute LoginDto loginDto, HttpServletRequest request) {
+    @ResponseBody
+    @PostMapping("/login")
+    public String login(@ModelAttribute LoginDto loginDto, HttpServletRequest request, HttpServletResponse response, Model model) {
+        Member member = new Member(loginDto);
+        boolean idPwdValid = memberLoginService.idPwdValid(member);
 
-        UserDetails userDetails = userDetailsService.loadUserByUsername(loginDto.getMemberId());
-
-        boolean matches = passwordEncoder.matches(
-                loginDto.getPassword(), userDetails.getPassword());
-
-        if (!matches) {
+        // idPwd 틀리면 오류폼
+        if (!idPwdValid) {
             return "redirect:/loginForm";
         }
 
+        Map<String, String> tokens = memberLoginService.getTokens(member);
+        String refreshToken = tokens.get("refreshToken");
+        String accessToken = tokens.get("accessToken");
 
+        // 각 토큰 저장
+        memberLoginService.saveRefreshToken(member.getMemberId(), refreshToken);
+        response.setHeader("Authorization", accessToken);
+
+        /**
+         * 자동로그인기능 쿠키생성(나중에)
+         */
 
         if (request.getRequestURI() != null) {
             return "redirect:/"+request.getRequestURI();

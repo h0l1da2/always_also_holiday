@@ -10,8 +10,8 @@ import today.also.hyuil.domain.member.Address;
 import today.also.hyuil.domain.member.Member;
 import today.also.hyuil.domain.member.Name;
 import today.also.hyuil.domain.member.Role;
-import today.also.hyuil.service.member.MailService;
-import today.also.hyuil.service.member.MemberJoinService;
+import today.also.hyuil.service.member.inter.MailService;
+import today.also.hyuil.service.member.inter.MemberJoinService;
 
 @Controller
 @RequestMapping("/join")

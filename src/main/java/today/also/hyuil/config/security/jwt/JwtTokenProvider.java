@@ -1,18 +1,19 @@
 package today.also.hyuil.config.security.jwt;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.JwtParser;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 import today.also.hyuil.domain.security.Token;
 import today.also.hyuil.repository.security.JwtTokenRepository;
 
 import java.security.Key;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 
 @Component
@@ -28,11 +29,9 @@ public class JwtTokenProvider {
 
     private String refreshToken;
     private final Key key;
-    private final JwtParser jwtParser;
     private final JwtTokenRepository jwtTokenRepository;
 
-    public JwtTokenProvider(@Value("${token.secret.key}") String secretKey, JwtParser jwtParser, JwtTokenRepository jwtTokenRepository) {
-        this.jwtParser = jwtParser;
+    public JwtTokenProvider(@Value("${token.secret.key}") String secretKey, JwtTokenRepository jwtTokenRepository) {
         this.jwtTokenRepository = jwtTokenRepository;
         // secretKey base64로 디코딩
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
@@ -40,11 +39,10 @@ public class JwtTokenProvider {
         this.key = Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public String createAccessToken(String memberId, String role, Long refreshId) {
+    public String createAccessToken(String memberId, Collection<? extends GrantedAuthority> role) {
         Claims claims = getClaims(accessToken, tokenValidTime);
 
         claims.put("memberId", memberId);
-        claims.put("refreshId", refreshId);
         claims.put("role", role);
 
         return Jwts.builder()
@@ -78,13 +76,36 @@ public class JwtTokenProvider {
     }
 
 
-    public String reCreateJwtToken(String token, Long refreshId) {
-        Claims claims = jwtParser.parseClaimsJwt(token).getBody();
+    public String reCreateJwtToken(String token) {
+        Jwt<Header, Claims> headerClaimsJwt =
+                Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJwt(token);
+
+        Claims claims = headerClaimsJwt.getBody();
 
         String memberId = claims.get("memberId", String.class);
         String role = claims.get("role", String.class);
-        return createAccessToken(memberId, role, refreshId);
+
+        return createAccessToken(memberId, getAuthorities(role));
     }
 
+    private Collection<GrantedAuthority> getAuthorities(String role) {
+        Collection<GrantedAuthority> authorities = new ArrayList<>();
+        authorities.add(
+                new SimpleGrantedAuthority(
+                        String.valueOf(role)
+                ));
+        return authorities;
+    }
+
+    public Token duplicationTokenDB(String memberId) {
+        return jwtTokenRepository.findByMemberId(memberId);
+    }
+
+    public Token setNewToken(Token token) {
+        return jwtTokenRepository.updateNewToken(token);
+    }
 }
 
