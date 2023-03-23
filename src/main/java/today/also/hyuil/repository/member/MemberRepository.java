@@ -67,7 +67,9 @@ public class MemberRepository {
                 .stream().findFirst();
 
         Member member = findMember.orElse(null);
-        member.getRole();
+        if (member != null) {
+            member.getRole();
+        }
         return member;
     }
 }

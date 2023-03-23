@@ -16,6 +16,8 @@
   <div class="container">
     <div class="row login-center" >
       <div class="table-center"><h1 class="login-title">로그인</h1></div>
+      <div class="table-center loginError" th:if="${error != null}">
+        <span id="loginError" class="join-alarm blankInput" th:text="${error}"></span></div>
       <form th:object="${loginForm}" class="login-form">
         <!-- Textarea -->
         <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
@@ -23,6 +25,7 @@
           <div class="form-group">
             <label class=" control-label" for="memberId">아이디 :</label>
             <input th:field="*{memberId}" type="text" class="form-control login-input" placeholder=" " required>
+            <div class="table-center noValid"><span id="idCheck" class="join-alarm blankInput">아이디를 제대로 입력해주세요</span></div>
           </div>
         </div>
         <div class="market-div">
@@ -31,11 +34,12 @@
             <div class="form-group">
               <label class=" control-label" for="password">비밀번호 :</label>
               <input th:field="*{password}" type="password" class="form-control login-input" placeholder=" " required>
+              <div class="table-center noValid"><span id="pwdCheck" class="join-alarm blankInput">패스워드를 제대로 입력해주세요</span></div>
             </div>
             <!-- Button -->
             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
               <div class="form-group">
-                <button type="submit" id="loginBtn" name="singlebutton" class="btn btn-default btn-login">로그인</button>
+                <button type="button" id="loginBtn" name="singlebutton" class="btn btn-default btn-login">로그인</button>
               </div>
             </div>
             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
@@ -44,9 +48,11 @@
               </div>
             </div>
           </div>
+        </div>
       </form>
     </div>
   </div>
+
   <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
     <label class=" control-label sns-label" for="sns">- SNS -</label>
   </div>
@@ -57,6 +63,60 @@
   </div>
 </div>
 </div>
+<script th:inline="javascript">
+
+  $( document ).ready( function() {
+
+    let urlParams = new URLSearchParams(window.location.search);
+    let redirectUrl = urlParams.get("redirectUrl");
+
+    $('#loginBtn').click(function () {
+
+      $('#idCheck').css('display', 'none');
+      $('#pwdCheck').css('display', 'none');
+      $('#loginError').css('display', 'none');
+
+      let memberId = document.getElementById('memberId').value;
+      let password = document.getElementById('password').value;
+
+      if (memberId == '' | memberId == ' ') {
+        $('#idCheck').css('display', 'block');
+        return false;
+      }
+      if (password == '' | password == ' ') {
+        $('#pwdCheck').css('display', 'block');
+        return false;
+      }
+
+      $.ajax({
+        type: 'POST',
+        url: '/login',
+        contentType: 'application/json',
+        data: JSON.stringify({memberId:memberId, password:password}),
+        dataType: 'json',
+        success: function(result) {
+          if (result.error) {
+            window.location.href='/loginForm?error='+result.error;
+          } else {
+
+            localStorage.setItem('jwt', result.JWT);
+            if (redirectUrl) {
+              window.location.href = redirectUrl;
+            } else {
+              window.location.href = "/";
+            }
+
+          }
+        },
+        error: function(error) {
+          console.error(error);
+        }
+      });
+
+    })
+  })
+
+</script>
 </body>
 </th:block>
 </html>
