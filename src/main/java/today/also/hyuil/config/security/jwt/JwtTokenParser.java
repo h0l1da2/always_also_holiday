@@ -16,9 +16,7 @@ import today.also.hyuil.repository.security.JwtTokenRepository;
 import javax.servlet.http.HttpServletRequest;
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
+import java.util.*;
 
 @Component
 public class JwtTokenParser {
@@ -54,10 +52,17 @@ public class JwtTokenParser {
 
     public Collection<GrantedAuthority> getAuthorities(String accessToken) {
         Claims claims = getClaims(accessToken);
+        String role = getRoleToString(claims);
+
         Collection<GrantedAuthority> authorities = new ArrayList<>();
-        authorities.add(new SimpleGrantedAuthority(String.valueOf(claims.get("role"))));
+        authorities.add(new SimpleGrantedAuthority(role));
 
         return authorities;
+    }
+
+    private String getRoleToString(Claims claims) {
+        List<Map<String, String>> roles = (List<Map<String, String>>) claims.get("role");
+        return roles.get(0).get("authority");
     }
 
     public Claims getClaims(String token) {
@@ -80,7 +85,9 @@ public class JwtTokenParser {
 
     public String getTokenUrl(HttpServletRequest request) {
         String token = request.getParameter("token");
+        System.out.println("token1 = " + token);
         if (StringUtils.hasText(token)) {
+            System.out.println("token2 = " + token);
             return token;
         }
         return null;

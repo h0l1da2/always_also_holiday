@@ -10,14 +10,13 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 import today.also.hyuil.domain.security.Token;
 import today.also.hyuil.repository.security.JwtTokenRepository;
 
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
+import java.util.*;
 
 @Component
 @PropertySource("classpath:application.yml")
@@ -64,7 +63,13 @@ public class JwtTokenProvider {
     }
 
     public Token saveRefreshInDB(Token refreshToken) {
-        return jwtTokenRepository.insertRefreshToken(refreshToken);
+        // 기존 토큰이 있으면 바꿔치기, 없으면 새로 insert
+        Token findToken = jwtTokenRepository.findByMemberId(refreshToken.getMemberId());
+        if (findToken == null) {
+            return jwtTokenRepository.insertRefreshToken(refreshToken);
+        }
+        findToken.changeToken(refreshToken);
+        return jwtTokenRepository.updateNewToken(findToken);
     }
 
     private Claims getNewClaims(String tokenType, int tokenValidTime) {
@@ -81,9 +86,16 @@ public class JwtTokenProvider {
         Claims claims = getOldClaims(token);
 
         String memberId = claims.get("memberId", String.class);
-        String role = String.valueOf(claims.get("role"));
+        String role = getRoleToString(claims);
+        if (StringUtils.hasText(role)) {
+            return createAccessToken(memberId, getAuthorities(role));
+        }
+        return null;
+    }
 
-        return createAccessToken(memberId, getAuthorities(role));
+    private String getRoleToString(Claims claims) {
+        List<Map<String, String>> roles = (List<Map<String, String>>) claims.get("role");
+        return roles.get(0).get("authority");
     }
 
     public Claims getOldClaims(String token) {
@@ -91,15 +103,9 @@ public class JwtTokenProvider {
         return claims;
     }
 
-
-
-
     private Collection<GrantedAuthority> getAuthorities(String role) {
         Collection<GrantedAuthority> authorities = new ArrayList<>();
-        authorities.add(
-                new SimpleGrantedAuthority(
-                        String.valueOf(role)
-                ));
+        authorities.add(new SimpleGrantedAuthority(role));
         return authorities;
     }
 
