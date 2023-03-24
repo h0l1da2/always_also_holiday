@@ -1,58 +1,87 @@
 package today.also.hyuil.config.security.jwt;
 
-import io.jsonwebtoken.Claims;
-import org.springframework.http.HttpHeaders;
-import org.springframework.util.StringUtils;
+import io.jsonwebtoken.JwtException;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.filter.OncePerRequestFilter;
 import today.also.hyuil.domain.security.Token;
-import today.also.hyuil.repository.security.JwtTokenRepository;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Collection;
 
 public class JwtFilter extends OncePerRequestFilter {
 
     private final JwtTokenParser jwtTokenParser;
     private final JwtTokenProvider jwtTokenProvider;
-    private final JwtTokenRepository jwtTokenRepository;
-    private static final String BEARER = "Bearer_";
+    private final UserDetailsService userDetailsService;
+    private static final String BEARER = "Bearer ";
 
-    public JwtFilter(JwtTokenParser jwtTokenParser, JwtTokenProvider jwtTokenProvider, JwtTokenRepository jwtTokenRepository) {
+    public JwtFilter(JwtTokenParser jwtTokenParser, JwtTokenProvider jwtTokenProvider, UserDetailsService userDetailsService) {
         this.jwtTokenParser = jwtTokenParser;
         this.jwtTokenProvider = jwtTokenProvider;
-        this.jwtTokenRepository = jwtTokenRepository;
+        this.userDetailsService = userDetailsService;
     }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        String token = resolveToken(request);
+        String token = jwtTokenParser.resolveToken(request);
 
-        if (token != null) {
-            token.substring(BEARER.length());
-            boolean tokenValid = jwtTokenParser.validToken(token, false);
+        System.out.println("엥?");
 
-            if (!tokenValid) {
-                Token refreshToken = jwtTokenParser.getRefreshToken(token);
-                boolean refreshValid = jwtTokenParser.validToken(refreshToken.getToken(), true);
-                if (refreshValid) {
-                    Claims claims = jwtTokenParser.getClaims(token);
-                    String refresh = jwtTokenProvider.createRefreshToken();
-                    String memberId = claims.get("memberId", String.class);
-                }
+        if (token == null) {
+            System.out.println("토큰이 없어요");
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        token.substring(BEARER.length());
+        boolean tokenValid = jwtTokenParser.validToken(token, false);
+
+        if (!tokenValid) {
+            Token refreshToken = jwtTokenParser.getRefreshToken(token);
+            if (refreshToken == null) {
+                throw new NullPointerException("리프레쉬 토큰이 없음");
+            }
+            boolean refreshValid = jwtTokenParser.validToken(refreshToken.getToken(), true);
+            if (!refreshValid) {
+                System.out.println("리프레쉬 토큰 인증 실패");
+                filterChain.doFilter(request, response);
+                return;
             }
         }
+        // 토큰s 재발급 후, 저장~
+        String memberId = jwtTokenParser.tokenInMemberId(token);
+        String refreshT = jwtTokenProvider.createRefreshToken();
+        String accessT = jwtTokenProvider.reCreateJwtToken(token);
+
+        Token refreshToken = jwtTokenProvider.saveRefreshInDB(new Token(memberId, refreshT));
+
+        // 인증 완료!
+        Authentication authentication = extractAuthentication(memberId, accessT);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
         filterChain.doFilter(request, response);
     }
 
-    private String resolveToken(HttpServletRequest request) {
-        String bearerToken = request.getHeader(HttpHeaders.AUTHORIZATION);
-        if (StringUtils.hasText(bearerToken) && bearerToken.toLowerCase().startsWith(BEARER.toLowerCase())) {
-            return bearerToken.substring(BEARER.length()).trim();
-        }
+    // authentication 생성
+    private Authentication extractAuthentication(String memberId, String accessToken) {
+        try {
+            Collection<GrantedAuthority> authorities = jwtTokenParser.getAuthorities(accessToken);
+            UserDetails userDetails = userDetailsService.loadUserByUsername(memberId);
 
-        return null;
+            return new UsernamePasswordAuthenticationToken(userDetails, accessToken, authorities);
+        } catch (JwtException | IllegalArgumentException | NullPointerException exception) {
+            throw new BadCredentialsException(exception.getMessage());
+        }
     }
+
 }
