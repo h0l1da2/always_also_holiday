@@ -14,6 +14,7 @@ import today.also.hyuil.domain.security.Token;
 import today.also.hyuil.repository.security.JwtTokenRepository;
 
 import javax.servlet.http.HttpServletRequest;
+import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -29,7 +30,7 @@ public class JwtTokenParser {
 
     public JwtTokenParser(@Value("${token.secret.key}") String secretKey, JwtTokenRepository jwtTokenRepository) {
         this.jwtTokenRepository = jwtTokenRepository;
-        Key key = Keys.hmacShaKeyFor(secretKey.getBytes());
+        Key key = Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
         this.jwtParser = Jwts.parserBuilder().setSigningKey(key).build();
     }
 
@@ -54,13 +55,13 @@ public class JwtTokenParser {
     public Collection<GrantedAuthority> getAuthorities(String accessToken) {
         Claims claims = getClaims(accessToken);
         Collection<GrantedAuthority> authorities = new ArrayList<>();
-        authorities.add(new SimpleGrantedAuthority(claims.get("role").toString()));
+        authorities.add(new SimpleGrantedAuthority(String.valueOf(claims.get("role"))));
 
         return authorities;
     }
 
     public Claims getClaims(String token) {
-        Claims claims = jwtParser.parseClaimsJwt(token).getBody();
+        Claims claims = jwtParser.parseClaimsJws(token).getBody();
         return claims;
     }
 
@@ -69,12 +70,20 @@ public class JwtTokenParser {
         return String.valueOf(claims.get("memberId"));
     }
 
-    public String resolveToken(HttpServletRequest request) {
+    public String getTokenHeader(HttpServletRequest request) {
         String bearerToken = request.getHeader(HttpHeaders.AUTHORIZATION);
         if (StringUtils.hasText(bearerToken) && bearerToken.toLowerCase().startsWith(BEARER.toLowerCase())) {
             return bearerToken.substring(BEARER.length()).trim();
         }
-
         return null;
     }
+
+    public String getTokenUrl(HttpServletRequest request) {
+        String token = request.getParameter("token");
+        if (StringUtils.hasText(token)) {
+            return token;
+        }
+        return null;
+    }
+
 }

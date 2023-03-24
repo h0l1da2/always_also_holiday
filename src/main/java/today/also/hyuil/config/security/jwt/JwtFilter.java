@@ -33,17 +33,19 @@ public class JwtFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        String token = jwtTokenParser.resolveToken(request);
-
-        System.out.println("엥?");
-
+        String token = jwtTokenParser.getTokenHeader(request);
         if (token == null) {
-            System.out.println("토큰이 없어요");
-            filterChain.doFilter(request, response);
-            return;
+            String tokenUrl = jwtTokenParser.getTokenUrl(request);
+            if (tokenUrl == null) {
+                System.out.println("토큰이 없어요");
+                filterChain.doFilter(request, response);
+                return;
+            }
+            // url 파라미터에 토큰이 있을 경우
+            token = tokenUrl;
+            System.out.println("token = " + token);
         }
 
-        token.substring(BEARER.length());
         boolean tokenValid = jwtTokenParser.validToken(token, false);
 
         if (!tokenValid) {
