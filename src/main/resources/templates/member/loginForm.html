@@ -96,7 +96,11 @@
         dataType: 'json',
         success: function(result) {
           if (result.error) {
-            window.location.href='/loginForm?error='+result.error;
+            if(redirectUrl) {
+              window.location.href='/loginForm?error='+result.error+"&redirectUrl="+redirectUrl;
+            } else {
+              window.location.href='/loginForm?error='+result.error;
+            }
           } else {
 
             localStorage.setItem('jwt', result.JWT);
