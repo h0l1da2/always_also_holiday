@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
-<th:block th:fragment="headerFragment(param1)">
+<th:block th:fragment="headerFragment(memberId)">
   <div class="header">
     <div class="container">
       <div class="row">
         <div class="col-lg-3 col-md-3 col-sm-4 col-xs-12">
-          <div class="logo"> <a th:href="@{/}"><img th:src="@{/static/images/logo.png}" alt=""></a> </div>
+          <div class="logo"><a th:href="@{/}"><img th:src="@{/static/images/logo.png}" alt=""></a> </div>
         </div>
         <div class="col-lg-9 col-md-9 col-sm-12 col-xs-12">
           <div class="row">
@@ -14,7 +14,8 @@
             <div class="col-lg-4 col-md-4 col-sm-5 col-xs-6">
             </div>
             <div class="col-lg-4 col-md-4 col-sm-3 col-xs-12">
-              <div class="top-btn"> <a th:href="@{/loginForm}" class="btn btn-default menu-title">로그인</a> </div>
+              <div class="top-btn"><a th:href="@{/loginForm}" class="btn btn-default menu-title">로그인</a> </div>
+<!--              <div class="top-btn" th:if="${memberId != null}"><a th:href="@{/loginForm}" class="btn btn-default menu-title" th:text="${memberId}"></a> </div>-->
             </div>
           </div>
         </div>
