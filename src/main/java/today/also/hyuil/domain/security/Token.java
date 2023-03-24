@@ -44,4 +44,5 @@ public class Token {
         this.createDate = new Date();
         this.updateDate = new Date();
     }
+
 }

@@ -43,7 +43,6 @@ public class JwtFilter extends OncePerRequestFilter {
             }
             // url 파라미터에 토큰이 있을 경우
             token = tokenUrl;
-            System.out.println("token = " + token);
         }
 
         boolean tokenValid = jwtTokenParser.validToken(token, false);
@@ -65,12 +64,13 @@ public class JwtFilter extends OncePerRequestFilter {
         String refreshT = jwtTokenProvider.createRefreshToken();
         String accessT = jwtTokenProvider.reCreateJwtToken(token);
 
+        // 기존 리프레쉬 토큰이랑 바꿔치기 or 새로 insert
         Token refreshToken = jwtTokenProvider.saveRefreshInDB(new Token(memberId, refreshT));
 
         // 인증 완료!
         Authentication authentication = extractAuthentication(memberId, accessT);
         SecurityContextHolder.getContext().setAuthentication(authentication);
-
+        System.out.println("인증 완료!!");
         filterChain.doFilter(request, response);
     }
 
