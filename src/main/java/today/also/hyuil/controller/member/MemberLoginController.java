@@ -25,7 +25,6 @@ public class MemberLoginController {
     public String loginForm(@RequestParam(name = "error", required = false) String error, Model model) {
         model.addAttribute("loginForm", new LoginDto());
         if (error != null && error.equals("error")) {
-            System.out.println("error = " + error);
             model.addAttribute(error, "아이디 또는 비밀번호가 틀립니다");
         }
         return "member/loginForm";
@@ -37,6 +36,7 @@ public class MemberLoginController {
         Map map = new HashMap();
 
         if (loginDtoNullCheck(loginDto)) {
+            System.out.println("111");
             errorMapReturn(map);
         }
 
@@ -47,6 +47,7 @@ public class MemberLoginController {
 
             // idPwd 틀리면 오류폼
             if (!idPwdValid) {
+                System.out.println("222");
                 errorMapReturn(map);
             }
         } catch (UsernameNotFoundException e) {
@@ -61,13 +62,13 @@ public class MemberLoginController {
 
         // 각 토큰 저장
         memberLoginService.saveRefreshToken(member.getMemberId(), refreshToken);
-        response.setHeader("Authorization", "Bearer "+accessToken);
+        System.out.println("333");
 
         /**
          * 자동로그인기능 쿠키생성(나중에)
          */
         map.put("JWT", accessToken);
-        System.out.println("error : "+ map.get("error"));
+        System.out.println("444");
         return map;
     }
 

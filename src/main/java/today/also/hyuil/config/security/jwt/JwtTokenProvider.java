@@ -10,7 +10,6 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import today.also.hyuil.domain.security.Token;
 import today.also.hyuil.repository.security.JwtTokenRepository;
@@ -103,9 +102,6 @@ public class JwtTokenProvider {
         Claims claims = jwtParser.parseClaimsJws(token).getBody();
         return claims;
     }
-
-
-
 
     private Collection<GrantedAuthority> getAuthorities(String role) {
         Collection<GrantedAuthority> authorities = new ArrayList<>();

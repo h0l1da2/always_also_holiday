@@ -78,7 +78,6 @@ public class JwtTokenParser {
     public String getTokenHeader(HttpServletRequest request) {
         String bearerToken = request.getHeader(HttpHeaders.AUTHORIZATION);
         if (StringUtils.hasText(bearerToken) && bearerToken.toLowerCase().startsWith(BEARER.toLowerCase())) {
-            System.out.println("bearerToken = " + bearerToken);
             return bearerToken.substring(BEARER.length()).trim();
         }
         return null;
@@ -86,8 +85,9 @@ public class JwtTokenParser {
 
     public String getTokenUrl(HttpServletRequest request) {
         String token = request.getParameter("token");
+        System.out.println("token1 = " + token);
         if (StringUtils.hasText(token)) {
-            System.out.println("tokenUrl = " + token);
+            System.out.println("token2 = " + token);
             return token;
         }
         return null;
