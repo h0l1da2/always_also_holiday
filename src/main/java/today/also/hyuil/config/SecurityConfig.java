@@ -10,6 +10,8 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import today.also.hyuil.config.security.CustomAccessDeniedHandler;
+import today.also.hyuil.config.security.CustomAuthenticationEntryPoint;
 import today.also.hyuil.config.security.CustomUserDetailsService;
 import today.also.hyuil.config.security.jwt.JwtFilter;
 import today.also.hyuil.config.security.jwt.JwtTokenParser;
@@ -51,9 +53,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
                 .and()
                 .addFilterBefore(new JwtFilter(jwtTokenParser, jwtTokenProvider, userDetailsService()), UsernamePasswordAuthenticationFilter.class)
-//                .exceptionHandling()
-//                .authenticationEntryPoint() // 인증이 실패했을 경우
-//                .accessDeniedHandler() // 권한이 없을 경우
+                .exceptionHandling()
+                .authenticationEntryPoint(new CustomAuthenticationEntryPoint()) // 인증이 실패했을 경우
+                .accessDeniedHandler(new CustomAccessDeniedHandler()) // 권한이 없을 경우
         ;
     }
 
