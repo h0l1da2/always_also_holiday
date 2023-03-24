@@ -16,6 +16,7 @@ import today.also.hyuil.config.security.CustomUserDetailsService;
 import today.also.hyuil.config.security.jwt.JwtFilter;
 import today.also.hyuil.config.security.jwt.JwtTokenParser;
 import today.also.hyuil.config.security.jwt.JwtTokenProvider;
+import today.also.hyuil.config.security.jwt.JwtTokenSetFilter;
 import today.also.hyuil.repository.member.MemberRepository;
 import today.also.hyuil.repository.security.JwtTokenRepository;
 
@@ -53,6 +54,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
                 .and()
                 .addFilterBefore(new JwtFilter(jwtTokenParser, jwtTokenProvider, userDetailsService()), UsernamePasswordAuthenticationFilter.class)
+                .addFilterAfter(new JwtTokenSetFilter(), UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling()
                 .authenticationEntryPoint(new CustomAuthenticationEntryPoint()) // 인증이 실패했을 경우
                 .accessDeniedHandler(new CustomAccessDeniedHandler()) // 권한이 없을 경우

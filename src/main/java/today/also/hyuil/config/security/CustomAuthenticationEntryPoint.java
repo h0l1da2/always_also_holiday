@@ -12,8 +12,7 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
 
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
-        StringBuffer requestURL = request.getRequestURL();
-        String redirectUrl = requestURL.toString();
-        response.sendRedirect("/loginForm?redirectUrl="+redirectUrl);
+        String redirectURI = request.getRequestURI();
+        response.sendRedirect("/loginForm?redirectUrl="+redirectURI);
     }
 }

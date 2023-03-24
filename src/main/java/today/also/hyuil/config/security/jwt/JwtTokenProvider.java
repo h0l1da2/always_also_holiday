@@ -1,7 +1,9 @@
 package today.also.hyuil.config.security.jwt;
 
-import io.jsonwebtoken.*;
-import io.jsonwebtoken.io.Decoders;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtParser;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
@@ -11,6 +13,7 @@ import org.springframework.stereotype.Component;
 import today.also.hyuil.domain.security.Token;
 import today.also.hyuil.repository.security.JwtTokenRepository;
 
+import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -28,19 +31,18 @@ public class JwtTokenProvider {
     @Value("${token.refresh}")
 
     private String refreshToken;
-    private final Key key;
     private final JwtTokenRepository jwtTokenRepository;
+    private final JwtParser jwtParser;
+    private final Key key;
 
     public JwtTokenProvider(@Value("${token.secret.key}") String secretKey, JwtTokenRepository jwtTokenRepository) {
         this.jwtTokenRepository = jwtTokenRepository;
-        // secretKey base64로 디코딩
-        byte[] keyBytes = Decoders.BASE64.decode(secretKey);
-        // key 객체로 변환
-        this.key = Keys.hmacShaKeyFor(keyBytes);
+        key = Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
+        this.jwtParser = Jwts.parserBuilder().setSigningKey(key).build();
     }
 
     public String createAccessToken(String memberId, Collection<? extends GrantedAuthority> role) {
-        Claims claims = getClaims(accessToken, tokenValidTime);
+        Claims claims = getNewClaims(accessToken, tokenValidTime);
 
         claims.put("memberId", memberId);
         claims.put("role", role);
@@ -53,7 +55,7 @@ public class JwtTokenProvider {
     }
 
     public String createRefreshToken() {
-        Claims claims = getClaims(refreshToken, tokenValidTime * 10);
+        Claims claims = getNewClaims(refreshToken, tokenValidTime * 10);
 
         return Jwts.builder()
                 .setClaims(claims)
@@ -65,7 +67,7 @@ public class JwtTokenProvider {
         return jwtTokenRepository.insertRefreshToken(refreshToken);
     }
 
-    private Claims getClaims(String tokenType,int tokenValidTime) {
+    private Claims getNewClaims(String tokenType, int tokenValidTime) {
         Date now = new Date();
 
         return Jwts.claims()
@@ -75,21 +77,22 @@ public class JwtTokenProvider {
 
     }
 
-
     public String reCreateJwtToken(String token) {
-        Jwt<Header, Claims> headerClaimsJwt =
-                Jwts.parserBuilder()
-                .setSigningKey(key)
-                .build()
-                .parseClaimsJwt(token);
-
-        Claims claims = headerClaimsJwt.getBody();
+        Claims claims = getOldClaims(token);
 
         String memberId = claims.get("memberId", String.class);
-        String role = claims.get("role", String.class);
+        String role = String.valueOf(claims.get("role"));
 
         return createAccessToken(memberId, getAuthorities(role));
     }
+
+    public Claims getOldClaims(String token) {
+        Claims claims = jwtParser.parseClaimsJws(token).getBody();
+        return claims;
+    }
+
+
+
 
     private Collection<GrantedAuthority> getAuthorities(String role) {
         Collection<GrantedAuthority> authorities = new ArrayList<>();

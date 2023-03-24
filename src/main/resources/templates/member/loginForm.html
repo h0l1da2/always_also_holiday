@@ -101,7 +101,7 @@
 
             localStorage.setItem('jwt', result.JWT);
             if (redirectUrl) {
-              window.location.href = redirectUrl;
+              window.location.href = redirectUrl+"?token="+result.JWT;
             } else {
               window.location.href = "/";
             }

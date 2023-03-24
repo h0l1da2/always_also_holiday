@@ -2,6 +2,7 @@ package today.also.hyuil.repository.member;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 import today.also.hyuil.domain.member.Member;
 
 import javax.persistence.EntityManager;
@@ -9,6 +10,7 @@ import java.util.Optional;
 
 import static today.also.hyuil.domain.member.QMember.member;
 
+@Transactional
 @Repository
 public class MemberRepository {
 
