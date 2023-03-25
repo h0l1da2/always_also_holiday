@@ -59,6 +59,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .exceptionHandling()
                 .authenticationEntryPoint(new CustomAuthenticationEntryPoint()) // 인증이 실패했을 경우
                 .accessDeniedHandler(new CustomAccessDeniedHandler()) // 권한이 없을 경우
+
+                .and()
+                .oauth2Login()
+                .loginPage("/loginForm")
+                .userInfoEndpoint()
+//                .userService() // 로그인 성공 후처리
         ;
     }
 
