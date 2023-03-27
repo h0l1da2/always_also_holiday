@@ -27,17 +27,14 @@ public class CustomDefaultOAuth2UserService extends DefaultOAuth2UserService {
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
         OAuth2User oAuth2User = super.loadUser(userRequest);
 
-        SnsUserInfo userInfo = null;
-
         String client = userRequest.getClientRegistration().getRegistrationId();
 
         // userInfo 에 해당 sns 에 맞는 info 객체를 넣는 메소드
-        clientUserInfoCheck(oAuth2User, client);
+        SnsUserInfo userInfo = clientUserInfoCheck(oAuth2User, client);
 
         // sns이름 + pk가 memberId
         String pkey = userInfo.getPkey();
         String memberId = userInfo.getSnsName() + pkey;
-
         Member member = memberRepository.findByMemberIdRole(memberId);
 
         // 기존 가입 멤버가 아니라면 ?
@@ -59,18 +56,18 @@ public class CustomDefaultOAuth2UserService extends DefaultOAuth2UserService {
         return new CustomUserDetails(member, oAuth2User.getAttributes());
     }
 
-    private void clientUserInfoCheck(OAuth2User oAuth2User, String client) {
-        SnsUserInfo userInfo;
+    private SnsUserInfo clientUserInfoCheck(OAuth2User oAuth2User, String client) {
         if(client.equals("google")) {
-            userInfo = new GoogleUserInfo(oAuth2User.getAttributes());
+            return new GoogleUserInfo(oAuth2User.getAttributes());
         }
         if(client.equals("naver")) {
-            userInfo = new NaverUserInfo(
+            return new NaverUserInfo(
                     (Map<String, Object>) oAuth2User.getAttributes().get("response"));
         }
         if(client.equals("kakao")) {
-            userInfo = new KakaoUserInfo(oAuth2User.getAttributes());
+            return new KakaoUserInfo(oAuth2User.getAttributes());
         }
+        return null;
     }
     private Member getNewSnsMember(String memberId, String nickname, String password, String name, String email, String phone, Sns sns, Date now) {
         return Member.builder()

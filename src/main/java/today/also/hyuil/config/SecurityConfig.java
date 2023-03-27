@@ -14,6 +14,7 @@ import today.also.hyuil.config.security.CustomAccessDeniedHandler;
 import today.also.hyuil.config.security.CustomAuthenticationEntryPoint;
 import today.also.hyuil.config.security.CustomUserDetailsService;
 import today.also.hyuil.config.security.auth.CustomDefaultOAuth2UserService;
+import today.also.hyuil.config.security.auth.CustomOAuth2AuthorizedClientService;
 import today.also.hyuil.config.security.jwt.JwtFilter;
 import today.also.hyuil.config.security.jwt.JwtTokenParser;
 import today.also.hyuil.config.security.jwt.JwtTokenProvider;
@@ -61,6 +62,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .oauth2Login()
                 .loginPage("/loginForm")
+                .authorizedClientService(new CustomOAuth2AuthorizedClientService(jwtTokenProvider, memberRepository))
                 .userInfoEndpoint()
                 .userService(new CustomDefaultOAuth2UserService(memberRepository, bCryptPasswordEncoder())) // 로그인 성공 후처리
         ;
