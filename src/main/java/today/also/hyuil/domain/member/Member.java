@@ -1,5 +1,6 @@
 package today.also.hyuil.domain.member;
 
+import lombok.Builder;
 import lombok.Getter;
 import today.also.hyuil.domain.dto.member.LoginDto;
 import today.also.hyuil.domain.dto.member.MemberJoinDto;
@@ -10,6 +11,7 @@ import java.util.Date;
 
 @Entity
 @Getter
+@Builder
 public class Member {
 
     @Id @GeneratedValue
@@ -63,5 +65,25 @@ public class Member {
     public Member(LoginDto loginDto) {
         this.memberId = loginDto.getMemberId();
         this.password = loginDto.getPassword();
+    }
+
+    public Member(Long id, String memberId, String password, String name, String nickname, String email, String phone, Address address, Role role, Date removeDate, Date stopDate, Date lastLogin, Date joinDate, Date pwdModifyDate, String whyStop, Sns sns, Admin admin) {
+        this.id = id;
+        this.memberId = memberId;
+        this.password = password;
+        this.name = name;
+        this.nickname = nickname;
+        this.email = email;
+        this.phone = phone;
+        this.address = address;
+        this.role = role;
+        this.removeDate = removeDate;
+        this.stopDate = stopDate;
+        this.lastLogin = lastLogin;
+        this.joinDate = joinDate;
+        this.pwdModifyDate = pwdModifyDate;
+        this.whyStop = whyStop;
+        this.sns = sns;
+        this.admin = admin;
     }
 }

@@ -18,7 +18,7 @@ public class Address {
     private String postcode;
     private String detail;
 
-    protected Address() {}
+    public Address() {}
 
     public Address(MemberJoinDto memberJoinDto) {
         this.address = memberJoinDto.getAddress();

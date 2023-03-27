@@ -15,6 +15,9 @@ public class Role {
     private Name name;
 
     protected Role() {}
+    public Role(Name name) {
+        this.name = name;
+    }
 
     public Role(MemberJoinDto memberJoinDto) {
         this.name = memberJoinDto.getRoleName();

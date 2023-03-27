@@ -19,13 +19,13 @@ public class MemberJoinController {
 
     private String randomCode;
     private final MemberJoinService memberJoinService;
-    private final MailService mailService;
     private final BCryptPasswordEncoder passwordEncoder;
+    private final MailService mailService;
 
-    public MemberJoinController(MemberJoinService memberJoinService, MailService mailService, BCryptPasswordEncoder passwordEncoder) {
+    public MemberJoinController(MemberJoinService memberJoinService, BCryptPasswordEncoder passwordEncoder, MailService mailService) {
         this.memberJoinService = memberJoinService;
-        this.mailService = mailService;
         this.passwordEncoder = passwordEncoder;
+        this.mailService = mailService;
     }
 
     @GetMapping
@@ -114,7 +114,8 @@ public class MemberJoinController {
 
     @PostMapping("/complete")
     public String joinMember(@ModelAttribute MemberJoinDto memberJoinDto) {
-        memberJoinDto.setPassword(passwordEncoder.encode(memberJoinDto.getPassword()));
+        String encodedPassword = getEncodedPassword(memberJoinDto.getPassword());
+        memberJoinDto.setPassword(encodedPassword);
         memberJoinDto.setRoleName(Name.ROLE_USER);
         Member member =
                 new Member(memberJoinDto,
@@ -142,5 +143,9 @@ public class MemberJoinController {
             return true;
         }
         return false;
+    }
+
+    public String getEncodedPassword(String password) {
+        return passwordEncoder.encode(password);
     }
 }
