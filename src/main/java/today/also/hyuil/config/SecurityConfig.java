@@ -13,12 +13,12 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import today.also.hyuil.config.security.CustomAccessDeniedHandler;
 import today.also.hyuil.config.security.CustomAuthenticationEntryPoint;
 import today.also.hyuil.config.security.CustomUserDetailsService;
+import today.also.hyuil.config.security.auth.CustomDefaultOAuth2UserService;
 import today.also.hyuil.config.security.jwt.JwtFilter;
 import today.also.hyuil.config.security.jwt.JwtTokenParser;
 import today.also.hyuil.config.security.jwt.JwtTokenProvider;
 import today.also.hyuil.config.security.jwt.JwtTokenSetFilter;
 import today.also.hyuil.repository.member.MemberRepository;
-import today.also.hyuil.repository.security.JwtTokenRepository;
 
 @EnableWebSecurity
 @Configuration
@@ -27,13 +27,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final MemberRepository memberRepository;
     private final JwtTokenParser jwtTokenParser;
     private final JwtTokenProvider jwtTokenProvider;
-    private final JwtTokenRepository jwtTokenRepository;
 
-    public SecurityConfig(MemberRepository memberRepository, JwtTokenParser jwtTokenParser, JwtTokenProvider jwtTokenProvider, JwtTokenRepository jwtTokenRepository) {
+    public SecurityConfig(MemberRepository memberRepository, JwtTokenParser jwtTokenParser, JwtTokenProvider jwtTokenProvider) {
         this.memberRepository = memberRepository;
         this.jwtTokenParser = jwtTokenParser;
         this.jwtTokenProvider = jwtTokenProvider;
-        this.jwtTokenRepository = jwtTokenRepository;
     }
 
     @Override
@@ -64,7 +62,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .oauth2Login()
                 .loginPage("/loginForm")
                 .userInfoEndpoint()
-//                .userService() // 로그인 성공 후처리
+                .userService(new CustomDefaultOAuth2UserService(memberRepository, bCryptPasswordEncoder())) // 로그인 성공 후처리
         ;
     }
 
