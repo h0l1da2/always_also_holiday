@@ -6,6 +6,7 @@ import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import today.also.hyuil.config.security.CustomUserDetails;
+import today.also.hyuil.config.security.auth.userinfo.SnsUserInfo;
 import today.also.hyuil.config.security.jwt.JwtAuthService;
 import today.also.hyuil.domain.member.*;
 import today.also.hyuil.repository.member.MemberRepository;

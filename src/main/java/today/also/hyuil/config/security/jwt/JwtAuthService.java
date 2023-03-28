@@ -2,10 +2,10 @@ package today.also.hyuil.config.security.jwt;
 
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Component;
-import today.also.hyuil.config.security.auth.GoogleUserInfo;
-import today.also.hyuil.config.security.auth.KakaoUserInfo;
-import today.also.hyuil.config.security.auth.NaverUserInfo;
-import today.also.hyuil.config.security.auth.SnsUserInfo;
+import today.also.hyuil.config.security.auth.userinfo.GoogleUserInfo;
+import today.also.hyuil.config.security.auth.userinfo.KakaoUserInfo;
+import today.also.hyuil.config.security.auth.userinfo.NaverUserInfo;
+import today.also.hyuil.config.security.auth.userinfo.SnsUserInfo;
 
 import java.util.Map;
 
