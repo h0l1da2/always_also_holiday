@@ -14,11 +14,9 @@ import today.also.hyuil.config.security.CustomAccessDeniedHandler;
 import today.also.hyuil.config.security.CustomAuthenticationEntryPoint;
 import today.also.hyuil.config.security.CustomUserDetailsService;
 import today.also.hyuil.config.security.auth.CustomDefaultOAuth2UserService;
+import today.also.hyuil.config.security.auth.CustomOAuth2AuthorizedClientRepository;
 import today.also.hyuil.config.security.auth.CustomOAuth2AuthorizedClientService;
-import today.also.hyuil.config.security.jwt.JwtFilter;
-import today.also.hyuil.config.security.jwt.JwtTokenParser;
-import today.also.hyuil.config.security.jwt.JwtTokenProvider;
-import today.also.hyuil.config.security.jwt.JwtTokenSetFilter;
+import today.also.hyuil.config.security.jwt.*;
 import today.also.hyuil.repository.member.MemberRepository;
 
 @EnableWebSecurity
@@ -27,12 +25,16 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final MemberRepository memberRepository;
     private final JwtTokenParser jwtTokenParser;
-    private final JwtTokenProvider jwtTokenProvider;
+    private final JwtAuthService jwtAuthService;
+    private final JwtTokenService jwtTokenService;
+    private final CustomOAuth2AuthorizedClientRepository customOAuth2AuthorizedClientRepository;
 
-    public SecurityConfig(MemberRepository memberRepository, JwtTokenParser jwtTokenParser, JwtTokenProvider jwtTokenProvider) {
+    public SecurityConfig(MemberRepository memberRepository, JwtTokenParser jwtTokenParser, JwtAuthService jwtAuthService, JwtTokenService jwtTokenService, CustomOAuth2AuthorizedClientRepository customOAuth2AuthorizedClientRepository) {
         this.memberRepository = memberRepository;
         this.jwtTokenParser = jwtTokenParser;
-        this.jwtTokenProvider = jwtTokenProvider;
+        this.jwtAuthService = jwtAuthService;
+        this.jwtTokenService = jwtTokenService;
+        this.customOAuth2AuthorizedClientRepository = customOAuth2AuthorizedClientRepository;
     }
 
     @Override
@@ -53,7 +55,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .permitAll()
 
                 .and()
-                .addFilterBefore(new JwtFilter(jwtTokenParser, jwtTokenProvider, userDetailsService()), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new JwtFilter(userDetailsService(), jwtTokenParser, jwtTokenService), UsernamePasswordAuthenticationFilter.class)
                 .addFilterAfter(new JwtTokenSetFilter(), UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling()
                 .authenticationEntryPoint(new CustomAuthenticationEntryPoint()) // 인증이 실패했을 경우
@@ -62,9 +64,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .oauth2Login()
                 .loginPage("/loginForm")
-                .authorizedClientService(new CustomOAuth2AuthorizedClientService(jwtTokenProvider, memberRepository))
+                .authorizedClientService(new CustomOAuth2AuthorizedClientService(customOAuth2AuthorizedClientRepository, jwtAuthService, jwtTokenService, memberRepository))
                 .userInfoEndpoint()
-                .userService(new CustomDefaultOAuth2UserService(memberRepository, bCryptPasswordEncoder())) // 로그인 성공 후처리
+                .userService(new CustomDefaultOAuth2UserService(memberRepository, bCryptPasswordEncoder(), jwtAuthService)) // 로그인 성공 후처리
         ;
     }
 

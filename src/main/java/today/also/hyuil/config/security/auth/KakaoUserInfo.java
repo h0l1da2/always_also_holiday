@@ -15,7 +15,10 @@ public class KakaoUserInfo implements SnsUserInfo {
         this.attributesAccount = (Map<String, Object>) attributes.get("kakao_account");
         this.attributesProfile = (Map<String, Object>) attributesAccount.get("profile");
     }
-
+    @Override
+    public String getMemberId() {
+        return getSnsName() + getPkey();
+    }
     @Override
     public String getPkey() {
         return String.valueOf(attributes.get("id"));

@@ -18,6 +18,11 @@ public class NaverUserInfo implements SnsUserInfo{
     }
 
     @Override
+    public String getMemberId() {
+        return getSnsName() + getPkey();
+    }
+
+    @Override
     public Sns getSnsName() {
         return Sns.NAVER;
     }

@@ -7,6 +7,4 @@ import java.util.Map;
 public interface MemberLoginService {
 
     boolean idPwdValid(Member member);
-    Map<String, String> getTokens(Member member);
-    void saveRefreshToken(String memberId, String refreshToken);
 }

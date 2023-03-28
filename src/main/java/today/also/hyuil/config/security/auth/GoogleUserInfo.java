@@ -11,7 +11,10 @@ public class GoogleUserInfo implements SnsUserInfo{
     public GoogleUserInfo(Map<String, Object> attributes) {
         this.attributes = attributes;
     }
-
+    @Override
+    public String getMemberId() {
+        return getSnsName() + getPkey();
+    }
     @Override
     public String getPkey() {
         return String.valueOf(attributes.get("sub"));
