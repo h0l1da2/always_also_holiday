@@ -35,7 +35,7 @@ public class MemberLoginController {
 
     @ResponseBody
     @PostMapping("/login")
-    public Map loginToken(@RequestBody LoginDto loginDto, HttpServletResponse response) {
+    public Map loginToken(@RequestBody LoginDto loginDto) {
         Map map = new HashMap();
 
         if (loginDtoNullCheck(loginDto)) {

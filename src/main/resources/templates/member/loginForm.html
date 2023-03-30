@@ -57,18 +57,38 @@
     <label class=" control-label sns-label" for="sns">- SNS -</label>
   </div>
   <div class="sns-div">
-    <div class="sns-logo"> <a th:href="@{/oauth2/authorization/kakao}"><img th:src="@{/static/images/kakao.png}" alt="kakao"></a></div>
-    <div class="sns-logo"> <a th:href="@{/oauth2/authorization/naver}"><img th:src="@{/static/images/naver.png}" alt="naver"></a></div>
-    <div class="sns-logo"> <a th:href="@{/oauth2/authorization/google}"><img th:src="@{/static/images/google.png}" alt="google"></a></div>
+    <div class="sns-logo"> <a onclick="kakao()"><img th:src="@{/static/images/kakao.png}" alt="kakao"></a></div>
+    <div class="sns-logo"> <a onclick="naver()"><img th:src="@{/static/images/naver.png}" alt="naver"></a></div>
+    <div class="sns-logo"> <a onclick="google()"><img th:src="@{/static/images/google.png}" alt="google"></a></div>
   </div>
 </div>
 </div>
 <script th:inline="javascript">
 
-  $( document ).ready( function() {
+  let urlParams = new URLSearchParams(window.location.search);
+  let redirectUrl = urlParams.get("redirectUrl");
 
-    let urlParams = new URLSearchParams(window.location.search);
-    let redirectUrl = urlParams.get("redirectUrl");
+  function kakao() {
+    window.location.href = getRedirectUrl(redirectUrl, "kakao");
+  }
+
+  function naver() {
+    window.location.href = getRedirectUrl(redirectUrl, "naver");
+  }
+
+  function google() {
+    window.location.href = getRedirectUrl(redirectUrl, "google");
+  }
+
+  function getRedirectUrl(redirectUrl, client) {
+    if (redirectUrl) {
+      return "/oauth2/authorization/"+client+"?redirectUrl="+redirectUrl;
+    } else {
+      return "/oauth2/authorization/"+client;
+    }
+  }
+
+  $( document ).ready( function() {
 
     $('#loginBtn').click(function () {
 

@@ -1,6 +1,8 @@
 package today.also.hyuil.config.security.auth;
 
 import org.springframework.security.core.Authentication;
+import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestRedirectFilter;
+import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import today.also.hyuil.config.security.CustomUserDetails;
 import today.also.hyuil.config.security.jwt.JwtTokenService;
@@ -36,21 +38,22 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
         String accessToken = tokens.get("accessToken");
         String refreshToken = tokens.get("refreshToken");
 
+        System.out.println("토큰을 반환함 : "+accessToken);
+        System.out.println("토큰을 반환함 : "+refreshToken);
         jwtTokenService.saveRefreshToken(findMember.getMemberId(), refreshToken);
+        System.out.println("리프레쉬 저장");
         response.setHeader("Authorization", "Bearer "+accessToken);
+        System.out.println("헤더 저장");
 
-        // redirect 세팅
-        setRedirectUri(request, response);
-
-    }
-
-    private void setRedirectUri(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String redirectUrl = request.getParameter("redirectUrl");
 
-        if (redirectUrl != null) {
-            response.sendRedirect(redirectUrl);
-        } else {
-            response.sendRedirect("/");
-        }
+//        if (redirectUrl != null) {
+//            response.sendRedirect(redirectUrl);
+//        } else {
+//            response.sendRedirect("/");
+//        }
+
+        
     }
+
 }
