@@ -1,8 +1,6 @@
 package today.also.hyuil.config.security.auth;
 
 import org.springframework.security.core.Authentication;
-import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestRedirectFilter;
-import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import today.also.hyuil.config.security.CustomUserDetails;
 import today.also.hyuil.config.security.jwt.JwtTokenService;
@@ -53,7 +51,7 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
 //            response.sendRedirect("/");
 //        }
 
-        
+
     }
 
 }

@@ -15,6 +15,7 @@ import today.also.hyuil.config.security.CustomAccessDeniedHandler;
 import today.also.hyuil.config.security.CustomAuthenticationEntryPoint;
 import today.also.hyuil.config.security.CustomUserDetailsService;
 import today.also.hyuil.config.security.auth.CustomDefaultOAuth2UserService;
+import today.also.hyuil.config.security.auth.CustomOAuth2AuthorizationRequestResolver;
 import today.also.hyuil.config.security.auth.CustomOAuth2SuccessHandler;
 import today.also.hyuil.config.security.jwt.*;
 import today.also.hyuil.repository.member.MemberRepository;
@@ -27,12 +28,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final JwtTokenParser jwtTokenParser;
     private final JwtAuthService jwtAuthService;
     private final JwtTokenService jwtTokenService;
-
-    public SecurityConfig(MemberRepository memberRepository, JwtTokenParser jwtTokenParser, JwtAuthService jwtAuthService, JwtTokenService jwtTokenService) {
+    private final CustomOAuth2AuthorizationRequestResolver customOAuth2AuthorizationRequestResolver;
+    public SecurityConfig(MemberRepository memberRepository, JwtTokenParser jwtTokenParser, JwtAuthService jwtAuthService, JwtTokenService jwtTokenService, CustomOAuth2AuthorizationRequestResolver customOAuth2AuthorizationRequestResolver) {
         this.memberRepository = memberRepository;
         this.jwtTokenParser = jwtTokenParser;
         this.jwtAuthService = jwtAuthService;
         this.jwtTokenService = jwtTokenService;
+        this.customOAuth2AuthorizationRequestResolver = customOAuth2AuthorizationRequestResolver;
     }
 
     @Override
@@ -63,6 +65,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .oauth2Login()
                 .loginPage("/loginForm")
+                .authorizationEndpoint()
+                .authorizationRequestResolver(customOAuth2AuthorizationRequestResolver)
+                .and()
                 .userInfoEndpoint()
                 .userService(new CustomDefaultOAuth2UserService(memberRepository, bCryptPasswordEncoder(), jwtAuthService)) // 로그인
                 .and()
