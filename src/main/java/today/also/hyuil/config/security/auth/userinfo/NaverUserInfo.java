@@ -1,25 +1,30 @@
-package today.also.hyuil.config.security.auth;
+package today.also.hyuil.config.security.auth.userinfo;
 
 import today.also.hyuil.domain.member.Sns;
 
 import java.util.Map;
 
-public class GoogleUserInfo implements SnsUserInfo{
+public class NaverUserInfo implements SnsUserInfo{
 
     private final Map<String, Object> attributes;
 
-    public GoogleUserInfo(Map<String, Object> attributes) {
+    public NaverUserInfo(Map<String, Object> attributes) {
         this.attributes = attributes;
     }
 
     @Override
     public String getPkey() {
-        return String.valueOf(attributes.get("sub"));
+        return String.valueOf(attributes.get("id"));
+    }
+
+    @Override
+    public String getMemberId() {
+        return getSnsName() + getPkey();
     }
 
     @Override
     public Sns getSnsName() {
-        return Sns.GOOGLE;
+        return Sns.NAVER;
     }
 
     @Override
@@ -34,6 +39,6 @@ public class GoogleUserInfo implements SnsUserInfo{
 
     @Override
     public String getMobile() {
-        return "NONE";
+        return String.valueOf(attributes.get("mobile"));
     }
 }

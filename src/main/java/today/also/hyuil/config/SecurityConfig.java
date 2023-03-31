@@ -9,15 +9,15 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.oauth2.client.web.OAuth2LoginAuthenticationFilter;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import today.also.hyuil.config.security.CustomAccessDeniedHandler;
 import today.also.hyuil.config.security.CustomAuthenticationEntryPoint;
 import today.also.hyuil.config.security.CustomUserDetailsService;
 import today.also.hyuil.config.security.auth.CustomDefaultOAuth2UserService;
-import today.also.hyuil.config.security.jwt.JwtFilter;
-import today.also.hyuil.config.security.jwt.JwtTokenParser;
-import today.also.hyuil.config.security.jwt.JwtTokenProvider;
-import today.also.hyuil.config.security.jwt.JwtTokenSetFilter;
+import today.also.hyuil.config.security.auth.CustomOAuth2AuthorizationRequestResolver;
+import today.also.hyuil.config.security.auth.CustomOAuth2SuccessHandler;
+import today.also.hyuil.config.security.jwt.*;
 import today.also.hyuil.repository.member.MemberRepository;
 
 @EnableWebSecurity
@@ -26,12 +26,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final MemberRepository memberRepository;
     private final JwtTokenParser jwtTokenParser;
-    private final JwtTokenProvider jwtTokenProvider;
-
-    public SecurityConfig(MemberRepository memberRepository, JwtTokenParser jwtTokenParser, JwtTokenProvider jwtTokenProvider) {
+    private final JwtAuthService jwtAuthService;
+    private final JwtTokenService jwtTokenService;
+    private final CustomOAuth2AuthorizationRequestResolver customOAuth2AuthorizationRequestResolver;
+    public SecurityConfig(MemberRepository memberRepository, JwtTokenParser jwtTokenParser, JwtAuthService jwtAuthService, JwtTokenService jwtTokenService, CustomOAuth2AuthorizationRequestResolver customOAuth2AuthorizationRequestResolver) {
         this.memberRepository = memberRepository;
         this.jwtTokenParser = jwtTokenParser;
-        this.jwtTokenProvider = jwtTokenProvider;
+        this.jwtAuthService = jwtAuthService;
+        this.jwtTokenService = jwtTokenService;
+        this.customOAuth2AuthorizationRequestResolver = customOAuth2AuthorizationRequestResolver;
     }
 
     @Override
@@ -52,7 +55,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .permitAll()
 
                 .and()
-                .addFilterBefore(new JwtFilter(jwtTokenParser, jwtTokenProvider, userDetailsService()), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new JwtFilter(userDetailsService(), jwtTokenParser, jwtTokenService), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new JwtFilter(userDetailsService(), jwtTokenParser, jwtTokenService), OAuth2LoginAuthenticationFilter.class)
                 .addFilterAfter(new JwtTokenSetFilter(), UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling()
                 .authenticationEntryPoint(new CustomAuthenticationEntryPoint()) // 인증이 실패했을 경우
@@ -61,8 +65,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .oauth2Login()
                 .loginPage("/loginForm")
+                .authorizationEndpoint()
+                .authorizationRequestResolver(customOAuth2AuthorizationRequestResolver)
+                .and()
                 .userInfoEndpoint()
-                .userService(new CustomDefaultOAuth2UserService(memberRepository, bCryptPasswordEncoder())) // 로그인 성공 후처리
+                .userService(new CustomDefaultOAuth2UserService(memberRepository, bCryptPasswordEncoder(), jwtAuthService)) // 로그인
+                .and()
+                .successHandler(new CustomOAuth2SuccessHandler(jwtTokenService, memberRepository))
         ;
     }
 

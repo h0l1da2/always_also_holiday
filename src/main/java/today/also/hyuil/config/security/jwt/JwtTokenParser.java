@@ -60,11 +60,6 @@ public class JwtTokenParser {
         return authorities;
     }
 
-    private String getRoleToString(Claims claims) {
-        List<Map<String, String>> roles = (List<Map<String, String>>) claims.get("role");
-        return roles.get(0).get("authority");
-    }
-
     public Claims getClaims(String token) {
         Claims claims = jwtParser.parseClaimsJws(token).getBody();
         return claims;
@@ -93,4 +88,9 @@ public class JwtTokenParser {
         return null;
     }
 
+
+    private String getRoleToString(Claims claims) {
+        List<Map<String, String>> roles = (List<Map<String, String>>) claims.get("role");
+        return roles.get(0).get("authority");
+    }
 }

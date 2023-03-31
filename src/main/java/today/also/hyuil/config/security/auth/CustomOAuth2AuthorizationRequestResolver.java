@@ -1,0 +1,79 @@
+package today.also.hyuil.config.security.auth;
+
+import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestResolver;
+import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
+import org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames;
+import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
+import today.also.hyuil.config.security.auth.userinfo.SnsInfo;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+import java.util.UUID;
+
+@Component
+public class CustomOAuth2AuthorizationRequestResolver implements OAuth2AuthorizationRequestResolver {
+    private final String REQUEST_URL = "/oauth2/authorization/";
+    private final String BASE_URL = "http://localhost:8080";
+    private final SnsInfo snsInfo;
+
+    public CustomOAuth2AuthorizationRequestResolver(SnsInfo snsInfo) {
+        this.snsInfo = snsInfo;
+    }
+
+    @Override
+    public OAuth2AuthorizationRequest resolve(HttpServletRequest request) {
+        if (request.getRequestURI().equals("/loginForm")) {
+            return null;
+        }
+        if (request.getRequestURI().startsWith(REQUEST_URL)) {
+            String sns = request.getRequestURI().substring(REQUEST_URL.length());
+            return this.resolve(request, sns);
+        }
+        return null;
+    }
+
+    @Override
+    public OAuth2AuthorizationRequest resolve(HttpServletRequest request, String clientRegistrationId) {
+
+        String sns = clientRegistrationId.toUpperCase();
+        String state = UUID.randomUUID().toString();
+
+        setStateSession(request, state);
+
+        String clientId = snsInfo.clientId(sns);
+        String authUri = snsInfo.authUri(sns);
+        String redirectUri = getRedirectUri(request, sns);
+        String responseType = snsInfo.responseType();
+        String[] scopes = snsInfo.scope(sns).stream().toArray(String[]::new);
+        redirectUri = getRedirectUri(request, redirectUri);
+
+        return OAuth2AuthorizationRequest
+                .authorizationCode()
+                .clientId(clientId)
+                .authorizationUri(authUri)
+                .scope(scopes)
+                .redirectUri(redirectUri)
+                .state(state)
+                .parameters(p -> p.put(OAuth2ParameterNames.RESPONSE_TYPE, responseType))
+                .build();
+    }
+
+    private void setStateSession(HttpServletRequest request, String state) {
+        HttpSession session = request.getSession();
+        if (session != null) {
+            session.setAttribute("state", state);
+        }
+    }
+
+    private String getRedirectUri(HttpServletRequest request, String sns) {
+        String redirectUrl = request.getParameter("redirectUrl");
+        if (!StringUtils.hasText(redirectUrl)) {
+            redirectUrl = snsInfo.redirectUri(sns);
+        } else {
+            redirectUrl = BASE_URL + request.getParameter("redirectUrl");
+        }
+        return redirectUrl;
+    }
+
+}

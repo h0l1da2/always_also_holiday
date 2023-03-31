@@ -67,10 +67,9 @@ public class MemberRepository {
                 .from(member)
                 .where(member.memberId.eq(memberId))
                 .stream().findFirst();
-
         Member member = findMember.orElse(null);
-        if (member != null) {
-            member.getRole();
+        if (findMember.isPresent()) {
+            member.getRole().getName();
         }
         return member;
     }

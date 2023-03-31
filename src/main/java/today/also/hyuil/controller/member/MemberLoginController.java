@@ -4,6 +4,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import today.also.hyuil.config.security.jwt.JwtTokenService;
 import today.also.hyuil.domain.dto.member.LoginDto;
 import today.also.hyuil.domain.member.Member;
 import today.also.hyuil.service.member.inter.MemberLoginService;
@@ -16,9 +17,11 @@ import java.util.Map;
 public class MemberLoginController {
 
     private final MemberLoginService memberLoginService;
+    private final JwtTokenService jwtTokenService;
 
-    public MemberLoginController(MemberLoginService memberLoginService) {
+    public MemberLoginController(MemberLoginService memberLoginService, JwtTokenService jwtTokenService) {
         this.memberLoginService = memberLoginService;
+        this.jwtTokenService = jwtTokenService;
     }
 
     @GetMapping("/loginForm")
@@ -32,7 +35,7 @@ public class MemberLoginController {
 
     @ResponseBody
     @PostMapping("/login")
-    public Map loginToken(@RequestBody LoginDto loginDto, HttpServletResponse response) {
+    public Map loginToken(@RequestBody LoginDto loginDto) {
         Map map = new HashMap();
 
         if (loginDtoNullCheck(loginDto)) {
@@ -56,12 +59,13 @@ public class MemberLoginController {
             return map;
         }
 
-        Map<String, String> tokens = memberLoginService.getTokens(member);
+        Map<String, String> tokens = jwtTokenService.getTokens(
+                member.getMemberId(), member.getRole().getName());
         String refreshToken = tokens.get("refreshToken");
         String accessToken = tokens.get("accessToken");
 
         // 각 토큰 저장
-        memberLoginService.saveRefreshToken(member.getMemberId(), refreshToken);
+        jwtTokenService.saveRefreshToken(member.getMemberId(), refreshToken);
         System.out.println("333");
 
         /**

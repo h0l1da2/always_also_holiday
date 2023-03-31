@@ -17,17 +17,18 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Map;
 
 public class JwtFilter extends OncePerRequestFilter {
 
-    private final JwtTokenParser jwtTokenParser;
-    private final JwtTokenProvider jwtTokenProvider;
     private final UserDetailsService userDetailsService;
+    private final JwtTokenParser jwtTokenParser;
+    private final JwtTokenService jwtTokenService;
 
-    public JwtFilter(JwtTokenParser jwtTokenParser, JwtTokenProvider jwtTokenProvider, UserDetailsService userDetailsService) {
-        this.jwtTokenParser = jwtTokenParser;
-        this.jwtTokenProvider = jwtTokenProvider;
+    public JwtFilter(UserDetailsService userDetailsService, JwtTokenParser jwtTokenParser, JwtTokenService jwtTokenService) {
         this.userDetailsService = userDetailsService;
+        this.jwtTokenParser = jwtTokenParser;
+        this.jwtTokenService = jwtTokenService;
     }
 
     @Override
@@ -60,11 +61,14 @@ public class JwtFilter extends OncePerRequestFilter {
         }
         // 토큰s 재발급 후, 저장~
         String memberId = jwtTokenParser.tokenInMemberId(token);
-        String refreshT = jwtTokenProvider.createRefreshToken();
-        String accessT = jwtTokenProvider.reCreateJwtToken(token);
+
+        Map<String, String> reTokens = jwtTokenService.getReCreateTokens(token);
+
+        String accessT = reTokens.get("accessToken");
+        String refreshT = reTokens.get("refreshToken");
 
         // 기존 리프레쉬 토큰이랑 바꿔치기 or 새로 insert
-        Token refreshToken = jwtTokenProvider.saveRefreshInDB(new Token(memberId, refreshT));
+        Token refreshToken = jwtTokenService.saveRefreshInDB(new Token(memberId, refreshT));
 
         // 인증 완료!
         Authentication authentication = extractAuthentication(memberId, accessT);
@@ -73,7 +77,6 @@ public class JwtFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
-    // authentication 생성
     private Authentication extractAuthentication(String memberId, String accessToken) {
         try {
             Collection<GrantedAuthority> authorities = jwtTokenParser.getAuthorities(accessToken);

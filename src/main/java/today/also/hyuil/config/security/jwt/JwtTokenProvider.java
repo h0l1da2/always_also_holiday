@@ -11,8 +11,6 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
-import today.also.hyuil.domain.security.Token;
-import today.also.hyuil.repository.security.JwtTokenRepository;
 
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
@@ -30,12 +28,10 @@ public class JwtTokenProvider {
     @Value("${token.refresh}")
 
     private String refreshToken;
-    private final JwtTokenRepository jwtTokenRepository;
     private final JwtParser jwtParser;
     private final Key key;
 
-    public JwtTokenProvider(@Value("${token.secret.key}") String secretKey, JwtTokenRepository jwtTokenRepository) {
-        this.jwtTokenRepository = jwtTokenRepository;
+    public JwtTokenProvider(@Value("${token.secret.key}") String secretKey) {
         key = Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
         this.jwtParser = Jwts.parserBuilder().setSigningKey(key).build();
     }
@@ -60,16 +56,6 @@ public class JwtTokenProvider {
                 .setClaims(claims)
                 .signWith(key, SignatureAlgorithm.HS512)
                 .compact();
-    }
-
-    public Token saveRefreshInDB(Token refreshToken) {
-        // 기존 토큰이 있으면 바꿔치기, 없으면 새로 insert
-        Token findToken = jwtTokenRepository.findByMemberId(refreshToken.getMemberId());
-        if (findToken == null) {
-            return jwtTokenRepository.insertRefreshToken(refreshToken);
-        }
-        findToken.changeToken(refreshToken);
-        return jwtTokenRepository.updateNewToken(findToken);
     }
 
     private Claims getNewClaims(String tokenType, int tokenValidTime) {
@@ -109,12 +95,5 @@ public class JwtTokenProvider {
         return authorities;
     }
 
-    public Token duplicationTokenDB(String memberId) {
-        return jwtTokenRepository.findByMemberId(memberId);
-    }
-
-    public Token setNewToken(Token token) {
-        return jwtTokenRepository.updateNewToken(token);
-    }
 }
 
