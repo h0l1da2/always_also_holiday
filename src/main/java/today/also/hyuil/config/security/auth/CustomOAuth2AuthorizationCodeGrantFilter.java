@@ -51,11 +51,11 @@ public class CustomOAuth2AuthorizationCodeGrantFilter extends OAuth2Authorizatio
             filterChain.doFilter(request, response);
             return;
         }
-        
+
         String requestURI = request.getRequestURL().toString();
         String state = request.getParameter("state");
 
-        HttpSession session = request.getSession();
+        HttpSession session = request.getSession(false);
         if (session != null) {
             String originState = String.valueOf(session.getAttribute("state"));
 
@@ -86,6 +86,7 @@ public class CustomOAuth2AuthorizationCodeGrantFilter extends OAuth2Authorizatio
                 CustomAccessTokenResponse tokenResponse = responseEntity.getBody();
                 request.setAttribute("tokenResponse", tokenResponse);
 
+                removeSessionAttr(session, originState);
             }
         }
 
@@ -101,6 +102,11 @@ public class CustomOAuth2AuthorizationCodeGrantFilter extends OAuth2Authorizatio
         }
 
 
+    }
+
+    private void removeSessionAttr(HttpSession session, String originState) {
+        session.removeAttribute("state");
+        session.removeAttribute(originState);
     }
 
     private MultiValueMap<String, String> setParameters(String code, String clientId, String clientSecret, String requestURI) {
