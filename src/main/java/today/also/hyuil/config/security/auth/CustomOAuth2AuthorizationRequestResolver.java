@@ -9,6 +9,8 @@ import today.also.hyuil.config.security.auth.userinfo.SnsInfo;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 @Component
@@ -23,9 +25,7 @@ public class CustomOAuth2AuthorizationRequestResolver implements OAuth2Authoriza
 
     @Override
     public OAuth2AuthorizationRequest resolve(HttpServletRequest request) {
-        if (request.getRequestURI().equals("/loginForm")) {
-            return null;
-        }
+        // /oauth2/** 요청일 때만 resolver 동작해야 함니다
         if (request.getRequestURI().startsWith(REQUEST_URL)) {
             String sns = request.getRequestURI().substring(REQUEST_URL.length());
             return this.resolve(request, sns);
@@ -40,6 +40,7 @@ public class CustomOAuth2AuthorizationRequestResolver implements OAuth2Authoriza
         String state = UUID.randomUUID().toString();
 
         setStateSession(request, state);
+        setClientSession(request, state, sns);
 
         String clientId = snsInfo.clientId(sns);
         String authUri = snsInfo.authUri(sns);
@@ -48,6 +49,10 @@ public class CustomOAuth2AuthorizationRequestResolver implements OAuth2Authoriza
         String[] scopes = snsInfo.scope(sns).stream().toArray(String[]::new);
         redirectUri = getRedirectUri(request, redirectUri);
 
+        Map<String, Object> map = new HashMap<>();
+        map.put(OAuth2ParameterNames.RESPONSE_TYPE, responseType);
+        map.put("client", sns);
+
         return OAuth2AuthorizationRequest
                 .authorizationCode()
                 .clientId(clientId)
@@ -55,8 +60,15 @@ public class CustomOAuth2AuthorizationRequestResolver implements OAuth2Authoriza
                 .scope(scopes)
                 .redirectUri(redirectUri)
                 .state(state)
-                .parameters(p -> p.put(OAuth2ParameterNames.RESPONSE_TYPE, responseType))
+                .parameters(params -> params.putAll(map))
                 .build();
+    }
+
+    private void setClientSession(HttpServletRequest request, String state, String sns) {
+        HttpSession session = request.getSession();
+        if (session != null) {
+            session.setAttribute(state, sns);
+        }
     }
 
     private void setStateSession(HttpServletRequest request, String state) {
