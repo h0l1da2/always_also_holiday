@@ -26,10 +26,12 @@ public class CustomOAuth2AuthorizationRequestResolver implements OAuth2Authoriza
     @Override
     public OAuth2AuthorizationRequest resolve(HttpServletRequest request) {
         // /oauth2/** 요청일 때만 resolver 동작해야 함니다
+        System.out.println("동작 ㅇㅇ");
         if (request.getRequestURI().startsWith(REQUEST_URL)) {
             String sns = request.getRequestURI().substring(REQUEST_URL.length());
             return this.resolve(request, sns);
         }
+        System.out.println("리졸버 동작 ㄴㄴ");
         return null;
     }
 
@@ -52,7 +54,7 @@ public class CustomOAuth2AuthorizationRequestResolver implements OAuth2Authoriza
         Map<String, Object> map = new HashMap<>();
         map.put(OAuth2ParameterNames.RESPONSE_TYPE, responseType);
         map.put("client", sns);
-
+        System.out.println("돼요?");
         return OAuth2AuthorizationRequest
                 .authorizationCode()
                 .clientId(clientId)

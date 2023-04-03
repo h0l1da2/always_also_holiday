@@ -1,7 +1,11 @@
-package today.also.hyuil.config.security.jwt;
+package today.also.hyuil.config.security.auth.userinfo;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Getter;
+import lombok.ToString;
 
+@Getter
+@ToString
 public class CustomAccessTokenResponse {
 
     @JsonProperty("token_type")
@@ -18,5 +22,6 @@ public class CustomAccessTokenResponse {
     private long refreshTokenExpiresIn;
     @JsonProperty("scope")
     private String scope; // 여러개 올 경우, 공백으로 구분 "aaa bbb ccc"
+
 
 }
