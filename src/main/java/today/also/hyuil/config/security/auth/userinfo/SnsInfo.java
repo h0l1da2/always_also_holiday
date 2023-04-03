@@ -8,6 +8,7 @@ import today.also.hyuil.domain.member.Sns;
 import java.util.ArrayList;
 import java.util.List;
 
+// Sns Info 나누기
 @Component
 @PropertySource("classpath:application.yml")
 public class SnsInfo {
@@ -118,6 +119,7 @@ public class SnsInfo {
         if (sns.equals(Sns.KAKAO.name())) {
             scope.add("profile_nickname");
             scope.add("account_email");
+            scope.add("openid");
         }
         if (sns.equals(Sns.NAVER.name())) {
             scope.add("name");

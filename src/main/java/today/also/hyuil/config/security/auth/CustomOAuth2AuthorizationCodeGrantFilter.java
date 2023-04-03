@@ -10,7 +10,8 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 import today.also.hyuil.config.security.auth.userinfo.SnsInfo;
-import today.also.hyuil.config.security.jwt.CustomAccessTokenResponse;
+import today.also.hyuil.config.security.auth.userinfo.CustomAccessTokenResponse;
+import today.also.hyuil.domain.member.Sns;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -53,20 +54,25 @@ public class CustomOAuth2AuthorizationCodeGrantFilter extends OAuth2Authorizatio
         }
 
         String requestURI = request.getRequestURL().toString();
-        String state = request.getParameter("state");
+        System.out.println("requestURI = " + requestURI);
 
         HttpSession session = request.getSession(false);
+
         if (session != null) {
             String originState = String.valueOf(session.getAttribute("state"));
+            String state = request.getParameter("state");
 
-            // state가 동일하고, 정상 응답이 왔을 경우(코드 받았음)
             if (state.equals(originState) && StringUtils.hasText(code)) {
+                /**
+                 * 카카오 -
+                 * state가 동일하고, 정상 응답이 왔을 경우(코드 받았음)
+                 */
                 // state 값이 key 고 value 가 sns 명
                 String sns = String.valueOf(session.getAttribute(originState));
                 String clientId = snsInfo.clientId(sns);
                 String clientSecret = snsInfo.clientSecret(sns);
                 String tokenUri = snsInfo.tokenUri(sns);
-
+                System.out.println("tokenUri = " + tokenUri);
                 MultiValueMap<String, String> parameters =
                         setParameters(code, clientId, clientSecret, requestURI);
 
@@ -85,6 +91,7 @@ public class CustomOAuth2AuthorizationCodeGrantFilter extends OAuth2Authorizatio
                 // (토큰) 응답 받기
                 CustomAccessTokenResponse tokenResponse = responseEntity.getBody();
                 request.setAttribute("tokenResponse", tokenResponse);
+                request.setAttribute("sns", sns);
 
                 removeSessionAttr(session, originState);
             }
