@@ -26,7 +26,6 @@ public class CustomOAuth2AuthorizationRequestResolver implements OAuth2Authoriza
     @Override
     public OAuth2AuthorizationRequest resolve(HttpServletRequest request) {
         // /oauth2/** 요청일 때만 resolver 동작해야 함니다
-        System.out.println("동작 ㅇㅇ");
         if (request.getRequestURI().startsWith(REQUEST_URL)) {
             String sns = request.getRequestURI().substring(REQUEST_URL.length());
             return this.resolve(request, sns);
@@ -37,7 +36,7 @@ public class CustomOAuth2AuthorizationRequestResolver implements OAuth2Authoriza
 
     @Override
     public OAuth2AuthorizationRequest resolve(HttpServletRequest request, String clientRegistrationId) {
-
+        System.out.println("리졸버 시작");
         String sns = clientRegistrationId.toUpperCase();
         String state = UUID.randomUUID().toString();
 

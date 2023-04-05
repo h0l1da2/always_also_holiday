@@ -75,10 +75,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
                 .and()
                 .addFilterBefore(new JwtFilter(userDetailsService(), jwtTokenParser, jwtTokenService), UsernamePasswordAuthenticationFilter.class)
-                .addFilterBefore(new JwtFilter(userDetailsService(), jwtTokenParser, jwtTokenService), OAuth2LoginAuthenticationFilter.class)
-                .addFilterBefore(new CustomOAuth2AuthorizationCodeGrantFilter(clientRegistrationRepository, oAuth2AuthorizedClientRepository, authenticationManager(), snsInfo), OAuth2LoginAuthenticationFilter.class)
                 .addFilterAfter(new JwtTokenSetFilter(), UsernamePasswordAuthenticationFilter.class)
-                .addFilterAfter(new OAuth2JwtTokenFilter(jwtTokenService, jwtTokenParser, memberRepository, snsInfo, kakaoJwk, googleJwk), CustomOAuth2AuthorizationCodeGrantFilter.class)
+                // OAuth2
+                .addFilterBefore(new CustomOAuth2AuthorizationCodeGrantFilter(clientRegistrationRepository, oAuth2AuthorizedClientRepository, authenticationManager(), snsInfo), OAuth2LoginAuthenticationFilter.class)
+                .addFilterBefore(new OAuth2JwtTokenFilter(jwtTokenService, jwtTokenParser, memberRepository, snsInfo, kakaoJwk, googleJwk), CustomOAuth2AuthorizationCodeGrantFilter.class)
                 .exceptionHandling()
                 .authenticationEntryPoint(new CustomAuthenticationEntryPoint()) // 인증이 실패했을 경우
                 .accessDeniedHandler(new CustomAccessDeniedHandler()) // 권한이 없을 경우

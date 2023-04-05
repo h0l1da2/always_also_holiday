@@ -12,7 +12,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.filter.OncePerRequestFilter;
 import today.also.hyuil.config.security.auth.jwk.GoogleJwk;
 import today.also.hyuil.config.security.auth.jwk.KakaoJwk;
-import today.also.hyuil.config.security.auth.tokenresponse.AccessTokenResponse;
+import today.also.hyuil.config.security.auth.tokenresponse.TokenResponse;
 import today.also.hyuil.config.security.auth.tokenresponse.NaverProfileApiResponse;
 import today.also.hyuil.config.security.auth.userinfo.SnsInfo;
 import today.also.hyuil.config.security.jwt.JwtTokenParser;
@@ -49,9 +49,9 @@ public class OAuth2JwtTokenFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-
-        AccessTokenResponse tokenResponse =
-                (AccessTokenResponse) request.getAttribute("tokenResponse");
+        System.out.println("토큰 생성/저장 필터");
+        TokenResponse tokenResponse =
+                (TokenResponse) request.getAttribute("tokenResponse");
         String sns = String.valueOf(request.getAttribute("sns"));
         String memberId = "";
         String token = "";
