@@ -4,7 +4,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 
+import java.security.Provider;
+import java.security.Security;
 import java.util.Base64;
+import java.util.TreeSet;
 
 public class TokenTest {
 
@@ -38,5 +41,23 @@ public class TokenTest {
         JSONObject jsonObject = new JSONObject(json);
 
         String kid = String.valueOf(jsonObject.get("kid"));
+    }
+
+    @Test
+    void myAlg() {
+        TreeSet<String> algorithms = new TreeSet<>();
+        for (Provider provider : Security.getProviders())
+            for (Provider.Service service : provider.getServices())
+                if (service.getType().equals("Signature"))
+                    algorithms.add(service.getAlgorithm());
+        for (String algorithm : algorithms)
+            System.out.println(algorithm);
+    }
+
+    @Test
+    void mySigLength() {
+        String sig = "eV_D9NIa3POeGTHJanEtxofqYIunK3BnjZQNNj5eSFfnVHwM4F7oymokQ-Qk9ccWeb_dNNP5AEY4zaxrwkoBK0kUAhZLNjTv6KEMf2TKT1t4kbZgeEuE61hQJlmBw_lpxC1EtMYonCEZgv7xjSsTn5CK57P79Pwc1IxUbp1JLJYrkwwOB0r1cqftXtMQHohgRVh5GUATMrwfciQhPQBYdA9ademq_PkGwDcav7HeBs6N5jIkOATXp3f5bAeT2zS62XMwHTAGPDEZ3cCdTchEd8BE3CLi2rYzy09NEnLeWgSpIz68RKu4HVecFmEAwB8yv1CFu6R7JmaibtAospd0lg";
+
+        System.out.println(sig.length());
     }
 }

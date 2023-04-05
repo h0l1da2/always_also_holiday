@@ -18,6 +18,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.security.PublicKey;
 import java.util.Map;
 
 public class OAuth2JwtTokenFilter extends OncePerRequestFilter {
@@ -53,12 +54,15 @@ public class OAuth2JwtTokenFilter extends OncePerRequestFilter {
              * GOOGLE : email , name
              */
             String idToken = tokenResponse.getIdToken();
-            String clientSecret = snsInfo.clientSecret(sns);
             String kid = null;
+            String n = null;
+            String e = null;
+            String kty = null;
+            String alg = null;
             try {
                 kid = jwtTokenParser.getTokenSecret(idToken, "header", "kid");
-            } catch (JSONException e) {
-                e.printStackTrace();
+            } catch (JSONException jsonE) {
+                jsonE.printStackTrace();
             }
 
             // 해당 sns를 가지고 해당 pk
@@ -66,20 +70,26 @@ public class OAuth2JwtTokenFilter extends OncePerRequestFilter {
 
                 // kid First인지 Second인지 확인하고, 해당 객체 쓰기
 
-                if (kid.equals(kidFirst)) {
-                    kid = kidFirst;
+                if (kid.equals(kakaoJwk.getKidFirst())) {
+                    kakaoJwk.jwkSetting("first");
+                } else if (kid.equals(kakaoJwk.getKidSecond())) {
+                    kakaoJwk.jwkSetting("second");
                 } else {
                     throw new RuntimeException("카카오 공개키가 수정된 거 같음");
                 }
+                n = kakaoJwk.getN();
+                e = kakaoJwk.getE();
+                kty = kakaoJwk.getKty();
+                alg = kakaoJwk.getAlg();
             }
 
             System.out.println("이 아래부터 문제 - idToken = " + idToken);
             System.out.println("이 아래부터 문제 - kid = " + kid);
 
-            jwtTokenParser.getPublicKey(kid, )
-            jwtTokenParser.isSignatureValid()
+            PublicKey publicKey = jwtTokenParser.getPublicKey(n, e, kty);
+            jwtTokenParser.isSignatureValid(publicKey, alg, idToken);
 
-            Claims claims = jwtTokenParser.getSnsClaims(idToken, kid);
+            Claims claims = jwtTokenParser.getSnsClaims(idToken, publicKey);
             System.out.println("파싱끝");
 
             String pk = claims.get("sub", String.class);

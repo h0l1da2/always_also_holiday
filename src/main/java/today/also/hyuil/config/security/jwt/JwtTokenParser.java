@@ -1,8 +1,6 @@
 package today.also.hyuil.config.security.jwt;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.JwtParser;
-import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.configurationprocessor.json.JSONException;
@@ -19,6 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.*;
+import java.security.SignatureException;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.RSAPublicKeySpec;
 import java.util.*;
@@ -70,24 +69,25 @@ public class JwtTokenParser {
         return claims;
     }
 
-    private Key getKey(String publicKey) {
-        byte[] keyBytes = publicKey.getBytes(StandardCharsets.UTF_8);
-        return Keys.hmacShaKeyFor(keyBytes);
-    }
-
     private String[] splitToken(String token) {
         String[] jwt = token.split("\\.");
         return jwt;
     }
 
-    public PublicKey getPublicKey(String kid, String n, String e, String alg) throws InvalidKeySpecException, NoSuchAlgorithmException {
+    public PublicKey getPublicKey(String n, String e, String kty) {
         BigInteger modulus = new BigInteger(1, Base64.getUrlDecoder().decode(n));
         BigInteger exponent = new BigInteger(1, Base64.getUrlDecoder().decode(e));
-
         RSAPublicKeySpec spec = new RSAPublicKeySpec(modulus, exponent);
-        KeyFactory factory = KeyFactory.getInstance(alg);
-
-        return factory.generatePublic(spec);
+        try {
+            KeyFactory factory = KeyFactory.getInstance(kty);
+            return factory.generatePublic(spec);
+        } catch (NoSuchAlgorithmException ex) {
+            System.out.println("알고리즘을 못 찾아씀");
+            throw new RuntimeException(ex);
+        } catch (InvalidKeySpecException ex) {
+            System.out.println("잘못 된 키 스펙");
+            throw new RuntimeException(ex);
+        }
     }
 
     public String getTokenSecret(String token, String where, String what) throws JSONException {
@@ -113,22 +113,38 @@ public class JwtTokenParser {
         return String.valueOf(headerJson.get(what));
     }
 
-    public boolean isSignatureValid(PublicKey publicKey, String alg, String token) throws InvalidKeyException, NoSuchAlgorithmException, SignatureException {
+    public boolean isSignatureValid(PublicKey publicKey, String alg, String token) {
         String[] jwt = splitToken(token);
 
-        Signature verifier = Signature.getInstance(alg);
-        verifier.initVerify(publicKey);
-        verifier.update((jwt[0]+"."+jwt[1]).getBytes(StandardCharsets.UTF_8));
+        try {
+            Signature verifier = Signature.getInstance("SHA256withRSA");
+            verifier.initVerify(publicKey);
+            verifier.update((jwt[0]+"."+jwt[1]).getBytes(StandardCharsets.UTF_8));
 
-        return verifier.verify(jwt[2].getBytes());
+            return verifier.verify(Base64.getUrlDecoder().decode(jwt[2]));
+        } catch (NoSuchAlgorithmException e) {
+            System.out.println("알고리즘을 못 찾음");
+            throw new RuntimeException(e);
+        } catch (InvalidKeyException e) {
+            System.out.println("키 스펙이 잘못 됨");
+            throw new RuntimeException(e);
+        } catch (SignatureException e) {
+            System.out.println("서명이 잘못 됨");
+            throw new RuntimeException(e);
+        }
     }
 
-    public Claims getSnsClaims(String idToken, String publicKey) {
-        Key key = getKey(publicKey);
+    public Claims getSnsClaims(String idToken, PublicKey publicKey) {
+
         return Jwts.parserBuilder()
-                .setSigningKey(key)
+                .setSigningKeyResolver(new SigningKeyResolverAdapter() {
+                    @Override
+                    public Key resolveSigningKey(JwsHeader header, Claims claims) {
+                        return publicKey;
+                    }
+                })
                 .build()
-                .parseClaimsJwt(idToken)
+                .parseClaimsJws(idToken)
                 .getBody();
     }
 
