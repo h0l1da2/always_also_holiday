@@ -18,6 +18,7 @@ import today.also.hyuil.config.security.CustomAccessDeniedHandler;
 import today.also.hyuil.config.security.CustomAuthenticationEntryPoint;
 import today.also.hyuil.config.security.CustomUserDetailsService;
 import today.also.hyuil.config.security.auth.*;
+import today.also.hyuil.config.security.auth.jwk.GoogleJwk;
 import today.also.hyuil.config.security.auth.jwk.KakaoJwk;
 import today.also.hyuil.config.security.auth.userinfo.SnsInfo;
 import today.also.hyuil.config.security.jwt.*;
@@ -36,7 +37,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final OAuth2AuthorizedClientRepository oAuth2AuthorizedClientRepository;
     private final SnsInfo snsInfo;
     private final KakaoJwk kakaoJwk;
-    public SecurityConfig(MemberRepository memberRepository, JwtTokenParser jwtTokenParser, JwtAuthService jwtAuthService, JwtTokenService jwtTokenService, CustomOAuth2AuthorizationRequestResolver customOAuth2AuthorizationRequestResolver, ClientRegistrationRepository clientRegistrationRepository, OAuth2AuthorizedClientRepository oAuth2AuthorizedClientRepository, SnsInfo snsInfo, KakaoJwk kakaoJwk) {
+    private final GoogleJwk googleJwk;
+    public SecurityConfig(MemberRepository memberRepository, JwtTokenParser jwtTokenParser, JwtAuthService jwtAuthService, JwtTokenService jwtTokenService, CustomOAuth2AuthorizationRequestResolver customOAuth2AuthorizationRequestResolver, ClientRegistrationRepository clientRegistrationRepository, OAuth2AuthorizedClientRepository oAuth2AuthorizedClientRepository, SnsInfo snsInfo, KakaoJwk kakaoJwk, GoogleJwk googleJwk) {
         this.memberRepository = memberRepository;
         this.jwtTokenParser = jwtTokenParser;
         this.jwtAuthService = jwtAuthService;
@@ -46,6 +48,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         this.oAuth2AuthorizedClientRepository = oAuth2AuthorizedClientRepository;
         this.snsInfo = snsInfo;
         this.kakaoJwk = kakaoJwk;
+        this.googleJwk = googleJwk;
     }
 
     @Override
@@ -75,7 +78,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .addFilterBefore(new JwtFilter(userDetailsService(), jwtTokenParser, jwtTokenService), OAuth2LoginAuthenticationFilter.class)
                 .addFilterBefore(new CustomOAuth2AuthorizationCodeGrantFilter(clientRegistrationRepository, oAuth2AuthorizedClientRepository, authenticationManager(), snsInfo), OAuth2LoginAuthenticationFilter.class)
                 .addFilterAfter(new JwtTokenSetFilter(), UsernamePasswordAuthenticationFilter.class)
-                .addFilterAfter(new OAuth2JwtTokenFilter(jwtTokenService, jwtTokenParser, memberRepository, snsInfo, kakaoJwk), CustomOAuth2AuthorizationCodeGrantFilter.class)
+                .addFilterAfter(new OAuth2JwtTokenFilter(jwtTokenService, jwtTokenParser, memberRepository, snsInfo, kakaoJwk, googleJwk), CustomOAuth2AuthorizationCodeGrantFilter.class)
                 .exceptionHandling()
                 .authenticationEntryPoint(new CustomAuthenticationEntryPoint()) // 인증이 실패했을 경우
                 .accessDeniedHandler(new CustomAccessDeniedHandler()) // 권한이 없을 경우
@@ -90,6 +93,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .userService(new CustomDefaultOAuth2UserService(memberRepository, bCryptPasswordEncoder(), jwtAuthService)) // 로그인
                 .and()
                 .successHandler(new CustomOAuth2SuccessHandler(jwtTokenService, memberRepository))
+
+                .and()
+                .logout()
+                .logoutSuccessUrl("/")
+                .permitAll()
         ;
     }
 

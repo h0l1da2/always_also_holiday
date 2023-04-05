@@ -1,5 +1,6 @@
 package today.also.hyuil.config.security.auth.userinfo;
 
+import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
@@ -11,6 +12,7 @@ import java.util.List;
 // Sns Info 나누기
 @Component
 @PropertySource("classpath:application.yml")
+@Getter
 public class SnsInfo {
 
     @Value("${spring.security.oauth2.client.registration.google.client-id}")
@@ -33,6 +35,9 @@ public class SnsInfo {
     private String naverAuthUri;
     @Value("${spring.security.oauth2.client.provider.naver.token-uri}")
     private String naverTokenUri;
+    @Value("${spring.security.oauth2.client.provider.naver.user-info-uri}")
+    private String naverProfileApi;
+
 
     @Value("${spring.security.oauth2.client.registration.kakao.client-id}")
     private String kakaoClientId;
@@ -44,6 +49,7 @@ public class SnsInfo {
     private String kakaoAuthUri;
     @Value("${spring.security.oauth2.client.provider.kakao.token-uri}")
     private String kakaoTokenUri;
+
 
     public String clientId(String sns) {
         if (sns.equals(Sns.GOOGLE.name())) {

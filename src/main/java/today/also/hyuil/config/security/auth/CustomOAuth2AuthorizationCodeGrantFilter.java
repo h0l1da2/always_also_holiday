@@ -10,8 +10,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 import today.also.hyuil.config.security.auth.userinfo.SnsInfo;
-import today.also.hyuil.config.security.auth.userinfo.CustomAccessTokenResponse;
-import today.also.hyuil.domain.member.Sns;
+import today.also.hyuil.config.security.auth.tokenresponse.AccessTokenResponse;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -26,15 +25,6 @@ public class CustomOAuth2AuthorizationCodeGrantFilter extends OAuth2Authorizatio
 
     private final SnsInfo snsInfo;
 
-    /**
-     * Constructs an {@code OAuth2AuthorizationCodeGrantFilter} using the provided
-     * parameters.
-     *
-     * @param clientRegistrationRepository the repository of client registrations
-     * @param authorizedClientRepository   the authorized client repository
-     * @param authenticationManager        the authentication manager
-     * @param snsInfo
-     */
     public CustomOAuth2AuthorizationCodeGrantFilter(ClientRegistrationRepository clientRegistrationRepository, OAuth2AuthorizedClientRepository authorizedClientRepository, AuthenticationManager authenticationManager, SnsInfo snsInfo) {
         super(clientRegistrationRepository, authorizedClientRepository, authenticationManager);
         this.snsInfo = snsInfo;
@@ -85,11 +75,12 @@ public class CustomOAuth2AuthorizationCodeGrantFilter extends OAuth2Authorizatio
 
                 // https://kauth.kakao.com/oauth/token 으로 토큰 요청 보내기
                 RestTemplate restTemplate = new RestTemplate();
-                ResponseEntity<CustomAccessTokenResponse> responseEntity =
-                        restTemplate.exchange(tokenUri, HttpMethod.POST, entity, CustomAccessTokenResponse.class);
+                ResponseEntity<AccessTokenResponse> responseEntity =
+                        restTemplate.exchange(tokenUri, HttpMethod.POST, entity, AccessTokenResponse.class);
 
                 // (토큰) 응답 받기
-                CustomAccessTokenResponse tokenResponse = responseEntity.getBody();
+                // 카카오, 네이버, 구글이 다 다름 TokenResponse 가
+                AccessTokenResponse tokenResponse = responseEntity.getBody();
                 request.setAttribute("tokenResponse", tokenResponse);
                 request.setAttribute("sns", sns);
 

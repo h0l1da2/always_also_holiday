@@ -1,4 +1,4 @@
-package today.also.hyuil.config.security.auth.userinfo;
+package today.also.hyuil.config.security.auth.tokenresponse;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
@@ -6,7 +6,7 @@ import lombok.ToString;
 
 @Getter
 @ToString
-public class CustomAccessTokenResponse {
+public class AccessTokenResponse {
 
     @JsonProperty("token_type")
     private String tokenType;

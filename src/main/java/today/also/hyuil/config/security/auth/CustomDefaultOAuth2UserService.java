@@ -1,7 +1,6 @@
 package today.also.hyuil.config.security.auth;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
@@ -29,6 +28,7 @@ public class CustomDefaultOAuth2UserService extends DefaultOAuth2UserService {
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
+        System.out.println("유저서비스시작");
         OAuth2User oAuth2User = super.loadUser(userRequest);
         String client = userRequest.getClientRegistration().getRegistrationId();
 
@@ -42,6 +42,7 @@ public class CustomDefaultOAuth2UserService extends DefaultOAuth2UserService {
 
         // 기존 가입 멤버가 아니라면 ?
         if (member == null) {
+            System.out.println("멤버를 가입시키자");
             String nickname = userInfo.getSnsName()+"_"+pkey.substring(0, 6);
             String password = getEncodedPassword(pkey+ UUID.randomUUID());
             String name = userInfo.getName();
