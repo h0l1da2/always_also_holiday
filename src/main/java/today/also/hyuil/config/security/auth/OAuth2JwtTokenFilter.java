@@ -152,20 +152,19 @@ public class OAuth2JwtTokenFilter extends OncePerRequestFilter {
             // 이 아래부터 공통 작업(토큰 만드는 작업)
             memberId = sns+sub;
             Member member = memberJoinService.findMyAccount(memberId);
-
+            String accessToken = "";
             if (member != null) {
 
                 Map<String, String> tokens =
                         jwtTokenService.getTokens(memberId, member.getRole().getName());
-                String accessToken = tokens.get("accessToken");
+                accessToken = tokens.get("accessToken");
                 String refreshToken = tokens.get("refreshToken");
 
                 jwtTokenService.saveRefreshToken(memberId, refreshToken);
 
-
-                response.setHeader("Authorization", "Bearer "+accessToken);
             }
-            String redirectUri = request.getRequestURI();
+            String redirectUri = "/loginForm?redirect="+request.getRequestURI()+"&token="+accessToken;
+            System.out.println("redirectUri = " + redirectUri);
             response.sendRedirect(redirectUri);
         }
 
