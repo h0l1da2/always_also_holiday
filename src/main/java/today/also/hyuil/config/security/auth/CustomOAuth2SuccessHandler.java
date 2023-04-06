@@ -5,7 +5,7 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 import today.also.hyuil.config.security.CustomUserDetails;
 import today.also.hyuil.config.security.jwt.JwtTokenService;
 import today.also.hyuil.domain.member.Member;
-import today.also.hyuil.repository.member.MemberRepository;
+import today.also.hyuil.service.member.inter.MemberJoinService;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -19,18 +19,18 @@ import java.util.Map;
 public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler {
 
     private final JwtTokenService jwtTokenService;
-    private final MemberRepository memberRepository;
+    private final MemberJoinService memberJoinService;
 
-    public CustomOAuth2SuccessHandler(JwtTokenService jwtTokenService, MemberRepository memberRepository) {
+    public CustomOAuth2SuccessHandler(JwtTokenService jwtTokenService, MemberJoinService memberJoinService) {
         this.jwtTokenService = jwtTokenService;
-        this.memberRepository = memberRepository;
+        this.memberJoinService = memberJoinService;
     }
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
 
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-        Member findMember = memberRepository.findByMemberIdRole(userDetails.getUsername());
+        Member findMember = memberJoinService.findMyAccount(userDetails.getUsername());
         Map<String, String> tokens = jwtTokenService.getTokens(findMember.getMemberId(), findMember.getRole().getName());
 
         String accessToken = tokens.get("accessToken");

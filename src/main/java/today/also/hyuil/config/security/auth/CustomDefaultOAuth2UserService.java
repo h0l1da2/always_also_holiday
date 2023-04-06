@@ -1,29 +1,29 @@
 package today.also.hyuil.config.security.auth;
 
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
+import org.springframework.stereotype.Service;
 import today.also.hyuil.config.security.CustomUserDetails;
+import today.also.hyuil.config.security.auth.userinfo.GoogleUserInfo;
+import today.also.hyuil.config.security.auth.userinfo.KakaoUserInfo;
+import today.also.hyuil.config.security.auth.userinfo.NaverUserInfo;
 import today.also.hyuil.config.security.auth.userinfo.SnsUserInfo;
-import today.also.hyuil.config.security.jwt.JwtAuthService;
 import today.also.hyuil.domain.member.*;
-import today.also.hyuil.repository.member.MemberRepository;
+import today.also.hyuil.service.member.inter.MemberJoinService;
 
 import java.util.Date;
+import java.util.Map;
 import java.util.UUID;
 
+@Service
 public class CustomDefaultOAuth2UserService extends DefaultOAuth2UserService {
 
-    private final MemberRepository memberRepository;
-    private final BCryptPasswordEncoder passwordEncoder;
-    private final JwtAuthService jwtAuthService;
+    private final MemberJoinService memberJoinService;
 
-    public CustomDefaultOAuth2UserService(MemberRepository memberRepository, BCryptPasswordEncoder passwordEncoder, JwtAuthService jwtAuthService) {
-        this.memberRepository = memberRepository;
-        this.passwordEncoder = passwordEncoder;
-        this.jwtAuthService = jwtAuthService;
+    public CustomDefaultOAuth2UserService(MemberJoinService memberJoinService) {
+        this.memberJoinService = memberJoinService;
     }
 
     @Override
@@ -33,18 +33,18 @@ public class CustomDefaultOAuth2UserService extends DefaultOAuth2UserService {
         String client = userRequest.getClientRegistration().getRegistrationId();
 
         // userInfo 에 해당 sns 에 맞는 info 객체를 넣는 메소드
-        SnsUserInfo userInfo = jwtAuthService.clientUserInfoCheck(oAuth2User, client);
+        SnsUserInfo userInfo = clientUserInfoCheck(oAuth2User, client);
 
         // sns이름 + pk가 memberId
         String pkey = userInfo.getPkey();
         String memberId = userInfo.getMemberId();
-        Member member = memberRepository.findByMemberIdRole(memberId);
+        Member member = memberJoinService.findMyAccount(memberId);
 
         // 기존 가입 멤버가 아니라면 ?
         if (member == null) {
             System.out.println("멤버를 가입시키자");
             String nickname = userInfo.getSnsName()+"_"+pkey.substring(0, 6);
-            String password = getEncodedPassword(pkey+ UUID.randomUUID());
+            String password = pkey+ UUID.randomUUID();
             String name = userInfo.getName();
             String email = userInfo.getEmail();
             String phone = userInfo.getMobile();
@@ -54,7 +54,7 @@ public class CustomDefaultOAuth2UserService extends DefaultOAuth2UserService {
                     getNewSnsMember
                             (memberId, nickname, password, name, email, phone, sns, now);
 
-            member = memberRepository.insertMember(newMember);
+            member = memberJoinService.joinMember(newMember);
         }
         return new CustomUserDetails(member, oAuth2User.getAttributes());
     }
@@ -76,9 +76,18 @@ public class CustomDefaultOAuth2UserService extends DefaultOAuth2UserService {
                 .build();
     }
 
-
-
-    private String getEncodedPassword(String password) {
-        return passwordEncoder.encode(password);
+    public SnsUserInfo clientUserInfoCheck(OAuth2User oAuth2User, String client) {
+        if(client.equals("google")) {
+            return new GoogleUserInfo(oAuth2User.getAttributes());
+        }
+        if(client.equals("naver")) {
+            return new NaverUserInfo(
+                    (Map<String, Object>) oAuth2User.getAttributes().get("response"));
+        }
+        if(client.equals("kakao")) {
+            return new KakaoUserInfo(oAuth2User.getAttributes());
+        }
+        return null;
     }
+
 }

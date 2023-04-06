@@ -12,14 +12,14 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.filter.OncePerRequestFilter;
 import today.also.hyuil.config.security.auth.jwk.GoogleJwk;
 import today.also.hyuil.config.security.auth.jwk.KakaoJwk;
-import today.also.hyuil.config.security.auth.tokenresponse.TokenResponse;
 import today.also.hyuil.config.security.auth.tokenresponse.NaverProfileApiResponse;
+import today.also.hyuil.config.security.auth.tokenresponse.TokenResponse;
 import today.also.hyuil.config.security.auth.userinfo.SnsInfo;
 import today.also.hyuil.config.security.jwt.JwtTokenParser;
 import today.also.hyuil.config.security.jwt.JwtTokenService;
 import today.also.hyuil.domain.member.Member;
 import today.also.hyuil.domain.member.Sns;
-import today.also.hyuil.repository.member.MemberRepository;
+import today.also.hyuil.service.member.inter.MemberJoinService;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -33,15 +33,15 @@ public class OAuth2JwtTokenFilter extends OncePerRequestFilter {
 
     private final JwtTokenService jwtTokenService;
     private final JwtTokenParser jwtTokenParser;
-    private final MemberRepository memberRepository;
+    private final MemberJoinService memberJoinService;
     private final SnsInfo snsInfo;
 
     private final KakaoJwk kakaoJwk;
     private final GoogleJwk googleJwk;
-    public OAuth2JwtTokenFilter(JwtTokenService jwtTokenService, JwtTokenParser jwtTokenParser, MemberRepository memberRepository, SnsInfo snsInfo, KakaoJwk kakaoJwk, GoogleJwk googleJwk) {
+    public OAuth2JwtTokenFilter(JwtTokenService jwtTokenService, JwtTokenParser jwtTokenParser, MemberJoinService memberJoinService, SnsInfo snsInfo, KakaoJwk kakaoJwk, GoogleJwk googleJwk) {
         this.jwtTokenService = jwtTokenService;
         this.jwtTokenParser = jwtTokenParser;
-        this.memberRepository = memberRepository;
+        this.memberJoinService = memberJoinService;
         this.snsInfo = snsInfo;
         this.kakaoJwk = kakaoJwk;
         this.googleJwk = googleJwk;
@@ -151,7 +151,7 @@ public class OAuth2JwtTokenFilter extends OncePerRequestFilter {
 
             // 이 아래부터 공통 작업(토큰 만드는 작업)
             memberId = sns+sub;
-            Member member = memberRepository.findByMemberIdRole(memberId);
+            Member member = memberJoinService.findMyAccount(memberId);
 
             if (member != null) {
 

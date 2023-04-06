@@ -3,11 +3,9 @@ package today.also.hyuil.service.member;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import today.also.hyuil.domain.member.*;
+import today.also.hyuil.domain.member.Member;
 import today.also.hyuil.repository.member.MemberRepository;
 import today.also.hyuil.service.member.inter.MemberJoinService;
-
-import java.util.Date;
 
 @Transactional
 @Service
@@ -23,6 +21,8 @@ public class MemberJoinServiceImpl implements MemberJoinService {
 
     @Override
     public Member joinMember(Member member) {
+        String encodedPassword = getEncodedPassword(member.getPassword());
+        member.encodePassword(encodedPassword);
         return memberRepository.insertMember(member);
     }
 
@@ -39,6 +39,15 @@ public class MemberJoinServiceImpl implements MemberJoinService {
     @Override
     public Member phoneCheck(String phone) {
         return memberRepository.findByPhone(phone);
+    }
+
+    @Override
+    public Member findMyAccount(String memberId) {
+        return memberRepository.findByMemberIdRole(memberId);
+    }
+
+    private String getEncodedPassword(String password) {
+        return passwordEncoder.encode(password);
     }
 
 }

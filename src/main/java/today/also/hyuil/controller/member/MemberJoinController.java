@@ -1,6 +1,5 @@
 package today.also.hyuil.controller.member;
 
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -19,12 +18,10 @@ public class MemberJoinController {
 
     private String randomCode;
     private final MemberJoinService memberJoinService;
-    private final BCryptPasswordEncoder passwordEncoder;
     private final MailService mailService;
 
-    public MemberJoinController(MemberJoinService memberJoinService, BCryptPasswordEncoder passwordEncoder, MailService mailService) {
+    public MemberJoinController(MemberJoinService memberJoinService, MailService mailService) {
         this.memberJoinService = memberJoinService;
-        this.passwordEncoder = passwordEncoder;
         this.mailService = mailService;
     }
 
@@ -114,8 +111,6 @@ public class MemberJoinController {
 
     @PostMapping("/complete")
     public String joinMember(@ModelAttribute MemberJoinDto memberJoinDto) {
-        String encodedPassword = getEncodedPassword(memberJoinDto.getPassword());
-        memberJoinDto.setPassword(encodedPassword);
         memberJoinDto.setRoleName(Name.ROLE_USER);
         Member member =
                 new Member(memberJoinDto,
@@ -145,7 +140,4 @@ public class MemberJoinController {
         return false;
     }
 
-    public String getEncodedPassword(String password) {
-        return passwordEncoder.encode(password);
-    }
 }
