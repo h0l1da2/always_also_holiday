@@ -9,7 +9,6 @@ import today.also.hyuil.domain.dto.member.LoginDto;
 import today.also.hyuil.domain.member.Member;
 import today.also.hyuil.service.member.inter.MemberLoginService;
 
-import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
 import java.util.Map;
 

@@ -18,34 +18,40 @@ import today.also.hyuil.config.security.CustomAccessDeniedHandler;
 import today.also.hyuil.config.security.CustomAuthenticationEntryPoint;
 import today.also.hyuil.config.security.CustomUserDetailsService;
 import today.also.hyuil.config.security.auth.*;
+import today.also.hyuil.config.security.auth.jwk.GoogleJwk;
 import today.also.hyuil.config.security.auth.jwk.KakaoJwk;
 import today.also.hyuil.config.security.auth.userinfo.SnsInfo;
-import today.also.hyuil.config.security.jwt.*;
-import today.also.hyuil.repository.member.MemberRepository;
+import today.also.hyuil.config.security.jwt.JwtFilter;
+import today.also.hyuil.config.security.jwt.JwtTokenParser;
+import today.also.hyuil.config.security.jwt.JwtTokenService;
+import today.also.hyuil.config.security.jwt.JwtTokenSetFilter;
+import today.also.hyuil.service.member.inter.MemberJoinService;
 
 @EnableWebSecurity
 @Configuration
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-    private final MemberRepository memberRepository;
+    private final MemberJoinService memberJoinService;
     private final JwtTokenParser jwtTokenParser;
-    private final JwtAuthService jwtAuthService;
     private final JwtTokenService jwtTokenService;
+    private final CustomDefaultOAuth2UserService customDefaultOAuth2UserService;
     private final CustomOAuth2AuthorizationRequestResolver customOAuth2AuthorizationRequestResolver;
     private final ClientRegistrationRepository clientRegistrationRepository;
     private final OAuth2AuthorizedClientRepository oAuth2AuthorizedClientRepository;
     private final SnsInfo snsInfo;
     private final KakaoJwk kakaoJwk;
-    public SecurityConfig(MemberRepository memberRepository, JwtTokenParser jwtTokenParser, JwtAuthService jwtAuthService, JwtTokenService jwtTokenService, CustomOAuth2AuthorizationRequestResolver customOAuth2AuthorizationRequestResolver, ClientRegistrationRepository clientRegistrationRepository, OAuth2AuthorizedClientRepository oAuth2AuthorizedClientRepository, SnsInfo snsInfo, KakaoJwk kakaoJwk) {
-        this.memberRepository = memberRepository;
+    private final GoogleJwk googleJwk;
+    public SecurityConfig(MemberJoinService memberJoinService, JwtTokenParser jwtTokenParser, JwtTokenService jwtTokenService, CustomDefaultOAuth2UserService customDefaultOAuth2UserService, CustomOAuth2AuthorizationRequestResolver customOAuth2AuthorizationRequestResolver, ClientRegistrationRepository clientRegistrationRepository, OAuth2AuthorizedClientRepository oAuth2AuthorizedClientRepository, SnsInfo snsInfo, KakaoJwk kakaoJwk, GoogleJwk googleJwk) {
+        this.memberJoinService = memberJoinService;
         this.jwtTokenParser = jwtTokenParser;
-        this.jwtAuthService = jwtAuthService;
         this.jwtTokenService = jwtTokenService;
+        this.customDefaultOAuth2UserService = customDefaultOAuth2UserService;
         this.customOAuth2AuthorizationRequestResolver = customOAuth2AuthorizationRequestResolver;
         this.clientRegistrationRepository = clientRegistrationRepository;
         this.oAuth2AuthorizedClientRepository = oAuth2AuthorizedClientRepository;
         this.snsInfo = snsInfo;
         this.kakaoJwk = kakaoJwk;
+        this.googleJwk = googleJwk;
     }
 
     @Override
@@ -72,10 +78,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
                 .and()
                 .addFilterBefore(new JwtFilter(userDetailsService(), jwtTokenParser, jwtTokenService), UsernamePasswordAuthenticationFilter.class)
-                .addFilterBefore(new JwtFilter(userDetailsService(), jwtTokenParser, jwtTokenService), OAuth2LoginAuthenticationFilter.class)
-                .addFilterBefore(new CustomOAuth2AuthorizationCodeGrantFilter(clientRegistrationRepository, oAuth2AuthorizedClientRepository, authenticationManager(), snsInfo), OAuth2LoginAuthenticationFilter.class)
                 .addFilterAfter(new JwtTokenSetFilter(), UsernamePasswordAuthenticationFilter.class)
-                .addFilterAfter(new OAuth2JwtTokenFilter(jwtTokenService, jwtTokenParser, memberRepository, snsInfo, kakaoJwk), CustomOAuth2AuthorizationCodeGrantFilter.class)
+                // OAuth2
+                .addFilterBefore(new CustomOAuth2AuthorizationCodeGrantFilter(clientRegistrationRepository, oAuth2AuthorizedClientRepository, authenticationManager(), snsInfo), OAuth2LoginAuthenticationFilter.class)
+                .addFilterBefore(new OAuth2JwtTokenFilter(jwtTokenService, jwtTokenParser, memberJoinService, snsInfo, kakaoJwk, googleJwk), CustomOAuth2AuthorizationCodeGrantFilter.class)
                 .exceptionHandling()
                 .authenticationEntryPoint(new CustomAuthenticationEntryPoint()) // 인증이 실패했을 경우
                 .accessDeniedHandler(new CustomAccessDeniedHandler()) // 권한이 없을 경우
@@ -87,9 +93,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizationRequestResolver(customOAuth2AuthorizationRequestResolver)
                 .and()
                 .userInfoEndpoint()
-                .userService(new CustomDefaultOAuth2UserService(memberRepository, bCryptPasswordEncoder(), jwtAuthService)) // 로그인
+                .userService(customDefaultOAuth2UserService) // 로그인
                 .and()
-                .successHandler(new CustomOAuth2SuccessHandler(jwtTokenService, memberRepository))
+                .successHandler(new CustomOAuth2SuccessHandler(jwtTokenService, memberJoinService))
+
+                .and()
+                .logout()
+                .logoutSuccessUrl("/")
+                .permitAll()
         ;
     }
 
@@ -100,13 +111,5 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .mvcMatchers("/static/**", "/favicon.ico");
     }
 
-    @Bean
-    public UserDetailsService userDetailsService() {
-        return new CustomUserDetailsService(memberRepository);
-    }
-    @Bean
-    public BCryptPasswordEncoder bCryptPasswordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
 
 }

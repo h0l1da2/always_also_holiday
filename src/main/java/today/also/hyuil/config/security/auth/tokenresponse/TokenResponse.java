@@ -1,4 +1,4 @@
-package today.also.hyuil.config.security.auth.userinfo;
+package today.also.hyuil.config.security.auth.tokenresponse;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
@@ -6,7 +6,7 @@ import lombok.ToString;
 
 @Getter
 @ToString
-public class CustomAccessTokenResponse {
+public class TokenResponse {
 
     @JsonProperty("token_type")
     private String tokenType;
@@ -20,6 +20,10 @@ public class CustomAccessTokenResponse {
     private String refreshToken;
     @JsonProperty("refresh_token_expires_in")
     private long refreshTokenExpiresIn;
+    @JsonProperty("error")
+    private String error;
+    @JsonProperty("error_description")
+    private String errorDescription;
     @JsonProperty("scope")
     private String scope; // 여러개 올 경우, 공백으로 구분 "aaa bbb ccc"
 

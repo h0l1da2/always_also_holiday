@@ -10,7 +10,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 import today.also.hyuil.config.security.auth.userinfo.SnsInfo;
-import today.also.hyuil.config.security.auth.userinfo.CustomAccessTokenResponse;
+import today.also.hyuil.config.security.auth.tokenresponse.TokenResponse;
 import today.also.hyuil.domain.member.Sns;
 
 import javax.servlet.FilterChain;
@@ -19,6 +19,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 
 import static org.springframework.http.MediaType.*;
 
@@ -26,15 +28,6 @@ public class CustomOAuth2AuthorizationCodeGrantFilter extends OAuth2Authorizatio
 
     private final SnsInfo snsInfo;
 
-    /**
-     * Constructs an {@code OAuth2AuthorizationCodeGrantFilter} using the provided
-     * parameters.
-     *
-     * @param clientRegistrationRepository the repository of client registrations
-     * @param authorizedClientRepository   the authorized client repository
-     * @param authenticationManager        the authentication manager
-     * @param snsInfo
-     */
     public CustomOAuth2AuthorizationCodeGrantFilter(ClientRegistrationRepository clientRegistrationRepository, OAuth2AuthorizedClientRepository authorizedClientRepository, AuthenticationManager authenticationManager, SnsInfo snsInfo) {
         super(clientRegistrationRepository, authorizedClientRepository, authenticationManager);
         this.snsInfo = snsInfo;
@@ -43,7 +36,7 @@ public class CustomOAuth2AuthorizationCodeGrantFilter extends OAuth2Authorizatio
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        System.out.println("필터 시작");
+        System.out.println("그랜트 필터 시작");
         // http://localhost:8080/fanLetter?code={code}&state={state}
 
         String code = request.getParameter("code");
@@ -72,24 +65,32 @@ public class CustomOAuth2AuthorizationCodeGrantFilter extends OAuth2Authorizatio
                 String clientId = snsInfo.clientId(sns);
                 String clientSecret = snsInfo.clientSecret(sns);
                 String tokenUri = snsInfo.tokenUri(sns);
-                System.out.println("tokenUri = " + tokenUri);
                 MultiValueMap<String, String> parameters =
                         setParameters(code, clientId, clientSecret, requestURI);
-
+                System.out.println("code = " + code);
                 // 헤더 세팅
                 HttpHeaders headers = new HttpHeaders();
                 headers.setBasicAuth(sns, snsInfo.clientSecret(sns));
                 headers.setContentType(valueOf(APPLICATION_FORM_URLENCODED_VALUE));
+                if (sns.equals(Sns.GOOGLE.name())) {
+                    String authValue =
+                            Base64.getEncoder().encodeToString(
+                                    (clientId + ":" + clientSecret).getBytes(StandardCharsets.UTF_8));
+                    headers.set("Authorization", "Basic "+authValue);
+                }
 
                 HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<>(parameters, headers);
 
                 // https://kauth.kakao.com/oauth/token 으로 토큰 요청 보내기
                 RestTemplate restTemplate = new RestTemplate();
-                ResponseEntity<CustomAccessTokenResponse> responseEntity =
-                        restTemplate.exchange(tokenUri, HttpMethod.POST, entity, CustomAccessTokenResponse.class);
+                System.out.println("설마여기니 = "+tokenUri);
+                ResponseEntity<TokenResponse> responseEntity =
+                        restTemplate.exchange(tokenUri, HttpMethod.POST, entity, TokenResponse.class);
+                System.out.println("동작하니 = ");
 
                 // (토큰) 응답 받기
-                CustomAccessTokenResponse tokenResponse = responseEntity.getBody();
+                // 카카오, 네이버, 구글이 다 다름 TokenResponse 가
+                TokenResponse tokenResponse = responseEntity.getBody();
                 request.setAttribute("tokenResponse", tokenResponse);
                 request.setAttribute("sns", sns);
 
@@ -99,14 +100,7 @@ public class CustomOAuth2AuthorizationCodeGrantFilter extends OAuth2Authorizatio
 
 
 
-        String errorDescription = request.getParameter("errorDescription");
-        String error = request.getParameter("error");
-
-        if (StringUtils.hasText(error) | StringUtils.hasText(errorDescription)) {
-            response.sendRedirect("/loginForm?error=error");
-        } else {
-            filterChain.doFilter(request, response);
-        }
+        filterChain.doFilter(request, response);
 
 
     }

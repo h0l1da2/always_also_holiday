@@ -86,4 +86,8 @@ public class Member {
         this.sns = sns;
         this.admin = admin;
     }
+
+    public void encodePassword(String password) {
+        this.password = password;
+    }
 }

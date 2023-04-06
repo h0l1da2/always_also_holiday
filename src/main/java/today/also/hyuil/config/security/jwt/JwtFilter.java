@@ -33,6 +33,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+        System.out.println("JWT 검증 필터");
         String token = jwtTokenParser.getTokenHeader(request);
         if (token == null) {
             String tokenUrl = jwtTokenParser.getTokenUrl(request);
