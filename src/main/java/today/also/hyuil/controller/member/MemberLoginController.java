@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import today.also.hyuil.config.security.jwt.JwtTokenService;
 import today.also.hyuil.domain.dto.member.LoginDto;
 import today.also.hyuil.domain.member.Member;
-import today.also.hyuil.service.member.inter.MemberLoginService;
+import today.also.hyuil.service.member.inter.MemberJoinService;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -15,11 +15,11 @@ import java.util.Map;
 @Controller
 public class MemberLoginController {
 
-    private final MemberLoginService memberLoginService;
+    private final MemberJoinService memberJoinService;
     private final JwtTokenService jwtTokenService;
 
-    public MemberLoginController(MemberLoginService memberLoginService, JwtTokenService jwtTokenService) {
-        this.memberLoginService = memberLoginService;
+    public MemberLoginController(MemberJoinService memberJoinService, JwtTokenService jwtTokenService) {
+        this.memberJoinService = memberJoinService;
         this.jwtTokenService = jwtTokenService;
     }
 
@@ -38,26 +38,22 @@ public class MemberLoginController {
         Map map = new HashMap();
 
         if (loginDtoNullCheck(loginDto)) {
-            System.out.println("111");
             errorMapReturn(map);
         }
 
-        Member member = null;
         try {
-            member = new Member(loginDto);
-            boolean idPwdValid = memberLoginService.idPwdValid(member);
-
+            boolean idPwdValid = memberJoinService.idPwdValid(loginDto.getMemberId(), loginDto.getPassword());
             // idPwd 틀리면 오류폼
             if (!idPwdValid) {
-                System.out.println("222");
                 errorMapReturn(map);
+                return map;
             }
         } catch (UsernameNotFoundException e) {
             System.out.println("아이디가 없음");
             errorMapReturn(map);
             return map;
         }
-
+        Member member = memberJoinService.findMyAccount(loginDto.getMemberId());
         Map<String, String> tokens = jwtTokenService.getTokens(
                 member.getMemberId(), member.getRole().getName());
         String refreshToken = tokens.get("refreshToken");
@@ -65,13 +61,11 @@ public class MemberLoginController {
 
         // 각 토큰 저장
         jwtTokenService.saveRefreshToken(member.getMemberId(), refreshToken);
-        System.out.println("333");
 
         /**
          * 자동로그인기능 쿠키생성(나중에)
          */
         map.put("JWT", accessToken);
-        System.out.println("444");
         return map;
     }
 
