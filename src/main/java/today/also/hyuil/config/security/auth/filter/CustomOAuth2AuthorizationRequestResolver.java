@@ -1,4 +1,4 @@
-package today.also.hyuil.config.security.auth;
+package today.also.hyuil.config.security.auth.filter;
 
 import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestResolver;
 import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
