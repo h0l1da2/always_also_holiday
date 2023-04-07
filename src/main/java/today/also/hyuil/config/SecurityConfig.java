@@ -1,5 +1,6 @@
 package today.also.hyuil.config;
 
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -7,13 +8,18 @@ import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.client.web.OAuth2AuthorizedClientRepository;
 import org.springframework.security.oauth2.client.web.OAuth2LoginAuthenticationFilter;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import today.also.hyuil.config.security.CustomAccessDeniedHandler;
 import today.also.hyuil.config.security.CustomAuthenticationEntryPoint;
+import today.also.hyuil.config.security.CustomUserDetailsService;
 import today.also.hyuil.config.security.auth.*;
+import today.also.hyuil.config.security.auth.filter.CustomOAuth2AuthorizationCodeGrantFilter;
+import today.also.hyuil.config.security.auth.filter.CustomOAuth2AuthorizationRequestResolver;
+import today.also.hyuil.config.security.auth.filter.OAuth2JwtTokenFilter;
 import today.also.hyuil.config.security.auth.jwk.GoogleJwk;
 import today.also.hyuil.config.security.auth.jwk.KakaoJwk;
 import today.also.hyuil.config.security.auth.userinfo.SnsInfo;
@@ -76,7 +82,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .addFilterBefore(new JwtFilter(userDetailsService(), jwtTokenParser, jwtTokenService), UsernamePasswordAuthenticationFilter.class)
                 .addFilterAfter(new JwtTokenSetFilter(), UsernamePasswordAuthenticationFilter.class)
                 // OAuth2
-                .addFilterBefore(new CustomOAuth2AuthorizationCodeGrantFilter(clientRegistrationRepository, oAuth2AuthorizedClientRepository, authenticationManager(), snsInfo), OAuth2LoginAuthenticationFilter.class)
+                .addFilterBefore(new CustomOAuth2AuthorizationCodeGrantFilter(clientRegistrationRepository, oAuth2AuthorizedClientRepository, authenticationManager(), customDefaultOAuth2UserService, snsInfo), OAuth2LoginAuthenticationFilter.class)
                 .addFilterBefore(new OAuth2JwtTokenFilter(jwtTokenService, jwtTokenParser, memberJoinService, snsInfo, kakaoJwk, googleJwk), CustomOAuth2AuthorizationCodeGrantFilter.class)
                 .exceptionHandling()
                 .authenticationEntryPoint(new CustomAuthenticationEntryPoint()) // 인증이 실패했을 경우
@@ -99,7 +105,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .permitAll()
         ;
     }
-
+    @Bean
+    public UserDetailsService userDetailsService() {
+        return new CustomUserDetailsService(memberJoinService);
+    }
     @Override
     public void configure(WebSecurity web) throws Exception {
         web

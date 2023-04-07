@@ -1,15 +1,25 @@
-package today.also.hyuil.config.security.auth;
+package today.also.hyuil.config.security.auth.filter;
 
+import com.nimbusds.oauth2.sdk.auth.ClientAuthentication;
 import io.jsonwebtoken.Claims;
 import org.springframework.boot.configurationprocessor.json.JSONException;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.oauth2.client.registration.ClientRegistration;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
+import org.springframework.security.oauth2.core.OAuth2AccessToken;
+import org.springframework.security.oauth2.core.OAuth2AccessToken.TokenType;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.filter.OncePerRequestFilter;
+import today.also.hyuil.config.security.auth.CustomDefaultOAuth2UserService;
 import today.also.hyuil.config.security.auth.jwk.GoogleJwk;
 import today.also.hyuil.config.security.auth.jwk.KakaoJwk;
 import today.also.hyuil.config.security.auth.tokenresponse.NaverProfileApiResponse;
@@ -159,17 +169,20 @@ public class OAuth2JwtTokenFilter extends OncePerRequestFilter {
                         jwtTokenService.getTokens(memberId, member.getRole().getName());
                 accessToken = tokens.get("accessToken");
                 String refreshToken = tokens.get("refreshToken");
-
+                request.setAttribute("accessToken", accessToken);
                 jwtTokenService.saveRefreshToken(memberId, refreshToken);
 
             }
             String redirectUri = "/loginForm?redirect="+request.getRequestURI()+"&token="+accessToken;
-            System.out.println("redirectUri = " + redirectUri);
             response.sendRedirect(redirectUri);
+
+
         }
 
         filterChain.doFilter(request, response);
 
 
     }
+
+
 }
