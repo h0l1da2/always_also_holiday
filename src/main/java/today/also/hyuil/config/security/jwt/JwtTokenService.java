@@ -29,7 +29,7 @@ public class JwtTokenService {
     }
 
     public Map<String, String> getTokens(String memberId, Name role) {
-
+        System.out.println("여기까진 가나");
         String refreshToken = jwtTokenProvider.createRefreshToken();
         String accessToken = jwtTokenProvider.createAccessToken(
                 memberId, getAuthorities(String.valueOf(role)));

@@ -8,5 +8,6 @@ public interface MemberJoinService {
     Member nicknameCheck(String nickname);
     Member phoneCheck(String phone);
     Member findMyAccount(String memberId);
+    boolean idPwdValid(String memberId, String password);
 
 }

@@ -46,6 +46,12 @@ public class MemberJoinServiceImpl implements MemberJoinService {
         return memberRepository.findByMemberIdRole(memberId);
     }
 
+    @Override
+    public boolean idPwdValid(String memberId, String password) {
+        Member findMember = memberRepository.findByMemberId(memberId);
+        return passwordEncoder.matches(password, findMember.getPassword());
+    }
+
     private String getEncodedPassword(String password) {
         return passwordEncoder.encode(password);
     }

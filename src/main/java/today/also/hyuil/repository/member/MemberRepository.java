@@ -4,6 +4,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import today.also.hyuil.domain.member.Member;
+import today.also.hyuil.domain.member.Role;
 
 import javax.persistence.EntityManager;
 import java.util.Optional;
