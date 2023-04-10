@@ -30,7 +30,6 @@ public class CustomOAuth2AuthorizationRequestResolver implements OAuth2Authoriza
             String sns = request.getRequestURI().substring(REQUEST_URL.length());
             return this.resolve(request, sns);
         }
-        System.out.println("리졸버 동작 ㄴㄴ");
         return null;
     }
 
@@ -53,7 +52,6 @@ public class CustomOAuth2AuthorizationRequestResolver implements OAuth2Authoriza
         Map<String, Object> map = new HashMap<>();
         map.put(OAuth2ParameterNames.RESPONSE_TYPE, responseType);
         map.put("client", sns);
-        System.out.println("돼요?");
         return OAuth2AuthorizationRequest
                 .authorizationCode()
                 .clientId(clientId)
@@ -66,14 +64,14 @@ public class CustomOAuth2AuthorizationRequestResolver implements OAuth2Authoriza
     }
 
     private void setClientSession(HttpServletRequest request, String state, String sns) {
-        HttpSession session = request.getSession();
+        HttpSession session = request.getSession(false);
         if (session != null) {
             session.setAttribute(state, sns);
         }
     }
 
     private void setStateSession(HttpServletRequest request, String state) {
-        HttpSession session = request.getSession();
+        HttpSession session = request.getSession(false);
         if (session != null) {
             session.setAttribute("state", state);
         }
