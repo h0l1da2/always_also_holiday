@@ -143,7 +143,6 @@
               window.location.href='/loginForm?error='+result.error;
             }
           } else {
-
             localStorage.setItem('jwt', result.JWT);
             if (redirectUrl) {
               window.location.href = redirectUrl+"?token="+result.JWT;

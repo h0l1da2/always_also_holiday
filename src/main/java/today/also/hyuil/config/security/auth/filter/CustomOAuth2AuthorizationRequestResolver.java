@@ -52,6 +52,7 @@ public class CustomOAuth2AuthorizationRequestResolver implements OAuth2Authoriza
         Map<String, Object> map = new HashMap<>();
         map.put(OAuth2ParameterNames.RESPONSE_TYPE, responseType);
         map.put("client", sns);
+
         return OAuth2AuthorizationRequest
                 .authorizationCode()
                 .clientId(clientId)

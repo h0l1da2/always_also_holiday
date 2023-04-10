@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import java.security.Provider;
 import java.security.Security;
 import java.util.Base64;
+import java.util.Collections;
 import java.util.TreeSet;
 
 public class TokenTest {
@@ -59,5 +60,10 @@ public class TokenTest {
         String sig = "eV_D9NIa3POeGTHJanEtxofqYIunK3BnjZQNNj5eSFfnVHwM4F7oymokQ-Qk9ccWeb_dNNP5AEY4zaxrwkoBK0kUAhZLNjTv6KEMf2TKT1t4kbZgeEuE61hQJlmBw_lpxC1EtMYonCEZgv7xjSsTn5CK57P79Pwc1IxUbp1JLJYrkwwOB0r1cqftXtMQHohgRVh5GUATMrwfciQhPQBYdA9ademq_PkGwDcav7HeBs6N5jIkOATXp3f5bAeT2zS62XMwHTAGPDEZ3cCdTchEd8BE3CLi2rYzy09NEnLeWgSpIz68RKu4HVecFmEAwB8yv1CFu6R7JmaibtAospd0lg";
 
         System.out.println(sig.length());
+    }
+
+    @Test
+    void googleAccessToken() {
+        String accessT = "ya29.a0Ael9sCM3FBY3jw27dLwD5Fturw5WC8bzygyZ4BcpH4HY8A9Y7nkk5k7IjhHU9L2i3IFFmvb3ij0aDqDImnIQXYqijIj0sgxp3pQyEm5J5FI0y_o3bhC-O0DHIcSKgp8atO6BaB_9SVGH3lUaYUSKa297O7cdeQaCgYKARQSARASFQF4udJhbW5ToaeqFfN7G-V2Tl74qw0165";
     }
 }

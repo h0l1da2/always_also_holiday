@@ -2,6 +2,7 @@ package today.also.hyuil.config.security.auth.tokenresponse;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
+import lombok.ToString;
 
 @Getter
 public class NaverProfileApiResponse {
@@ -10,28 +11,42 @@ public class NaverProfileApiResponse {
     private String resultCode;
     @JsonProperty("message")
     private String message;
-    @JsonProperty("response/id")
-    private String id;
-    @JsonProperty("response/nickname")
-    private String nickname;
-    @JsonProperty("response/name")
-    private String name;
-    @JsonProperty("response/email")
-    private String email;
-    @JsonProperty("response/gender")
-    private String gender;
-    @JsonProperty("response/age")
-    private String age;
-    @JsonProperty("response/birthday")
-    private String birthday;
-    @JsonProperty("response/profile_image")
-    private String profileImage;
-    @JsonProperty("response/birthyear")
-    private String birthYear;
-    @JsonProperty("response/mobile")
-    private String mobile;
+    @JsonProperty("response")
+    private NaverProfileResponse response;
 
+    @Getter
+    public static class NaverProfileResponse {
+        @JsonProperty("id")
+        private String id;
 
+        @JsonProperty("email")
+        private String email;
+
+        @JsonProperty("mobile")
+        private String mobile;
+
+        @JsonProperty("mobile_e164")
+        private String mobileE164;
+
+        @JsonProperty("name")
+        private String name;
+
+        @JsonProperty("nickname")
+        private String nickname;
+
+        @JsonProperty("gender")
+        private String gender;
+
+        @JsonProperty("age")
+        private String age;
+        @JsonProperty("birthday")
+        private String birthday;
+        @JsonProperty("profile_image")
+        private String profileImage;
+        @JsonProperty("birthyear")
+        private String birthYear;
+
+    }
 
 
 

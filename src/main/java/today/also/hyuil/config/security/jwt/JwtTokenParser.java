@@ -79,6 +79,7 @@ public class JwtTokenParser {
         BigInteger exponent = new BigInteger(1, Base64.getUrlDecoder().decode(e));
         RSAPublicKeySpec spec = new RSAPublicKeySpec(modulus, exponent);
         try {
+            System.out.println("kty = ????? "+kty);
             KeyFactory factory = KeyFactory.getInstance(kty);
             return factory.generatePublic(spec);
         } catch (NoSuchAlgorithmException ex) {
@@ -103,7 +104,11 @@ public class JwtTokenParser {
             x = 2;
         }
 
-        //시그니쳐는 byte[] 배열로 받아와야함.. 나중에 수정합시다
+        //시그니쳐는 byte[] 배열로 받아와야함..
+        if (x == 2) {
+            byte[] signatureBytes = Base64.getDecoder().decode(jwt[2]);
+            return new String(signatureBytes, StandardCharsets.UTF_8);
+        }
 
         byte[] tokenBytes = Base64.getDecoder().decode(jwt[x]);
 
@@ -163,9 +168,7 @@ public class JwtTokenParser {
 
     public String getTokenUrl(HttpServletRequest request) {
         String token = request.getParameter("token");
-        System.out.println("token1 = " + token);
         if (StringUtils.hasText(token)) {
-            System.out.println("token2 = " + token);
             return token;
         }
         return null;

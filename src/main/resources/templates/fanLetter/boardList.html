@@ -21,8 +21,7 @@
           <h1 class="mb20 fan-letter-title">자유롭게 하고 싶은 이야기를 남겨주세요</h1>
           <div class="table-center">
             <div class="form-group write-title">
-              <button id="singlebutton" name="singlebutton" class="btn btn-default info-btn-form"
-              onclick="goWritePage()">글쓰기</button>
+              <button id="writeBtn" name="writeBtn" class="btn btn-default info-btn-form">글쓰기</button>
             </div>
           </div>
           <table class="table">
@@ -117,27 +116,28 @@
     </div>
   </div>
 </div>
+<script th:inline="javascript">
+  $( document ).ready( function() {
+    let token = localStorage.getItem('jwt');
+    $('#writeBtn').click(function () {
+      $.ajax({
+        type: 'GET',
+        url: '/fanLetter/write',
+        contentType: 'application/json',
+        headers: {'Authorization':'Bearer '+token},
+        dataType: 'json',
+        success: function(result) {
+          // 헤더에 토큰 보내기
+          window.location.href = '/fanLetter/write';
+        },
+        error: function(error) {
+          console.error(error);
+        }
+      });
+
+    })
+  })
+</script>
 </body>
 </th:block>
-<script th:inline="javascript">
-
-  let token = localStorage.getItem('jwt');
-
-  function goWritePage() {
-    $.ajax({
-      type: 'GET',
-      url: '/fanLetter/write',
-      contentType: 'application/json',
-      headers: {'Authorization':'Bearer '+token},
-      dataType: 'json',
-      success: function(result) {
-        // 헤더에 토큰 보내기
-        window.location.href = '/fanLetter/write';
-      },
-      error: function(error) {
-        console.error(error);
-      }
-    });
-  }
-</script>
 </html>
