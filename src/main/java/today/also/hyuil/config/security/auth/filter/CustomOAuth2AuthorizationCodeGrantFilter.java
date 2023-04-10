@@ -79,7 +79,6 @@ public class CustomOAuth2AuthorizationCodeGrantFilter extends OAuth2Authorizatio
                 String tokenUri = snsInfo.tokenUri(sns);
                 MultiValueMap<String, String> parameters =
                         setParameters(code, clientId, clientSecret, requestURI);
-                System.out.println("code = " + code);
                 // 헤더 세팅
                 HttpHeaders headers = new HttpHeaders();
                 headers.setBasicAuth(sns, snsInfo.clientSecret(sns));
