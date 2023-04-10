@@ -27,6 +27,7 @@ public class CustomOAuth2AuthorizationRequestResolver implements OAuth2Authoriza
     public OAuth2AuthorizationRequest resolve(HttpServletRequest request) {
         // /oauth2/** 요청일 때만 resolver 동작해야 함니다
         if (request.getRequestURI().startsWith(REQUEST_URL)) {
+            System.out.println("!!!!");
             String sns = request.getRequestURI().substring(REQUEST_URL.length());
             return this.resolve(request, sns);
         }
@@ -47,7 +48,6 @@ public class CustomOAuth2AuthorizationRequestResolver implements OAuth2Authoriza
         String redirectUri = getRedirectUri(request, sns);
         String responseType = snsInfo.responseType();
         String[] scopes = snsInfo.scope(sns).stream().toArray(String[]::new);
-        redirectUri = getRedirectUri(request, redirectUri);
 
         Map<String, Object> map = new HashMap<>();
         map.put(OAuth2ParameterNames.RESPONSE_TYPE, responseType);
@@ -80,7 +80,7 @@ public class CustomOAuth2AuthorizationRequestResolver implements OAuth2Authoriza
     private String getRedirectUri(HttpServletRequest request, String sns) {
         String redirectUrl = request.getParameter("redirectUrl");
         if (!StringUtils.hasText(redirectUrl)) {
-            redirectUrl = snsInfo.redirectUri(sns);
+            redirectUrl = snsInfo.redirectUri(sns.toUpperCase());
         } else {
             redirectUrl = BASE_URL + request.getParameter("redirectUrl");
         }

@@ -6,9 +6,16 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Controller
 public class MainController {
 
+    private final String BASE_URL = "http://localhost:8080";
+
     @GetMapping
     public String main() {
         System.out.println("메인컨트롤러");
+        return "index";
+    }
+
+    @GetMapping("/login/oauth2/{sns}")
+    public String snsLoginMain() {
         return "index";
     }
 }

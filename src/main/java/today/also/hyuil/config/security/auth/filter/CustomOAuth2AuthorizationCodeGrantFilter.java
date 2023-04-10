@@ -35,6 +35,7 @@ import static org.springframework.http.MediaType.*;
 
 public class CustomOAuth2AuthorizationCodeGrantFilter extends OAuth2AuthorizationCodeGrantFilter {
 
+    private final String BASE_URL = "http://localhost:8080";
     private final ClientRegistrationRepository clientRegistrationRepository;
     private final CustomDefaultOAuth2UserService customDefaultOAuth2UserService;
     private final SnsInfo snsInfo;
@@ -51,7 +52,6 @@ public class CustomOAuth2AuthorizationCodeGrantFilter extends OAuth2Authorizatio
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         System.out.println("그랜트 필터 시작");
         // http://localhost:8080/fanLetter?code={code}&state={state}
-
         String code = request.getParameter("code");
 
         if (!StringUtils.hasText(code)) {
@@ -143,11 +143,12 @@ public class CustomOAuth2AuthorizationCodeGrantFilter extends OAuth2Authorizatio
     }
     private MultiValueMap<String, String> setParameters(String code, String clientId, String clientSecret, String requestURI) {
         MultiValueMap<String, String> parameters = new LinkedMultiValueMap<>();
+        String redirectUri = requestURI;
         parameters.add("grant_type", "authorization_code");
         parameters.add("code", code);
         parameters.add("client_id", clientId);
         parameters.add("client_secret", clientSecret);
-        parameters.add("redirect_uri", requestURI);
+        parameters.add("redirect_uri", redirectUri);
         return parameters;
     }
 }
