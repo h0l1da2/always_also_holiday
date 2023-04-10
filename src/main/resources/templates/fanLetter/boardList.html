@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="layout/default_layout">
+<html lang="ko" xmlns:th="http://thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout/default_layout}">
 <th:block layout:fragment="content">
 <body>
 
@@ -22,7 +22,7 @@
           <div class="table-center">
             <div class="form-group write-title">
               <button id="singlebutton" name="singlebutton" class="btn btn-default info-btn-form"
-              onclick="location.href='/fanLetter/write'">글쓰기</button>
+              onclick="goWritePage()">글쓰기</button>
             </div>
           </div>
           <table class="table">
@@ -119,4 +119,25 @@
 </div>
 </body>
 </th:block>
+<script th:inline="javascript">
+
+  let token = localStorage.getItem('jwt');
+
+  function goWritePage() {
+    $.ajax({
+      type: 'GET',
+      url: '/fanLetter/write',
+      contentType: 'application/json',
+      headers: {'Authorization':'Bearer '+token},
+      dataType: 'json',
+      success: function(result) {
+        // 헤더에 토큰 보내기
+        window.location.href = '/fanLetter/write';
+      },
+      error: function(error) {
+        console.error(error);
+      }
+    });
+  }
+</script>
 </html>

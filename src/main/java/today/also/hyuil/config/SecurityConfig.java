@@ -73,7 +73,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
                 .and()
                 .authorizeRequests()
-                .mvcMatchers("/fanLetter")
+                .mvcMatchers("/fanLetter/write")
                 .hasRole("USER")
                 .anyRequest()
                 .permitAll()
