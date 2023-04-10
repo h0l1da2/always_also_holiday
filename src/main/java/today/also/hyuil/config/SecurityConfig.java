@@ -73,7 +73,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
                 .and()
                 .authorizeRequests()
-                .mvcMatchers("/fanLetter")
+                .mvcMatchers("/fanLetter/write")
                 .hasRole("USER")
                 .anyRequest()
                 .permitAll()
@@ -83,7 +83,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .addFilterAfter(new JwtTokenSetFilter(), UsernamePasswordAuthenticationFilter.class)
                 // OAuth2
                 .addFilterBefore(new CustomOAuth2AuthorizationCodeGrantFilter(clientRegistrationRepository, oAuth2AuthorizedClientRepository, authenticationManager(), customDefaultOAuth2UserService, snsInfo), OAuth2LoginAuthenticationFilter.class)
-                .addFilterBefore(new OAuth2JwtTokenFilter(jwtTokenService, jwtTokenParser, memberJoinService, snsInfo, kakaoJwk, googleJwk), CustomOAuth2AuthorizationCodeGrantFilter.class)
+                .addFilterAfter(new OAuth2JwtTokenFilter(jwtTokenService, jwtTokenParser, memberJoinService, snsInfo, kakaoJwk, googleJwk), OAuth2LoginAuthenticationFilter.class)
                 .exceptionHandling()
                 .authenticationEntryPoint(new CustomAuthenticationEntryPoint()) // 인증이 실패했을 경우
                 .accessDeniedHandler(new CustomAccessDeniedHandler()) // 권한이 없을 경우

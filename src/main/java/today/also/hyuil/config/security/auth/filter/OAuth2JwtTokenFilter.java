@@ -1,25 +1,15 @@
 package today.also.hyuil.config.security.auth.filter;
 
-import com.nimbusds.oauth2.sdk.auth.ClientAuthentication;
 import io.jsonwebtoken.Claims;
 import org.springframework.boot.configurationprocessor.json.JSONException;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.oauth2.client.registration.ClientRegistration;
-import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
-import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
-import org.springframework.security.oauth2.core.OAuth2AccessToken;
-import org.springframework.security.oauth2.core.OAuth2AccessToken.TokenType;
-import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.filter.OncePerRequestFilter;
-import today.also.hyuil.config.security.auth.CustomDefaultOAuth2UserService;
 import today.also.hyuil.config.security.auth.jwk.GoogleJwk;
 import today.also.hyuil.config.security.auth.jwk.KakaoJwk;
 import today.also.hyuil.config.security.auth.tokenresponse.NaverProfileApiResponse;
@@ -82,30 +72,22 @@ public class OAuth2JwtTokenFilter extends OncePerRequestFilter {
                 // 헤더 세팅
                 HttpHeaders headers = new HttpHeaders();
                 headers.set("Authorization", "Bearer "+tokenResponse.getAccessToken());
-
                 HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<>(headers);
 
                 // https://openapi.naver.com/v1/nid/me 으로 프로필 정보 요청 보내기
                 RestTemplate restTemplate = new RestTemplate();
                 ResponseEntity<NaverProfileApiResponse> responseEntity =
-                        restTemplate.exchange(snsInfo.getNaverProfileApi(), HttpMethod.POST,
+                        restTemplate.exchange(snsInfo.getNaverProfileApi(), HttpMethod.GET,
                                 entity, NaverProfileApiResponse.class);
-
                 NaverProfileApiResponse profileResponse = responseEntity.getBody();
-
-                sub = profileResponse.getId();
+                sub = profileResponse.getResponse().getId();
 
             }
 
             // KAKAO 일 경우 작업
             if (sns.equals(Sns.KAKAO.name()) | sns.equals(Sns.GOOGLE.name())) {
 
-                if (sns.equals(Sns.KAKAO.name())) {
-                    token = tokenResponse.getIdToken();
-                }
-                if (sns.equals(Sns.GOOGLE.name())) {
-                    token = tokenResponse.getAccessToken();
-                }
+                token = tokenResponse.getIdToken();
 
                 String kid = "";
                 String n = "";
@@ -135,7 +117,7 @@ public class OAuth2JwtTokenFilter extends OncePerRequestFilter {
                     alg = kakaoJwk.getAlg();
                 }
 
-                if (sns.equals(Sns.NAVER.name())) {
+                if (sns.equals(Sns.GOOGLE.name())) {
                     if (kid.equals(googleJwk.getKidFirst())) {
                         googleJwk.jwkSetting("first");
                     } else if (kid.equals(googleJwk.getKidSecond())) {

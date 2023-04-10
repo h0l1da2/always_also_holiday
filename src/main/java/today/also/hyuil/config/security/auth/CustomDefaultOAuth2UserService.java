@@ -6,10 +6,7 @@ import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import today.also.hyuil.config.security.CustomUserDetails;
-import today.also.hyuil.config.security.auth.userinfo.GoogleUserInfo;
-import today.also.hyuil.config.security.auth.userinfo.KakaoUserInfo;
-import today.also.hyuil.config.security.auth.userinfo.NaverUserInfo;
-import today.also.hyuil.config.security.auth.userinfo.SnsUserInfo;
+import today.also.hyuil.config.security.auth.userinfo.*;
 import today.also.hyuil.domain.member.*;
 import today.also.hyuil.service.member.inter.MemberJoinService;
 
@@ -21,14 +18,17 @@ import java.util.UUID;
 public class CustomDefaultOAuth2UserService extends DefaultOAuth2UserService {
 
     private final MemberJoinService memberJoinService;
+    private final SnsInfo snsInfo;
 
-    public CustomDefaultOAuth2UserService(MemberJoinService memberJoinService) {
+    public CustomDefaultOAuth2UserService(MemberJoinService memberJoinService, SnsInfo snsInfo) {
         this.memberJoinService = memberJoinService;
+        this.snsInfo = snsInfo;
     }
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
         System.out.println("유저서비스시작");
+
         OAuth2User oAuth2User = super.loadUser(userRequest);
         String client = userRequest.getClientRegistration().getRegistrationId();
 
