@@ -68,26 +68,24 @@
   let urlParams = new URLSearchParams(window.location.search);
   let redirectUrl = urlParams.get("redirectUrl");
 
-  // jwt 가 로컬스토리지에 저장되어있지 않으면, getRedirect 실행
-  if (!isLogin) {
-    getRedirect();
-  }
-
-  function isLogin() {
-    let jwt = localStorage.getItem('jwt');
-    return jwt;
-  }
-
   function getRedirect() {
     let param = new URLSearchParams(window.location.search);
+
     if (param.has('redirect') && param.has('token')) {
       let redirect = urlParams.get("redirect");
       let token = urlParams.get("token");
       localStorage.setItem('jwt', token);
-      window.location.href = redirect;
-    }
 
+      if (redirect.startsWith('/login/oauth2/')) {
+        window.location.href = '/';
+      }
+
+      window.location.href = redirect+"?token="+token;
+
+    }
   }
+
+  getRedirect();
 
   function kakao() {
     window.location.href = getRedirectUrl(redirectUrl, "kakao");
