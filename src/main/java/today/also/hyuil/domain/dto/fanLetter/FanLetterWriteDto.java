@@ -12,3 +12,4 @@ public class FanLetterWriteDto {
     private String memberId;
     private List<ImageDto> images;
 }
+

@@ -52,7 +52,9 @@ public class FanLetterController {
     public String write(@RequestBody FanLetterWriteDto fanLetterWriteDto, HttpServletRequest request) {
         System.out.println("fanLetterWriteDto = " + fanLetterWriteDto);
         try {
-            String memberId = getMemberIdInSession(request);
+            // 세션에서 memberId 가져오기
+//            String memberId = getMemberIdInSession(request);
+            String memberId = "aaaa1";
 
             if (!writeDtoNullCheck(fanLetterWriteDto)) {
                 return "글 내용이 없음";
