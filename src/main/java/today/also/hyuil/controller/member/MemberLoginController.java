@@ -9,6 +9,8 @@ import today.also.hyuil.domain.dto.member.LoginDto;
 import today.also.hyuil.domain.member.Member;
 import today.also.hyuil.service.member.inter.MemberJoinService;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -34,7 +36,7 @@ public class MemberLoginController {
 
     @ResponseBody
     @PostMapping("/login")
-    public Map loginToken(@RequestBody LoginDto loginDto) {
+    public Map loginToken(@RequestBody LoginDto loginDto, HttpServletRequest request) {
         Map map = new HashMap();
 
         if (loginDtoNullCheck(loginDto)) {
@@ -66,7 +68,15 @@ public class MemberLoginController {
          * 자동로그인기능 쿠키생성(나중에)
          */
         map.put("JWT", accessToken);
+
+        sessionSetMemberId(loginDto.getMemberId(), request);
+
         return map;
+    }
+
+    private void sessionSetMemberId(String memberId, HttpServletRequest request) {
+        HttpSession session = request.getSession();
+        session.setAttribute("memberId", memberId);
     }
 
     private void errorMapReturn(Map map) {
