@@ -1,5 +1,6 @@
 package today.also.hyuil.config.security.jwt;
 
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -46,20 +47,30 @@ public class JwtFilter extends OncePerRequestFilter {
             token = tokenUrl;
         }
 
-        boolean tokenValid = jwtTokenParser.validToken(token, false);
-
-        if (!tokenValid) {
-            Token refreshToken = jwtTokenParser.getRefreshToken(token);
-            if (refreshToken == null) {
-                throw new NullPointerException("리프레쉬 토큰이 없음");
+        boolean tokenValid = false;
+        try {
+            tokenValid = jwtTokenParser.validToken(token, false);
+            if (!tokenValid) {
+                Token refreshToken = jwtTokenParser.getRefreshToken(token);
+                if (refreshToken == null) {
+                    System.out.println("리프레쉬 토큰 없음");
+                    filterChain.doFilter(request, response);
+                    return;
+                }
+                boolean refreshValid = jwtTokenParser.validToken(refreshToken.getToken(), true);
+                if (!refreshValid) {
+                    System.out.println("리프레쉬 토큰 인증 실패");
+                    filterChain.doFilter(request, response);
+                    return;
+                }
             }
-            boolean refreshValid = jwtTokenParser.validToken(refreshToken.getToken(), true);
-            if (!refreshValid) {
-                System.out.println("리프레쉬 토큰 인증 실패");
-                filterChain.doFilter(request, response);
-                return;
-            }
+        } catch (ExpiredJwtException e) {
+            System.out.println("토큰이 만료됨 : 인증 실패");
+            filterChain.doFilter(request, response);
+            return;
         }
+
+
         // 토큰s 재발급 후, 저장~
         String memberId = jwtTokenParser.tokenInMemberId(token);
 
