@@ -39,7 +39,7 @@
         </div>
         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
           <div class="form-group">
-            <h3>업로드 된 파일</h3>
+            <h3>업로드 된 이미지</h3>
             <div id="preview">
 <!--              <p id="${file.lastModified}">-->
 <!--                ${file.name}-->
@@ -66,13 +66,13 @@
       const fileInput = document.querySelector('#imagesInput');
       const preview = document.querySelector('#preview');
       fileInput.addEventListener('change', () => {
-        console.dir(fileInput)
-        const files = Array.from(fileInput.files)
-        files.forEach(file => {
+        console.dir(fileInput);
+        const files = Array.from(fileInput.files);
+        files.forEach(imageDto => {
           preview.innerHTML += `
-                        <p id="${file.lastModified}">
-                ${file.name}
-                <button id="fileDelBtn" name="fileDelBtn" data-index='${file.lastModified}'
+                        <p id="${imageDto.lastModified}">
+                ${imageDto.fileName}
+                <button id="fileDelBtn" name="fileDelBtn" data-index='${imageDto.lastModified}'
                         class="btn btn-default file-remove-btn">x</button>
               </p>`;
         });

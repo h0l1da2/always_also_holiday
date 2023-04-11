@@ -7,6 +7,7 @@ import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import today.also.hyuil.domain.dto.fanLetter.FanLetterWriteDto;
+import today.also.hyuil.domain.dto.fanLetter.ImageDto;
 import today.also.hyuil.domain.fanLetter.FanBoard;
 import today.also.hyuil.domain.file.File;
 import today.also.hyuil.domain.file.FileInfo;
@@ -15,6 +16,11 @@ import today.also.hyuil.domain.file.Type;
 import today.also.hyuil.exception.MemberNotFoundException;
 import today.also.hyuil.exception.fanLetter.MimeTypeNotMatchException;
 import today.also.hyuil.service.fanLetter.inter.FanLetterService;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+import java.util.ArrayList;
+import java.util.List;
 
 @Controller
 @RequestMapping("/fanLetter")
@@ -43,36 +49,41 @@ public class FanLetterController {
 
     @ResponseBody
     @PostMapping("/write")
-    public String write(@RequestBody FanLetterWriteDto fanLetterWriteDto) {
-
-        if (!writeDtoNullCheck(fanLetterWriteDto)) {
-            return "글 내용이 없음";
-        }
-
-        FanBoard fanBoard = new FanBoard(fanLetterWriteDto);
+    public String write(@RequestBody FanLetterWriteDto fanLetterWriteDto, HttpServletRequest request) {
+        System.out.println("fanLetterWriteDto = " + fanLetterWriteDto);
         try {
+            String memberId = getMemberIdInSession(request);
 
-            // 이미지 파일이 존재할 경우
-            if (isSetFile(fanLetterWriteDto)) {
-                File file = new File(fanLetterWriteDto);
-
-                // path type mimeType
-                String imgMimeType = setImgMimeType(fanLetterWriteDto);
-                file.imgMimeType(imgMimeType);
-
-
-                file.filePath(filePath);
-                file.fileType(Type.IMAGE);
-
-                FileInfo fileInfo = new FileInfo(file);
-                fileInfo.whereFileIs(IsWhere.FAN_BOARD);
-
-                fanBoard.letterHaveFile(fileInfo);
+            if (!writeDtoNullCheck(fanLetterWriteDto)) {
+                return "글 내용이 없음";
             }
 
-            FanBoard writeLetter = fanLetterService.writeLetter(fanLetterWriteDto.getMemberId(), fanBoard);
+            FanBoard fanBoard = new FanBoard(fanLetterWriteDto);
 
-            if (writeLetter == null) {
+            // 이미지 파일이 존재할 경우
+            List<FileInfo> fileInfoList = new ArrayList<>();
+            if (isLetterHaveFiles(fanLetterWriteDto)) {
+                System.out.println("fanLetterWriteDto.getImages() = " + fanLetterWriteDto.getImages());
+                for (ImageDto imageDto : fanLetterWriteDto.getImages()) {
+                    File file = new File(imageDto);
+                    // path type mimeType
+                    String imgMimeType = setImgMimeType(imageDto);
+                    file.imgMimeType(imgMimeType);
+
+                    file.filePath(filePath);
+                    file.fileType(Type.IMAGE);
+
+                    FileInfo fileInfo = new FileInfo(file);
+                    fileInfo.whereFileIs(IsWhere.FAN_BOARD);
+
+                    fileInfoList.add(fileInfo);
+                }
+
+            }
+
+            FanBoard writeLetter = fanLetterService.writeLetter(memberId, fanBoard, fileInfoList);
+
+            if (writeLetter.getId() == null) {
                 return "작성 오류";
             }
 
@@ -84,13 +95,24 @@ public class FanLetterController {
         return "작성 완료";
     }
 
-    private String setImgMimeType(FanLetterWriteDto fanLetterWriteDto) throws MimeTypeNotMatchException {
+    private String getMemberIdInSession(HttpServletRequest request) throws MemberNotFoundException {
+        HttpSession session = request.getSession(false);
+        String memberId = (String) session.getAttribute("memberId");
+
+        if (!StringUtils.hasText(memberId)) {
+            throw new MemberNotFoundException();
+        }
+
+        return memberId;
+    }
+
+    private String setImgMimeType(ImageDto imageDto) throws MimeTypeNotMatchException {
         String imgMimeType = "";
-        if (fanLetterWriteDto.getMimeType().contains("image/jpeg")) {
+        if (imageDto.getMimeType().contains("image/jpeg")) {
             imgMimeType = ".jpg";
-        } else if (fanLetterWriteDto.getMimeType().contains("image/png")) {
+        } else if (imageDto.getMimeType().contains("image/png")) {
             imgMimeType = ".png";
-        } else if (fanLetterWriteDto.getMimeType().contains("image/gif")) {
+        } else if (imageDto.getMimeType().contains("image/gif")) {
             imgMimeType = ".gif";
         } else {
             // exception 만들기
@@ -112,14 +134,8 @@ public class FanLetterController {
         return true;
     }
 
-    private boolean isSetFile(FanLetterWriteDto fanLetterWriteDto) {
-        if (!StringUtils.hasText(fanLetterWriteDto.getFileName())) {
-            return false;
-        }
-        if (!StringUtils.hasText(fanLetterWriteDto.getMimeType())) {
-            return false;
-        }
-        if (fanLetterWriteDto.getFileSize() == null) {
+    private boolean isLetterHaveFiles(FanLetterWriteDto fanLetterWriteDto) {
+        if (fanLetterWriteDto.getImages().isEmpty()) {
             return false;
         }
         return true;
