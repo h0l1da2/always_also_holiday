@@ -2,7 +2,6 @@
 <html lang="ko" xmlns:th="http://thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout/default_layout}">
 <th:block layout:fragment="content">
 <body>
-
 <div class="page-header page-caption">
   <div class="container">
     <div class="row">
@@ -39,12 +38,11 @@
         </div>
         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
           <div class="form-group">
-            <h3>업로드 된 이미지</h3>
+            <h3>* (최대 5장) 업로드 된 이미지</h3>
             <div id="preview">
 <!--              <p id="${file.lastModified}">-->
 <!--                ${file.name}-->
-<!--                <button id="fileDelBtn" name="fileDelBtn" data-index='${file.lastModified}'-->
-<!--                        class="btn btn-default file-remove-btn">x</button>-->
+<!--                <button data-index='${file.lastModified}' class='btn btn-default file-remove-btn'>X</button>-->
 <!--              </p>-->
             </div>
           </div>
@@ -59,29 +57,84 @@
     </div>
   </div>
 </div>
-</div>
 <script th:inline="javascript">
+
+  $( document ).ready( function() {
+    let jwt = localStorage.getItem('jwt');
+    $('#writeBtn').click(function () {
+      let title = document.getElementById('title').value;
+      let content = document.getElementById('content').value;
+
+      // == 는 자동 타입 변환, === 는 타입까지 비교
+      // | 는 비트 or , || 는 논리 or
+      if (title === '' || title === ' ') {
+        alert('제목을 입력하세요');
+        document.getElementById('title').focus();
+        return false;
+      }
+      if (content === '' || content === ' ') {
+        alert('내용을 입력하세요');
+        document.getElementById('content').focus();
+        return false;
+      }
+
+      let fanLetterData = new FormData();
+
+      // input file 을 formData에 담는 로직
+      const fileInput = document.querySelector('#imagesInput');
+      const files = Array.from(fileInput.files);
+      files.forEach(image => {
+        fanLetterData.append('image', image);
+      });
+
+      let fanLetterWriteDto = JSON.stringify({title:title, content:content});
+      fanLetterData.append('fanLetterWriteDto', fanLetterWriteDto);
+
+      $.ajax({
+        type: 'POST',
+        url: '/fanLetter/write',
+        headers: {'Authorization':'Bearer '+jwt},
+        processData: false,
+        contentType: false,
+        enctype: 'multipart/form-data',
+        data: fanLetterData,
+        success: function(result) {
+          alert('success');
+          if (result === 'WRITE_OK') {
+            window.location.href = '/fanLetter';
+          } else {
+            alert(result);
+          }
+        },
+        error: function(error) {
+          alert('error')
+          console.error(error);
+        }
+      });
+    })
+  })
+
+
   const handler = {
     init() {
       const fileInput = document.querySelector('#imagesInput');
       const preview = document.querySelector('#preview');
       fileInput.addEventListener('change', () => {
-        console.dir(fileInput);
-        const files = Array.from(fileInput.files);
-        files.forEach(imageDto => {
+        console.dir(fileInput)
+        const files = Array.from(fileInput.files)
+        files.forEach(file => {
           preview.innerHTML += `
-                        <p id="${imageDto.lastModified}">
-                ${imageDto.fileName}
-                <button id="fileDelBtn" name="fileDelBtn" data-index='${imageDto.lastModified}'
-                        class="btn btn-default file-remove-btn">x</button>
-              </p>`;
+                        <p id="${file.lastModified}">
+                            ${file.name}
+                            <button data-index='${file.lastModified}' class='btn btn-default file-remove-btn'>X</button>
+                        </p>`;
         });
       });
     },
 
     removeFile: () => {
       document.addEventListener('click', (e) => {
-        if(e.target.className !== 'file-remove-btn') return;
+        if(e.target.className !== 'btn btn-default file-remove-btn') return;
         const removeTargetId = e.target.dataset.index;
         const removeTarget = document.getElementById(removeTargetId);
         const files = document.querySelector('#imagesInput').files;
@@ -104,8 +157,8 @@
     }
   }
 
-  handler.init();
-  handler.removeFile();
+  handler.init()
+  handler.removeFile()
 </script>
 </body>
 </th:block>
