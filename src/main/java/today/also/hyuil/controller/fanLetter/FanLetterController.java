@@ -130,16 +130,17 @@ public class FanLetterController {
         if (!StringUtils.hasText(fanLetterWriteDto.getContent())) {
             return false;
         }
-        if (!StringUtils.hasText(fanLetterWriteDto.getMemberId())) {
+//        if (!StringUtils.hasText(fanLetterWriteDto.getMemberId())) {
+//            return false;
+//        }
+        return true;
+    }
+
+    private boolean isLetterHaveFiles(FanLetterWriteDto fanLetterWriteDto) {
+        if (fanLetterWriteDto.getImages() == null) {
             return false;
         }
         return true;
     }
 
-    private boolean isLetterHaveFiles(FanLetterWriteDto fanLetterWriteDto) {
-        if (fanLetterWriteDto.getImages().isEmpty()) {
-            return false;
-        }
-        return true;
-    }
 }

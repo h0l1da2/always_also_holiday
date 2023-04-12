@@ -96,8 +96,8 @@
         url: '/fanLetter/write',
         headers: {'Authorization':'Bearer '+jwt},
         contentType: 'application/json',
-        data: fanLetterData,
-        dataType: 'json',
+        data: JSON.stringify({title:title, content:content}),
+        dataType: 'text',
         success: function(result) {
           if (result === '작성 완료') {
             window.location.href = '/fanLetter';
