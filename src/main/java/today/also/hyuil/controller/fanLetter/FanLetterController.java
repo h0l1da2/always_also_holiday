@@ -1,13 +1,18 @@
 package today.also.hyuil.controller.fanLetter;
 
+import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import today.also.hyuil.domain.dto.fanLetter.FanLetterWriteDto;
-import today.also.hyuil.domain.dto.fanLetter.ImageDto;
 import today.also.hyuil.domain.fanLetter.FanBoard;
 import today.also.hyuil.domain.file.File;
 import today.also.hyuil.domain.file.FileInfo;
@@ -48,28 +53,37 @@ public class FanLetterController {
     }
 
     @ResponseBody
-    @PostMapping("/write")
-    public String write(@RequestBody FanLetterWriteDto fanLetterWriteDto, HttpServletRequest request) {
-        System.out.println("fanLetterWriteDto = " + fanLetterWriteDto);
+    @PostMapping(value = "/write")
+    public ResponseEntity<String> write(@RequestParam(value = "fanLetterWriteDto") String fanLetterWrite,
+                                @RequestPart(value = "image", required = false) List<MultipartFile> files,
+                                HttpServletRequest request) {
+
+        FanLetterWriteDto fanLetterWriteDto = gsonFanLetterDto(fanLetterWrite);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.TEXT_PLAIN);
+
+
         try {
             // 세션에서 memberId 가져오기
 //            String memberId = getMemberIdInSession(request);
             String memberId = "aaaa1";
 
             if (!writeDtoNullCheck(fanLetterWriteDto)) {
-                return "글 내용이 없음";
+                System.out.println("글 내용이 없음");
+                return new ResponseEntity<>("NOT_CONTENT", headers, HttpStatus.BAD_REQUEST);
             }
 
             FanBoard fanBoard = new FanBoard(fanLetterWriteDto);
 
             // 이미지 파일이 존재할 경우
             List<FileInfo> fileInfoList = new ArrayList<>();
-            if (isLetterHaveFiles(fanLetterWriteDto)) {
-                System.out.println("fanLetterWriteDto.getImages() = " + fanLetterWriteDto.getImages());
-                for (ImageDto imageDto : fanLetterWriteDto.getImages()) {
-                    File file = new File(imageDto);
+            if (isLetterHaveFiles(files)) {
+                for (MultipartFile multipartFile : files) {
+
+                    File file = new File(multipartFile);
                     // path type mimeType
-                    String imgMimeType = setImgMimeType(imageDto);
+                    String imgMimeType = setImgMimeType(multipartFile);
                     file.imgMimeType(imgMimeType);
 
                     file.filePath(filePath);
@@ -84,17 +98,20 @@ public class FanLetterController {
             }
 
             FanBoard writeLetter = fanLetterService.writeLetter(memberId, fanBoard, fileInfoList);
-
             if (writeLetter.getId() == null) {
-                return "작성 오류";
+                System.out.println("작성 오류");
+                return new ResponseEntity<>("WRITE_ERROR", headers, HttpStatus.INTERNAL_SERVER_ERROR);
             }
 
         } catch (MimeTypeNotMatchException e) {
-            return "이미지 파일 확장자를 확인해주세요";
+            System.out.println("이미지 파일 확장자 다름");
+            return new ResponseEntity<>("MIMETYPE_ERROR", headers, HttpStatus.BAD_REQUEST);
         } catch (MemberNotFoundException me) {
-            return "로그인을 해주세요";
+            System.out.println("로그인이 안 됨");
+            return new ResponseEntity<>("NOT_LOGIN", headers, HttpStatus.BAD_REQUEST);
         }
-        return "작성 완료";
+
+        return new ResponseEntity<>("WRITE_OK", headers, HttpStatus.OK);
     }
 
     private String getMemberIdInSession(HttpServletRequest request) throws MemberNotFoundException {
@@ -108,16 +125,17 @@ public class FanLetterController {
         return memberId;
     }
 
-    private String setImgMimeType(ImageDto imageDto) throws MimeTypeNotMatchException {
+    private String setImgMimeType(MultipartFile multipartFile) throws MimeTypeNotMatchException {
         String imgMimeType = "";
-        if (imageDto.getMimeType().contains("image/jpeg")) {
+        if (multipartFile.getContentType().contains("image/jpeg")) {
             imgMimeType = ".jpg";
-        } else if (imageDto.getMimeType().contains("image/png")) {
+        } else if (multipartFile.getContentType().contains("image/png")) {
             imgMimeType = ".png";
-        } else if (imageDto.getMimeType().contains("image/gif")) {
+        } else if (multipartFile.getContentType().contains("image/gif")) {
             imgMimeType = ".gif";
         } else {
             // exception 만들기
+            System.out.println("올바른 확장자가 아닙니다");
             throw new MimeTypeNotMatchException("올바른 확장자가 아닙니다");
         }
         return imgMimeType;
@@ -130,17 +148,19 @@ public class FanLetterController {
         if (!StringUtils.hasText(fanLetterWriteDto.getContent())) {
             return false;
         }
-//        if (!StringUtils.hasText(fanLetterWriteDto.getMemberId())) {
-//            return false;
-//        }
         return true;
     }
 
-    private boolean isLetterHaveFiles(FanLetterWriteDto fanLetterWriteDto) {
-        if (fanLetterWriteDto.getImages() == null) {
+    private boolean isLetterHaveFiles(List<MultipartFile> files) {
+        if (files == null) {
             return false;
         }
         return true;
     }
 
+    private FanLetterWriteDto gsonFanLetterDto(String fanLetterWrite) {
+        Gson gson = new Gson();
+        return gson.fromJson(fanLetterWrite, FanLetterWriteDto.class);
+
+    }
 }

@@ -84,28 +84,30 @@
       const fileInput = document.querySelector('#imagesInput');
       const files = Array.from(fileInput.files);
       files.forEach(image => {
-        fanLetterData.append('images', image);
-
+        fanLetterData.append('image', image);
       });
 
-      fanLetterData.append('title', title);
-      fanLetterData.append('content', content);
+      let fanLetterWriteDto = JSON.stringify({title:title, content:content});
+      fanLetterData.append('fanLetterWriteDto', fanLetterWriteDto);
 
       $.ajax({
         type: 'POST',
         url: '/fanLetter/write',
         headers: {'Authorization':'Bearer '+jwt},
-        contentType: 'application/json',
-        data: JSON.stringify({title:title, content:content}),
-        dataType: 'text',
+        processData: false,
+        contentType: false,
+        enctype: 'multipart/form-data',
+        data: fanLetterData,
         success: function(result) {
-          if (result === '작성 완료') {
+          alert('success');
+          if (result === 'WRITE_OK') {
             window.location.href = '/fanLetter';
           } else {
             alert(result);
           }
         },
         error: function(error) {
+          alert('error')
           console.error(error);
         }
       });

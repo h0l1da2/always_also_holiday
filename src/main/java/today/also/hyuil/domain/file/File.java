@@ -1,14 +1,14 @@
 package today.also.hyuil.domain.file;
 
 import lombok.Getter;
-import today.also.hyuil.domain.dto.fanLetter.FanLetterWriteDto;
-import today.also.hyuil.domain.dto.fanLetter.ImageDto;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.*;
 import java.util.UUID;
 
 @Entity
 @Getter
+@Table(name = "file")
 public class File {
 
     @Id @GeneratedValue
@@ -24,9 +24,9 @@ public class File {
 
     public File() {}
 
-    public File(ImageDto imageDto) {
-        this.name = imageDto.getFileName();
-        this.size = imageDto.getFileSize();
+    public File(MultipartFile multipartFile) {
+        this.name = multipartFile.getOriginalFilename();
+        this.size = multipartFile.getSize();
         this.uuid = UUID.randomUUID().toString();
     }
 
