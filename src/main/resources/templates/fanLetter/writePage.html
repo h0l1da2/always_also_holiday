@@ -81,22 +81,21 @@
       let fanLetterData = new FormData();
 
       // input file 을 formData에 담는 로직
-      const fileInput = document.querySelector('#imagesInput');
-      const files = Array.from(fileInput.files);
-      files.forEach(image => {
-        fanLetterData.append('image', image);
-      });
+      const fileInput = $('#imagesInput');
+      const files = fileInput[0].files;
+      for (var i = 0; i < files.length; i++) {
+        fanLetterData.append('image', files[i]);
+      }
 
-      let fanLetterWriteDto = JSON.stringify({title:title, content:content});
-      fanLetterData.append('fanLetterWriteDto', fanLetterWriteDto);
+      let fanLetterWriteDto = {title: title, content: content};
+      fanLetterData.append('fanLetterWriteDto', new Blob([JSON.stringify(fanLetterWriteDto)], {type: 'application/json'}));
 
       $.ajax({
         type: 'POST',
         url: '/fanLetter/write',
-        headers: {'Authorization':'Bearer '+jwt},
         processData: false,
         contentType: false,
-        enctype: 'multipart/form-data',
+        // enctype: 'multipart/form-data',
         data: fanLetterData,
         success: function(result) {
           alert('success');
