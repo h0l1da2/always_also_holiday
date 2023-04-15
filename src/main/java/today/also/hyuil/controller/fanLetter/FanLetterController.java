@@ -13,13 +13,21 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import today.also.hyuil.domain.dto.fanLetter.FanLetterWriteDto;
+import today.also.hyuil.domain.fanLetter.FanBoard;
+import today.also.hyuil.domain.file.File;
+import today.also.hyuil.domain.file.FileInfo;
+import today.also.hyuil.domain.file.IsWhere;
+import today.also.hyuil.domain.file.Type;
 import today.also.hyuil.exception.MemberNotFoundException;
 import today.also.hyuil.exception.fanLetter.MimeTypeNotMatchException;
 import today.also.hyuil.service.fanLetter.inter.FanLetterService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Controller
 @RequestMapping("/fanLetter")
@@ -47,66 +55,82 @@ public class FanLetterController {
     }
 
     @ResponseBody
-    @PostMapping(value = "/write", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
+    @PostMapping(value = "/write", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE},
+    produces = {MediaType.ALL_VALUE})
     public ResponseEntity<String> write(@RequestParam(value = "fanLetterWriteDto") String fanLetterWrite,
                                 @RequestPart(value = "image", required = false) List<MultipartFile> files,
                                 HttpServletRequest request) {
 
         FanLetterWriteDto fanLetterWriteDto = gsonFanLetterDto(fanLetterWrite);
-        System.out.println("fanLetterWriteDto = " + fanLetterWriteDto);
-        System.out.println(files.get(0).getOriginalFilename());
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.TEXT_PLAIN);
 
+        // webPath 값을 지정하면 해당경로까지의 realPath를 추출하는 코드
+//        String folderPath = request.getSession().getServletContext().getRealPath(filePath);
 
-//        try {
-//            // 세션에서 memberId 가져오기
-////            String memberId = getMemberIdInSession(request);
-//            String memberId = "aaaa1";
-//
-//            if (!writeDtoNullCheck(fanLetterWriteDto)) {
-//                System.out.println("글 내용이 없음");
-//                return new ResponseEntity<>("NOT_CONTENT", headers, HttpStatus.BAD_REQUEST);
-//            }
-//
-//            FanBoard fanBoard = new FanBoard(fanLetterWriteDto);
-//
-//            // 이미지 파일이 존재할 경우
-//            List<FileInfo> fileInfoList = new ArrayList<>();
-//            if (isLetterHaveFiles(files)) {
-//                for (MultipartFile multipartFile : files) {
-//
-//                    File file = new File(multipartFile);
-//                    // path type mimeType
-//                    String imgMimeType = setImgMimeType(multipartFile);
-//                    file.imgMimeType(imgMimeType);
-//
-//                    file.filePath(filePath);
-//                    file.fileType(Type.IMAGE);
-//
-//                    FileInfo fileInfo = new FileInfo(file);
-//                    fileInfo.whereFileIs(IsWhere.FAN_BOARD);
-//
-//                    fileInfoList.add(fileInfo);
-//                }
-//
-//            }
-//
-//            FanBoard writeLetter = fanLetterService.writeLetter(memberId, fanBoard, fileInfoList);
-//            if (writeLetter.getId() == null) {
-//                System.out.println("작성 오류");
-//                return new ResponseEntity<>("WRITE_ERROR", headers, HttpStatus.INTERNAL_SERVER_ERROR);
-//            }
-//
-//        } catch (MimeTypeNotMatchException e) {
-//            System.out.println("이미지 파일 확장자 다름");
-//            return new ResponseEntity<>("MIMETYPE_ERROR", headers, HttpStatus.BAD_REQUEST);
-//        } catch (MemberNotFoundException me) {
-//            System.out.println("로그인이 안 됨");
-//            return new ResponseEntity<>("NOT_LOGIN", headers, HttpStatus.BAD_REQUEST);
-//        }
+        try {
+            // 세션에서 memberId 가져오기
+//            String memberId = getMemberIdInSession(request);
+            String memberId = "aaaa1";
+
+            if (!writeDtoNullCheck(fanLetterWriteDto)) {
+                System.out.println("글 내용이 없음");
+                return new ResponseEntity<>("NOT_CONTENT", headers, HttpStatus.BAD_REQUEST);
+            }
+
+            FanBoard fanBoard = new FanBoard(fanLetterWriteDto);
+
+            // 이미지 파일이 존재할 경우
+            List<FileInfo> fileInfoList = new ArrayList<>();
+            if (isLetterHaveFiles(files)) {
+                for (MultipartFile multipartFile : files) {
+
+                    String fileUuid = UUID.randomUUID().toString();
+                    File file = new File(multipartFile);
+                    file.fileUUID(fileUuid);
+
+                    // 파일 저장 -> java.io.File (path/UUID.jpg)
+                    saveFile(multipartFile, fileUuid);
+
+                    // path type mimeType
+                    String imgMimeType = setImgMimeType(multipartFile);
+                    file.imgMimeType(imgMimeType);
+
+                    file.filePath(filePath);
+                    file.fileType(Type.IMAGE);
+
+                    FileInfo fileInfo = new FileInfo(file);
+                    fileInfo.whereFileIs(IsWhere.FAN_BOARD);
+
+                    fileInfoList.add(fileInfo);
+                }
+
+            }
+
+            FanBoard writeLetter = fanLetterService.writeLetter(memberId, fanBoard, fileInfoList);
+            if (writeLetter.getId() == null) {
+                System.out.println("작성 오류");
+                return new ResponseEntity<>("WRITE_ERROR", headers, HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+
+        } catch (MimeTypeNotMatchException e) {
+            System.out.println("이미지 파일 확장자 다름");
+            return new ResponseEntity<>("MIMETYPE_ERROR", headers, HttpStatus.BAD_REQUEST);
+        } catch (MemberNotFoundException me) {
+            System.out.println("로그인이 안 됨");
+            return new ResponseEntity<>("NOT_LOGIN", headers, HttpStatus.BAD_REQUEST);
+        } catch (IOException e) {
+            System.out.println("파일 업로드 에러");
+            e.printStackTrace();
+            return new ResponseEntity<>("FILE_UPLOAD_ERROR", headers, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
 
         return new ResponseEntity<>("WRITE_OK", headers, HttpStatus.OK);
+    }
+
+    private void saveFile(MultipartFile multipartFile, String fileUuid) throws IOException {
+        var fileIo = new java.io.File(filePath+ fileUuid + multipartFile.getContentType());
+        multipartFile.transferTo(fileIo);
     }
 
     private String getMemberIdInSession(HttpServletRequest request) throws MemberNotFoundException {
