@@ -4,7 +4,6 @@ import lombok.Getter;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.*;
-import java.util.UUID;
 
 @Entity
 @Getter
@@ -27,7 +26,6 @@ public class File {
     public File(MultipartFile multipartFile) {
         this.name = multipartFile.getOriginalFilename();
         this.size = multipartFile.getSize();
-        this.uuid = UUID.randomUUID().toString();
     }
 
     public void filePath(String path) {
@@ -40,5 +38,9 @@ public class File {
 
     public void imgMimeType(String imgMimeType) {
         this.mimeType = imgMimeType;
+    }
+
+    public void fileUUID(String uuid) {
+        this.uuid = uuid;
     }
 }
