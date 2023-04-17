@@ -60,8 +60,9 @@
 <script th:inline="javascript">
 
   $( document ).ready( function() {
-    let jwt = localStorage.getItem('jwt');
+
     $('#writeBtn').click(function () {
+      let jwt = localStorage.getItem('jwt');
       let title = document.getElementById('title').value;
       let content = document.getElementById('content').value;
 
@@ -95,8 +96,10 @@
         url: '/fanLetter/write',
         processData: false,
         contentType: false,
-        // enctype: 'multipart/form-data',
         data: fanLetterData,
+        beforeSend: function (xhr) {
+          xhr.setRequestHeader("Authorization","Bearer " + jwt);
+        },
         success: function(result) {
           alert('success');
           if (result === 'WRITE_OK') {

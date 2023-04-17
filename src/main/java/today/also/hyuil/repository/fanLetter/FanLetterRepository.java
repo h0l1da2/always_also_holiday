@@ -24,4 +24,8 @@ public class FanLetterRepository {
         em.close();
         return fanBoard;
     }
+
+    public void selectFanBoardList() {
+        query.select();
+    }
 }

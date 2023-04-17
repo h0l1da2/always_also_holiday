@@ -53,18 +53,14 @@ public class FanLetterController {
     }
 
     @ResponseBody
-    @PostMapping(value = "/write", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE},
-            produces = {MediaType.TEXT_PLAIN_VALUE})
+    @PostMapping(value = "/write", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE}, produces = {MediaType.TEXT_PLAIN_VALUE})
     public ResponseEntity<String> write(@RequestPart(value = "image", required = false) List<MultipartFile> files,
                                 @RequestPart(value = "fanLetterWriteDto") FanLetterWriteDto fanLetterWriteDto,
                                 HttpServletRequest request) {
 
-        System.out.println("fanLetterWriteDto = " + fanLetterWriteDto);
-        System.out.println("files = " + files);
-
 //         webPath 값을 지정하면 해당경로까지의 realPath를 추출하는 코드
 //        String folderPath = request.getSession().getServletContext().getRealPath(filePath);
-//
+
 //        try {
 //            // 세션에서 memberId 가져오기
 //            String memberId = getMemberIdInSession(request);
@@ -123,7 +119,7 @@ public class FanLetterController {
 //            return new ResponseEntity<>("FILE_UPLOAD_ERROR", HttpStatus.INTERNAL_SERVER_ERROR);
 //        }
 
-        System.out.println("!!!!!!!!!!!!!!!!");
+        System.out.println("!!!!!!!!!!!!!!!!!");
         return new ResponseEntity<>("WRITE_OK", HttpStatus.OK);
     }
 
