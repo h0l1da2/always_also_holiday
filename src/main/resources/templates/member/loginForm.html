@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout/default_layout}">
+<th:block layout:fragment="content">
+<body>
+<div class="page-header page-caption">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <a href="pricing.html"><h1 class="page-title">오늘도 휴일</h1></a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="space-medium">
+  <div class="container">
+    <div class="row login-center" >
+      <div class="table-center"><h1 class="login-title">로그인</h1></div>
+      <div class="table-center loginError" th:if="${error != null}">
+        <span id="loginError" class="join-alarm blankInput" th:text="${error}"></span></div>
+      <form th:object="${loginForm}" class="login-form">
+        <!-- Textarea -->
+        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+          <!-- Text input-->
+          <div class="form-group">
+            <label class=" control-label" for="memberId">아이디 :</label>
+            <input th:field="*{memberId}" type="text" class="form-control login-input" placeholder=" " required>
+            <div class="table-center noValid"><span id="idCheck" class="join-alarm blankInput">아이디를 제대로 입력해주세요</span></div>
+          </div>
+        </div>
+        <div class="market-div">
+          <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+            <!-- Text input-->
+            <div class="form-group">
+              <label class=" control-label" for="password">비밀번호 :</label>
+              <input th:field="*{password}" type="password" class="form-control login-input" placeholder=" " required>
+              <div class="table-center noValid"><span id="pwdCheck" class="join-alarm blankInput">패스워드를 제대로 입력해주세요</span></div>
+            </div>
+            <!-- Button -->
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+              <div class="form-group">
+                <button type="button" id="loginBtn" name="singlebutton" class="btn btn-default btn-login">로그인</button>
+              </div>
+            </div>
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+              <div class="form-group">
+                <button id="signBtn" onclick="location.href='/joinForm'" name="singlebutton" class="btn btn-default btn-login btn-login-join">회원가입</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+    <label class=" control-label sns-label" for="sns">- SNS -</label>
+  </div>
+  <div class="sns-div">
+    <div class="sns-logo"> <a onclick="kakao()"><img th:src="@{/static/images/kakao.png}" alt="kakao"></a></div>
+    <div class="sns-logo"> <a onclick="naver()"><img th:src="@{/static/images/naver.png}" alt="naver"></a></div>
+    <div class="sns-logo"> <a onclick="google()"><img th:src="@{/static/images/google.png}" alt="google"></a></div>
+  </div>
+</div>
+</div>
+<script th:inline="javascript">
+
+  let urlParams = new URLSearchParams(window.location.search);
+  let redirectUrl = urlParams.get("redirectUrl");
+
+  function getRedirect() {
+    let param = new URLSearchParams(window.location.search);
+
+    if (param.has('redirect') && param.has('token')) {
+      let redirect = urlParams.get("redirect");
+      let token = urlParams.get("token");
+      localStorage.setItem('jwt', token);
+
+      if (redirect.startsWith('/login/oauth2/')) {
+        window.location.href = '/';
+      }
+
+      window.location.href = redirect+"?token="+token;
+
+    }
+  }
+
+  getRedirect();
+
+  function kakao() {
+    window.location.href = getRedirectUrl(redirectUrl, "kakao");
+  }
+
+  function naver() {
+    window.location.href = getRedirectUrl(redirectUrl, "naver");
+  }
+
+  function google() {
+    window.location.href = getRedirectUrl(redirectUrl, "google");
+  }
+
+  function getRedirectUrl(redirectUrl, client) {
+    if (redirectUrl) {
+      return "/oauth2/authorization/"+client+"?redirectUrl="+redirectUrl;
+    } else {
+      return "/oauth2/authorization/"+client;
+    }
+  }
+
+  $( document ).ready( function() {
+
+    $('#loginBtn').click(function () {
+
+      $('#idCheck').css('display', 'none');
+      $('#pwdCheck').css('display', 'none');
+      $('#loginError').css('display', 'none');
+
+      let memberId = document.getElementById('memberId').value;
+      let password = document.getElementById('password').value;
+
+      if (memberId == '' | memberId == ' ') {
+        $('#idCheck').css('display', 'block');
+        return false;
+      }
+      if (password == '' | password == ' ') {
+        $('#pwdCheck').css('display', 'block');
+        return false;
+      }
+
+      $.ajax({
+        type: 'POST',
+        url: '/login',
+        contentType: 'application/json',
+        data: JSON.stringify({memberId:memberId, password:password}),
+        dataType: 'json',
+        success: function(result) {
+          if (result.error) {
+            if(redirectUrl) {
+              window.location.href='/loginForm?error='+result.error+"&redirectUrl="+redirectUrl;
+            } else {
+              window.location.href='/loginForm?error='+result.error;
+            }
+          } else {
+            localStorage.setItem('jwt', result.JWT);
+            if (redirectUrl) {
+              window.location.href = redirectUrl+"?token="+result.JWT;
+            } else {
+              window.location.href = "/";
+            }
+
+          }
+        },
+        error: function(error) {
+          console.error(error);
+        }
+      });
+
+    })
+  })
+
+</script>
+</body>
+</th:block>
+</html>

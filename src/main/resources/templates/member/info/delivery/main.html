@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="layout/default_layout">
+<th:block layout:fragment="content">
+  <div class="page-header page-caption">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+          <a href="pricing.html"><h1 class="page-title">배송 정보</h1></a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="space-medium">
+    <div class="container">
+      <div class="row">
+        <div class="table-center"><h1 class="title-name">전체</h1></div>
+        <div class="table-center">
+          <div class="form-group">
+            <button id="singlebutton" name="singlebutton" class="btn btn-default info-btn-form">전체</button>
+            <button id="singlebutton" name="singlebutton" class="btn btn-default info-btn-form">배송중</button>
+            <button id="singlebutton" name="singlebutton" class="btn btn-default info-btn-form">배송 완료</button>
+            <button id="singlebutton" name="singlebutton" class="btn btn-default info-btn-form">취소</button>
+          </div>
+        </div>
+
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+          <div class="mb30">
+            <table class="table">
+              <thead>
+              <tr>
+                <th class="table-center">번호</th>
+                <th class="table-center">상품명</th>
+                <th class="table-center">주문일</th>
+                <th class="table-center">상태</th>
+                <th class="table-center">취소 요청</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr>
+                <td class="table-center">1</td>
+                <td class="td-title td-cen">휴일이 신발</td>
+                <td class="table-center">2023-03-08 23:12</td>
+                <td class="table-center">주문 완료</td>
+                <td class="table-center"><a href="">취소</a></td>
+              </tr>
+              <tr>
+                <td class="table-center">1</td>
+                <td class="td-title td-cen">휴일이 신발</td>
+                <td class="table-center">2023-03-08 23:12</td>
+                <td class="table-center">주문 완료</td>
+                <td class="table-center"><a href="">취소</a></td>
+              </tr>
+              <tr>
+                <td class="table-center">1</td>
+                <td class="td-title td-cen">휴일이 신발</td>
+                <td class="table-center">2023-03-08 23:12</td>
+                <td class="table-center">주문 완료</td>
+                <td class="table-center"><a href="">취소</a></td>
+              </tr>
+              <tr>
+                <td class="table-center">1</td>
+                <td class="td-title td-cen">휴일이 신발</td>
+                <td class="table-center">2023-03-08 23:12</td>
+                <td class="table-center">주문 완료</td>
+                <td class="table-center"><a href="">취소</a></td>
+              </tr>
+              <tr>
+                <td class="table-center">1</td>
+                <td class="td-title td-cen">휴일이 신발</td>
+                <td class="table-center">2023-03-08 23:12</td>
+                <td class="table-center">주문 완료</td>
+                <td class="table-center"><a href="">취소</a></td>
+              </tr>
+              <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+              </tr>
+              </tbody>
+            </table>
+            <div class="table-center">
+              <a class="board-number">1</a>
+              <a class="board-number this-page">2</a>
+              <a class="board-number">3</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</th:block>
+</html>
