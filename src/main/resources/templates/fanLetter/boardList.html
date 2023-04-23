@@ -118,23 +118,24 @@
 </div>
 <script th:inline="javascript">
   $( document ).ready( function() {
-    let token = localStorage.getItem('jwt');
     $('#writeBtn').click(function () {
-      $.ajax({
-        type: 'GET',
-        url: '/fanLetter/write',
-        contentType: 'application/json',
-        headers: {'Authorization':'Bearer '+token},
-        dataType: 'json',
-        success: function(result) {
-          // 헤더에 토큰 보내기
-          window.location.href = '/fanLetter/write';
-        },
-        error: function(error) {
-          console.error(error);
-        }
-      });
-
+      let token = localStorage.getItem('jwt');
+      window.location.href='/fanLetter/write?token='+token;
+    //   $.ajax({
+    //     type: 'GET',
+    //     url: '/fanLetter/write',
+    //     contentType: 'application/json',
+    //     headers: {'Authorization':'Bearer '+token},
+    //     dataType: 'json',
+    //     success: function(result) {
+    //       // 헤더에 토큰 보내기
+    //       window.location.href = '/fanLetter/write';
+    //     },
+    //     error: function(error) {
+    //       console.error(error);
+    //     }
+    //   });
+    //
     })
   })
 </script>

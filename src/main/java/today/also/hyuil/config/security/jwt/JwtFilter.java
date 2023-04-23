@@ -9,6 +9,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 import today.also.hyuil.domain.security.Token;
 
@@ -37,9 +38,9 @@ public class JwtFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         System.out.println("JWT 검증 필터");
         String token = jwtTokenParser.getTokenHeader(request);
-        if (token == null) {
+        if (!tokenNullCheck(token)) {
             String tokenUrl = jwtTokenParser.getTokenUrl(request);
-            if (tokenUrl == null) {
+            if (!tokenNullCheck(tokenUrl)) {
                 System.out.println("토큰이 없어요");
                 filterChain.doFilter(request, response);
                 return;
@@ -105,6 +106,24 @@ public class JwtFilter extends OncePerRequestFilter {
             return new UsernamePasswordAuthenticationToken(userDetails, accessToken, authorities);
         } catch (JwtException | IllegalArgumentException | NullPointerException exception) {
             throw new BadCredentialsException(exception.getMessage());
+        }
+    }
+
+    private boolean tokenNullCheck(String token) {
+        try {
+            if (token == null) {
+                return false;
+            }
+            if (token.equals("null")) {
+                return false;
+            }
+            if (!StringUtils.hasText(token)) {
+                return false;
+            }
+            return true;
+        } catch (NullPointerException e) {
+            System.out.println("토큰이 널이에요.");
+            return false;
         }
     }
 
