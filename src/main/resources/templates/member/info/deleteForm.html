@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="layout/default_layout">
+<th:block layout:fragment="content">
+
+  <div class="page-header page-caption">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+          <h1 class="page-title">회원 탈퇴</h1>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="space-medium">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+          <div class="mb30">
+            <h1 class="mb20">정말 탈퇴하시겠어요 ?</h1>
+            <p>탈퇴하기 전에 확인하셨나요?<br></p>
+            <p>* 팬레터 / 장터 글은 탈퇴해도 삭제되지 않습니다<br>
+              * 진행 중인 거래나 배송이 있다면 아직 탈퇴하지 마세요<br>
+              * 팬미팅이 예약중인 상태라면 자동 취소 처리 됩니다<br>
+            </p>
+            <p>탈퇴 후 정보 복구는 불가능합니다. 신중히 탈퇴해주세요!</p>
+          </div>
+          <div class="bdr-btm"></div>
+        </div>
+        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 outline pinside40 join-div">
+          <div class="row">
+            <form>
+              <!-- Textarea -->
+              <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                <!-- Text input-->
+                <div class="form-group join-input">
+                  <h1 class="mb20">그래도<br>탈퇴하시겠다면</h1>
+                  <label class=" control-label" for="name">현재 비밀번호 : </label>
+                  <input id="name" name="name" type="text" class="form-control" placeholder="5자 이상" required>
+                </div>
+                <button id="singlebutton" name="singlebutton" class="btn btn-default info-btn-form">탈퇴</button>
+              </div>
+          </form>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</th:block>
+</html>

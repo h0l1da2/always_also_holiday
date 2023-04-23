@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="layout/default_layout">
+<th:block layout:fragment="content">
+<body>
+<div class="page-header page-caption">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <h1 class="page-title">회원 가입</h1>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="space-medium">
+  <div class="container">
+    <div class="row">
+      <div class="table-center"><h1 class="login-title">회원 가입</h1></div>
+
+      <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 outline pinside40 join-div">
+        <div class="row">
+          <form th:action="@{/join/complete}" th:object="${member}" method="POST" th:onsubmit="return formCheck(this)">
+            <!-- Textarea -->
+            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+              <!-- Text input-->
+              <div class="form-group join-input">
+                <label class=" control-label" for="memberId">아이디 : </label>
+                <input th:field="*{memberId}" type="text" class="form-control" placeholder="5~20글자(영문 대소문자 또는 숫자)"
+                       minlength="5" maxlength="20" required>
+                <div><span id="idDouble" class="join-alarm">아이디가 중복입니다</span></div>
+                <div><span id="writeId" class="join-alarm">아이디를 입력해주세요</span></div>
+                <div><span id="wrongId" class="join-alarm">아이디를 양식을 확인해주세요</span></div>
+                <div class="form-group">
+                  <label class=" control-label" for="password">비밀번호 :</label>
+                  <input th:field="*{password}" type="password" class="form-control" placeholder="6~20글자 영문 대소문자+숫자"
+                         minlength="6" maxlength="20" required>
+                  <div ><span id="pwdForm" class="join-alarm">비밀번호는 6자 이상, 영문 대소문자+숫자 포함이어야 합니다</span></div>
+                </div>
+                <label class=" control-label" for="passwordCheck">비밀번호 확인 :</label>
+                <input id="passwordCheck" type="password" class="form-control" placeholder="영문/숫자 포함 8자" required>
+                <div ><span id="difPwd" class="join-alarm">비밀번호가 서로 다릅니다</span></div>
+                <label class=" control-label" for="name">이름 : </label>
+                <input th:field="*{name}" type="text" class="form-control" placeholder=" " required>
+                <div class="form-group">
+                  <label class=" control-label" for="nickname">닉네임 :</label>
+                  <input th:field="*{nickname}" type="text" class="form-control" placeholder="한글/영문/숫자 3자 이상(특수문자 미포함)"
+                         minlength="3" required>
+                  <div ><span id="nickDouble" class="join-alarm">닉네임이 중복입니다</span></div>
+                  <div ><span id="wrongNick" class="join-alarm">닉네임 양식을 확인해주세요</span></div>
+                </div>
+                <div class="form-group">
+                  <label class=" control-label" for="address">주소 :</label>
+                  <input type="text" class="form-control" th:field="*{postcode}" placeholder="우편번호" readonly>
+                  <input type="button" class="form-control" onclick="execDaumPostcode()" value="우편번호 찾기"><br>
+                  <input type="text" class="form-control" th:field="*{address}" placeholder="주소" readonly>
+                  <input type="text" class="form-control" th:field="*{detail}" placeholder="상세주소">
+                  <input type="text" class="form-control" th:field="*{extraAddress}" placeholder="참고항목" readonly>
+                </div>
+                <div class="form-group">
+                  <label class=" control-label" for="email">이메일 :</label>
+                  <input th:field="*{email}" type="email" class="form-control" placeholder=" " required>
+                  <div ><span id="codeSend" class="join-alarm">이메일로 코드를 발송했습니다</span></div>
+                  <div ><span id="wrongEmail" class="join-alarm">이메일을 제대로 입력해주세요</span></div>
+                </div>
+                <div class="form-group">
+                  <label class=" control-label" for="code">코드 :</label>
+                  <input th:field="*{code}" type="text" class="form-control" placeholder=" " required>
+                  <div ><span id="difCode" class="join-alarm">코드가 다릅니다</span></div>
+                </div>
+                <label class=" control-label" for="phone">휴대폰 :</label>
+                <input th:field="*{phone}" type="text" class="form-control" placeholder="예시) 01012341234" required>
+                <div ><span id="phoneDouble" class="join-alarm">번호가 중복입니다</span></div>
+                <div ><span id="wrongPhone" class="join-alarm">번호를 제대로 입력하세요</span></div>
+              </div>
+            </div>
+
+            <div class="form-group join-div-btn">
+              <button id="idCheckBtn" type="button" name="singlebutton" class="btn btn-default btn-join">중복 확인</button>
+            </div>
+            <div class="form-group join-div-btn">
+              <button id="nickCheckBtn" type="button" name="singlebutton" class="btn btn-default btn-join">중복 확인</button>
+            </div>
+            <div class="form-group join-div-btn">
+              <button id="emailSendBtn" type="button" name="singlebutton" class="btn btn-default btn-join">코드 전송</button>
+            </div>
+            <div class="form-group join-div-btn">
+              <button id="codeCheckBtn" type="button" name="singlebutton" class="btn btn-default btn-join">코드 확인</button>
+            </div>
+            <div class="form-group join-div-btn">
+              <button id="phoneCheckBtn" type="button" name="singlebutton" class="btn btn-default btn-join">중복 확인</button>
+            </div>
+
+            <!-- Button -->
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+              <div class="form-group">
+                <button type="submit" id="joinBtn" name="singlebutton" class="btn btn-default btn-join-compl">회원 가입</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+<script th:inline="javascript">
+
+  function checkEmail(str){
+    let regEmail = /^([0-9a-zA-Z_\.-]+)@([0-9a-zA-Z_-]+)(\.[0-9a-zA-Z_-]+){1,2}$/;
+    if(!regEmail.test(str)) {
+      return false;
+    }else {
+      return true;
+    }
+  }
+  function checkMemberId(str){
+    let regMemberId = /[ㄱ-ㅎ|ㅏ-ㅣ|가-힣]/;
+    let reg = /[`~!@#$%^&*()_|+\-=?;:'",.<>\{\}\[\]\\\/ ]/gim;
+    let regNum = /^.{5,20}$/
+    if(regMemberId.test(str) || reg.test(str) || !regNum.test(str)) {
+      return false;
+    }else {
+      return true;
+    }
+  }
+  function checkNickname(str){
+    let regNickname = /[ㄱ-ㅎ|ㅏ-ㅣ]/;
+    let reg = /[`~!@#$%^&*()_|+\-=?;:'",.<>\{\}\[\]\\\/ ]/gim;
+    if(reg.test(str) | regNickname.test(str)) {
+      return false;
+    }else {
+      return true;
+    }
+  }
+  function checkPhone(str){
+    let reg = /^(01[016789]{1})-?[0-9]{3,4}-?[0-9]{4}$/;
+    if(reg.test(str)) {
+      return true;
+    }else {
+      return false;
+    }
+  }
+  function checkName(str){
+    let regex= /([^가-힣\x20])/i;
+    let regNum = /^.{2,20}$/
+    let reg = /[`~!@#$%^&*()_|+\-=?;:'",.<>\{\}\[\]\\\/ ]/gim;
+    if(regex.test(str) | !regNum.test(str) | !reg.test(str)) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+  function checkPassword(str){
+    let regex = /^[A-Za-z0-9]{6,12}$/;
+    if(regex.test(str)) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  function formCheck(form) {
+    let name = document.getElementById("name").value;
+    let address = document.getElementById("address").value;
+    let detail = document.getElementById("detail").value;
+    let password = document.getElementById("password").value;
+    if (idCheck == 0) {
+      alert('ID 중복확인은 필수입니다');
+      return false;
+    }
+    if (nicknameCheck == 0) {
+      alert('닉네임 중복확인은 필수입니다');
+      return false;
+    }
+    if (emailCheck == 0 | codeCheck == 0) {
+      alert('이메일 코드 인증을 해주세요');
+      return false;
+    }
+    if (phoneCheck == 0) {
+      alert('휴대폰 중복확인은 필수입니다');
+      return false;
+    }
+    if ($('#difPwd').css('display') == 'block' |
+            $('#pwdForm').css('display') == 'block') {
+      alert('비밀번호를 제대로 확인해주세요');
+      document.getElementById('password').focus();
+      return false;
+    }
+    if (!checkName(name)) {
+      alert('이름을 제대로 써주세요');
+      document.getElementById('name').focus();
+      return false;
+    }
+    if (address == '' | detail == '') {
+      alert('주소를 입력해주세요');
+      document.getElementById('detail').focus();
+      return false;
+    }
+    if (!checkPassword(password)) {
+      alert('비밀번호 양식을 맞춰주세요');
+      document.getElementById('password').focus();
+      return false;
+    }
+  }
+
+  let idCheck = 0;
+  let nicknameCheck = 0;
+  let emailCheck = 0;
+  let codeCheck = 0;
+  let phoneCheck = 0;
+
+  $( document ).ready( function() {
+
+    $('#passwordCheck').on("propertychange change keyup paste input", function (frm) {
+      $('#difPwd').css('display', 'block');
+      if(document.getElementById('password').value == document.getElementById('passwordCheck').value) {
+        $('#difPwd').css('display', 'none');
+        return false;
+      }
+    });
+    $('#password').on("propertychange change keyup paste input", function (frm) {
+      $('#difPwd').css('display', 'block');
+      if(document.getElementById('password').value == document.getElementById('passwordCheck').value) {
+        $('#difPwd').css('display', 'none');
+        return false;
+      }
+    });
+
+    $('#memberId').on("propertychange change keyup paste input", function (frm) {
+      $('#writeId').css('display', 'none');
+      $('#wrongId').css('display', 'none');
+      $('#idDouble').css('display', 'none');
+      idCheck = 0;
+    })
+    $('#nickname').on("propertychange change keyup paste input", function (frm) {
+      $('#nickDouble').css('display', 'none');
+      $('#wrongNick').css('display', 'none');
+      nicknameCheck = 0;
+    })
+    $('#email').on("propertychange change keyup paste input", function (frm) {
+      $('#wrongEmail').css('display', 'none');
+      emailCheck = 0;
+      codeCheck = 0;
+    })
+    $('#phone').on("propertychange change keyup paste input", function (frm) {
+      $('#wrongPhone').css('display', 'none');
+      phoneCheck = 0;
+    })
+
+    $('#idCheckBtn').click(function () {
+      let memberId = document.getElementById("memberId").value;
+      if (memberId == "" | memberId == " ") {
+        $('#writeId').css('display', 'block');
+        return false;
+      }
+      if (!checkMemberId(memberId)) {
+        $('#wrongId').css('display', 'block');
+        return false;
+      }
+
+      $.ajax({
+        type: 'POST',
+        url: '/join/idCheck',
+        contentType: "application/json",
+        data: JSON.stringify({memberId:memberId}),
+        dataType: 'text',
+        success: function (result) {
+          if(result=="가입 가능") {
+            alert("중복이 아닙니다");
+            idCheck=1;
+          } else {
+            alert(result);
+            document.getElementById('memberId').focus();
+          }
+        },
+        error: function(result) {
+          alert("확인실패");
+        }});
+
+    })
+    $('#nickCheckBtn').click(function () {
+      let nickname = document.getElementById("nickname").value;
+      if (nickname == "" | nickname == " " | !checkNickname(nickname)) {
+        $('#wrongNick').css('display', 'block');
+        return false;
+      }
+
+      $.ajax({
+        type: 'POST',
+        url: '/join/nicknameCheck',
+        contentType: "application/json",
+        data: JSON.stringify({nickname:nickname}),
+        dataType: 'text',
+        success: function (result) {
+          if(result=="가입 가능") {
+            alert("중복이 아닙니다");
+            nicknameCheck=1;
+            $('#wrongNick').css('display', 'none');
+          } else {
+            alert(result);
+            document.getElementById('nickname').focus();
+          }
+        },
+        error: function(result) {
+          alert("확인실패");
+        }});
+    })
+    $('#emailSendBtn').click(function () {
+      let email = document.getElementById("email").value;
+      if (!checkEmail(email)) {
+        $('#wrongEmail').css('display', 'block');
+        return false;
+      }
+      $.ajax({
+        type: 'POST',
+        url: '/join/emailSend',
+        contentType: "application/json",
+        data: JSON.stringify({email:email}),
+        dataType: 'text',
+        success: function (result) {
+          if(result=="확인 불가") {
+            alert(result);
+            document.getElementById('email').focus();
+          } else {
+            emailCheck = 1;
+            document.getElementById('code').focus();
+            $('#codeSend').css('display', 'block');
+      }
+        },
+        error: function(result) {
+          alert("확인실패");
+        }});
+    })
+    $('#codeCheckBtn').click(function () {
+      let code = document.getElementById("code").value;
+      $.ajax({
+        type: 'POST',
+        url: '/join/codeCheck',
+        contentType: "application/json",
+        data: JSON.stringify({code:code}),
+        dataType: 'text',
+        success: function (result) {
+          if(result=="코드 일치") {
+            $('#codeSend').css('display', 'none');
+            $('#difCode').css('display', 'none');
+            alert(result);
+            codeCheck = 1;
+          } else {
+            $('#difCode').css('display', 'block');
+          }
+        },
+        error: function(result) {
+          alert("확인실패");
+        }});
+    })
+    $('#phoneCheckBtn').click(function () {
+      let phone = document.getElementById("phone").value;
+      if (!checkPhone(phone)) {
+        $('#wrongPhone').css('display', 'block');
+        return false;
+      }
+      $.ajax({
+        type: 'POST',
+        url: '/join/phoneCheck',
+        contentType: "application/json",
+        data: JSON.stringify({phone:phone}),
+        dataType: 'text',
+        success: function (result) {
+          if(result=="가입 가능") {
+            alert("중복이 아닙니다");
+            phoneCheck=1;
+          } else {
+            alert(result);
+            document.getElementById('phone').focus();
+          }
+        },
+        error: function(result) {
+          alert("확인실패");
+        }});
+    })
+  })
+</script>
+<script>
+  function execDaumPostcode() {
+    new daum.Postcode({
+      oncomplete: function(data) {
+        // 팝업에서 검색결과 항목을 클릭했을때 실행할 코드를 작성하는 부분.
+
+        // 각 주소의 노출 규칙에 따라 주소를 조합한다.
+        // 내려오는 변수가 값이 없는 경우엔 공백('')값을 가지므로, 이를 참고하여 분기 한다.
+        var addr = ''; // 주소 변수
+        var extraAddr = ''; // 참고항목 변수
+
+        //사용자가 선택한 주소 타입에 따라 해당 주소 값을 가져온다.
+        if (data.userSelectedType === 'R') { // 사용자가 도로명 주소를 선택했을 경우
+          addr = data.roadAddress;
+        } else { // 사용자가 지번 주소를 선택했을 경우(J)
+          addr = data.jibunAddress;
+        }
+
+        // 사용자가 선택한 주소가 도로명 타입일때 참고항목을 조합한다.
+        if(data.userSelectedType === 'R'){
+          // 법정동명이 있을 경우 추가한다. (법정리는 제외)
+          // 법정동의 경우 마지막 문자가 "동/로/가"로 끝난다.
+          if(data.bname !== '' && /[동|로|가]$/g.test(data.bname)){
+            extraAddr += data.bname;
+          }
+          // 건물명이 있고, 공동주택일 경우 추가한다.
+          if(data.buildingName !== '' && data.apartment === 'Y'){
+            extraAddr += (extraAddr !== '' ? ', ' + data.buildingName : data.buildingName);
+          }
+          // 표시할 참고항목이 있을 경우, 괄호까지 추가한 최종 문자열을 만든다.
+          if(extraAddr !== ''){
+            extraAddr = ' (' + extraAddr + ')';
+          }
+          // 조합된 참고항목을 해당 필드에 넣는다.
+          document.getElementById("extraAddress").value = extraAddr;
+
+        } else {
+          document.getElementById("extraAddress").value = '';
+        }
+
+        // 우편번호와 주소 정보를 해당 필드에 넣는다.
+        document.getElementById('postcode').value = data.zonecode;
+        document.getElementById("address").value = addr;
+        // 커서를 상세주소 필드로 이동한다.
+        document.getElementById("detail").focus();
+      }
+    }).open();
+  }
+</script>
+</body>
+</th:block>
+</html>
