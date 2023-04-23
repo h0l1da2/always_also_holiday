@@ -97,9 +97,7 @@
         processData: false,
         contentType: false,
         data: fanLetterData,
-        beforeSend: function (xhr) {
-          xhr.setRequestHeader("Authorization","Bearer " + jwt);
-        },
+        headers: { 'Authorization': 'Bearer '+ jwt },
         success: function(result) {
           alert('success');
           if (result === 'WRITE_OK') {

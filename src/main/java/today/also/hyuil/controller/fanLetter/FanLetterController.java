@@ -60,7 +60,7 @@ public class FanLetterController {
 
 //         webPath 값을 지정하면 해당경로까지의 realPath를 추출하는 코드
 //        String folderPath = request.getSession().getServletContext().getRealPath(filePath);
-
+//
 //        try {
 //            // 세션에서 memberId 가져오기
 //            String memberId = getMemberIdInSession(request);
