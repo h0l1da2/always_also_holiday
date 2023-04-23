@@ -58,6 +58,8 @@ public class FanLetterController {
                                 @RequestPart(value = "fanLetterWriteDto") FanLetterWriteDto fanLetterWriteDto,
                                 HttpServletRequest request) {
 
+        System.out.println("fanLetterWriteDto = " + fanLetterWriteDto);
+
 //         webPath 값을 지정하면 해당경로까지의 realPath를 추출하는 코드
 //        String folderPath = request.getSession().getServletContext().getRealPath(filePath);
 //

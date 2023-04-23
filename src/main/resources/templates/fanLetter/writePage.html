@@ -62,6 +62,7 @@
   $( document ).ready( function() {
 
     $('#writeBtn').click(function () {
+
       let jwt = localStorage.getItem('jwt');
       let title = document.getElementById('title').value;
       let content = document.getElementById('content').value;
@@ -84,7 +85,7 @@
       // input file 을 formData에 담는 로직
       const fileInput = $('#imagesInput');
       const files = fileInput[0].files;
-      for (var i = 0; i < files.length; i++) {
+      for (let i = 0; i < files.length; i++) {
         fanLetterData.append('image', files[i]);
       }
 
@@ -97,17 +98,18 @@
         processData: false,
         contentType: false,
         data: fanLetterData,
-        headers: { 'Authorization': 'Bearer '+ jwt },
+        // headers: { 'Authorization': 'Bearer '+ jwt },
+        // dataType: 'json',
         success: function(result) {
           alert('success');
-          if (result === 'WRITE_OK') {
+          if (result.data === 'WRITE_OK') {
             window.location.href = '/fanLetter';
           } else {
-            alert(result);
+            alert(result.data);
           }
         },
-        error: function(error) {
-          alert('error')
+        error: function(xhr, status, error) {
+          alert('error - '+xhr.status+'. 메시지 : '+xhr.statusText)
           console.error(error);
         }
       });
