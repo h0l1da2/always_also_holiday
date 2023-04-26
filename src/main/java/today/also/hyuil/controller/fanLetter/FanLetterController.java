@@ -126,6 +126,19 @@ public class FanLetterController {
         return new ResponseEntity<>("WRITE_OK", HttpStatus.OK);
     }
 
+    @GetMapping("/modify")
+    public String modify(Model model, HttpServletRequest request) {
+        try {
+            String memberId = getMemberIdInSession(request);
+
+        } catch (MemberNotFoundException e) {
+            System.out.println("로그인이 안 되어있음");
+            return "redirect:/loginForm?redirectUrl=/fanLetter";
+        }
+
+        return "fanLetter/modifyPage";
+    }
+
 
 
     private void saveFile(MultipartFile multipartFile, String mimeType, String fileUuid) throws IOException {

@@ -80,6 +80,10 @@
         window.location.href = '/';
       }
 
+      if (redirect.startsWith('/fanLetter')) {
+        redirect = '/fanLetter';
+      }
+
       window.location.href = redirect+"?token="+token;
 
     }
