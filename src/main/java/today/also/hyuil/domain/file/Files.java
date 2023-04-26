@@ -8,7 +8,7 @@ import javax.persistence.*;
 @Entity
 @Getter
 @Table(name = "file")
-public class File {
+public class Files {
 
     @Id @GeneratedValue
     private Long id;
@@ -21,9 +21,9 @@ public class File {
     private String mimeType;
     private Long size;
 
-    public File() {}
+    public Files() {}
 
-    public File(MultipartFile multipartFile) {
+    public Files(MultipartFile multipartFile) {
         this.name = multipartFile.getOriginalFilename();
         this.size = multipartFile.getSize();
     }

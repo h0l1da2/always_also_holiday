@@ -16,7 +16,7 @@ public class FileInfo {
     private IsWhere isWhere;
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "file_id")
-    private File file;
+    private Files file;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "fan_board_id")
     private FanBoard fanBoard;
@@ -26,7 +26,7 @@ public class FileInfo {
 
     public FileInfo() {}
 
-    public FileInfo(File file) {
+    public FileInfo(Files file) {
         this.file = file;
     }
 
