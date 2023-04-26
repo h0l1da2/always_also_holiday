@@ -83,7 +83,10 @@ public class CustomOAuth2AuthorizationRequestResolver implements OAuth2Authoriza
         if (!StringUtils.hasText(redirectUrl)) {
             redirectUrl = snsInfo.redirectUri(sns.toUpperCase());
         } else {
-            redirectUrl = BASE_URL + request.getParameter("redirectUrl");
+            if (redirectUrl.startsWith("/fanLetter")) {
+                redirectUrl = "/fanLetter";
+            }
+            redirectUrl = BASE_URL + redirectUrl;
         }
         return redirectUrl;
     }
