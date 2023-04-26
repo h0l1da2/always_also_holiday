@@ -11,6 +11,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import today.also.hyuil.domain.dto.fanLetter.FanLetterWriteDto;
+import today.also.hyuil.domain.dto.fanLetter.FileDto;
 import today.also.hyuil.domain.fanLetter.FanBoard;
 import today.also.hyuil.domain.file.FileInfo;
 import today.also.hyuil.domain.file.Files;
@@ -158,7 +159,13 @@ public class FanLetterController {
 
     private void modelInFileInfoList(Model model, Map<String, Object> map) {
         List<FileInfo> fileInfoList = (List<FileInfo>) map.get("fileInfoList");
-        model.addAttribute("fileInfoList", fileInfoList);
+        ArrayList<FileDto> fileList = new ArrayList<>();
+        for (FileInfo fileInfo : fileInfoList) {
+            FileDto fileDto = new FileDto(fileInfo);
+            fileList.add(fileDto);
+        }
+
+        model.addAttribute("fileInfoList", fileList);
     }
 
     private void modelInFanBoard(Model model, Map<String, Object> map) {
