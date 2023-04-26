@@ -11,7 +11,9 @@ import today.also.hyuil.service.fanLetter.inter.FanLetterService;
 import today.also.hyuil.service.file.inter.FileService;
 import today.also.hyuil.service.member.inter.MemberJoinService;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Transactional
 @Service
@@ -42,5 +44,26 @@ public class FanLetterServiceImpl implements FanLetterService {
         }
 
         return insertFanBoard;
+    }
+
+    @Override
+    public Map<String, Object> modifyLetter(String memberId, Long fanLetterNum) throws MemberNotFoundException {
+        FanBoard fanBoard = fanLetterRepository.selectFanBoard(fanLetterNum);
+        String writer = fanBoard.getMember().getMemberId();
+
+        if (!writer.equals(memberId)) {
+            throw new MemberNotFoundException("해당 멤버가 쓴 글이 아닙니다");
+        }
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("fanBoard", fanBoard);
+
+        List<FileInfo> fileInfoList = fileService.fileInfoList(fanLetterNum);
+
+        if (fileInfoList.size() != 0) {
+            map.put("fileInfoList", fileInfoList);
+        }
+
+        return map;
     }
 }

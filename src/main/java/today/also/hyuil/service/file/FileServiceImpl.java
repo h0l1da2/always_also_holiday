@@ -6,6 +6,8 @@ import today.also.hyuil.domain.file.FileInfo;
 import today.also.hyuil.repository.file.FileRepository;
 import today.also.hyuil.service.file.inter.FileService;
 
+import java.util.List;
+
 @Transactional
 @Service
 public class FileServiceImpl implements FileService {
@@ -19,6 +21,11 @@ public class FileServiceImpl implements FileService {
     @Override
     public FileInfo saveFileInfo(FileInfo fileInfo) {
         return fileRepository.insertFileInfo(fileInfo);
+    }
+
+    @Override
+    public List<FileInfo> fileInfoList(Long letterNum) {
+        return fileRepository.selectInfoList(letterNum);
     }
 
 }

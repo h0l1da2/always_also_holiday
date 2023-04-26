@@ -25,6 +25,12 @@ public class FanLetterRepository {
         return fanBoard;
     }
 
+    public FanBoard selectFanBoard(Long num) {
+        FanBoard fanBoard = em.find(FanBoard.class, num);
+        em.close();
+        return fanBoard;
+    }
+
     public void selectFanBoardList() {
         query.select();
     }

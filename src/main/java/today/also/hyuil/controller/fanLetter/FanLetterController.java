@@ -26,6 +26,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Controller
@@ -111,12 +112,15 @@ public class FanLetterController {
             }
 
         } catch (MimeTypeNotMatchException e) {
+            e.printStackTrace();
             System.out.println("이미지 파일 확장자 다름");
             return new ResponseEntity<>("MIMETYPE_ERROR", HttpStatus.BAD_REQUEST);
         } catch (MemberNotFoundException me) {
+            me.printStackTrace();
             System.out.println("로그인이 안 됨");
             return new ResponseEntity<>("NOT_LOGIN", HttpStatus.BAD_REQUEST);
         } catch (IOException e) {
+            e.printStackTrace();
             System.out.println("파일 업로드 에러");
             e.printStackTrace();
             return new ResponseEntity<>("FILE_UPLOAD_ERROR", HttpStatus.INTERNAL_SERVER_ERROR);
@@ -126,19 +130,44 @@ public class FanLetterController {
         return new ResponseEntity<>("WRITE_OK", HttpStatus.OK);
     }
 
-    @GetMapping("/modify")
-    public String modify(Model model, HttpServletRequest request) {
+    @GetMapping("/modify/{num}")
+    public String modify(@PathVariable Long num, Model model, HttpServletRequest request) {
         try {
-            String memberId = getMemberIdInSession(request);
+//            String memberId = getMemberIdInSession(request);
+            String memberId = "aaaa1";
+            /**
+             * 1. 본인 글인지 검증
+             * 2. 본인 글이 맞다면 내용 보여줌
+             * 3. 사진은...? 일단 글만 보여주는 걸로 -> 사진도
+             */
+
+            Map<String, Object> map = fanLetterService.modifyLetter(memberId, num);
+            modelInFanBoard(model, map);
+
+            if (map.containsKey("fileInfoList")) {
+                modelInFileInfoList(model, map);
+            }
 
         } catch (MemberNotFoundException e) {
-            System.out.println("로그인이 안 되어있음");
+            e.printStackTrace();
             return "redirect:/loginForm?redirectUrl=/fanLetter";
         }
 
         return "fanLetter/modifyPage";
     }
 
+    private void modelInFileInfoList(Model model, Map<String, Object> map) {
+        List<FileInfo> fileInfoList = (List<FileInfo>) map.get("fileInfoList");
+        model.addAttribute("fileInfoList", fileInfoList);
+    }
+
+    private void modelInFanBoard(Model model, Map<String, Object> map) {
+        FanBoard fanBoard = (FanBoard) map.get("fanBoard");
+        FanLetterWriteDto fanLetterWriteDto = new FanLetterWriteDto(
+                fanBoard.getTitle(), fanBoard.getContent()
+        );
+        model.addAttribute("fanLetter", fanLetterWriteDto);
+    }
 
 
     private void saveFile(MultipartFile multipartFile, String mimeType, String fileUuid) throws IOException {
@@ -152,7 +181,6 @@ public class FanLetterController {
         try {
             memberId = (String) session.getAttribute("memberId");
         } catch (NullPointerException e) {
-            e.printStackTrace();
             throw new MemberNotFoundException("세션에 아이디가 없음");
         }
         return memberId;
