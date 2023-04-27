@@ -93,7 +93,7 @@
                   </div>
                 </div>
 
-                <div class="row">
+                <div class="row" th:if="">
                   <div class="col-lg-12 col-md-12 col-md-12 col-sm-12">
                     <div class="leave-comments">
                       <!-- leave comments -->
@@ -111,7 +111,7 @@
                           <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                             <!-- Button -->
                             <div class="form-group">
-                              <button id="singlebutton" name="singlebutton" class="btn btn-default">등록</button>
+                              <button type="button" id="writeBtn" name="writeBtn" class="btn btn-default">등록</button>
                             </div>
                           </div>
                         </div>
@@ -119,6 +119,7 @@
                     </div>
                   </div>
                 </div>
+
               </div>
             </div>
           </div>
@@ -127,6 +128,53 @@
     </div>
   </div>
 </div>
+<script th:inline="javascript">
+
+  $( document ).ready( function() {
+    $('#writeBtn').click(function () {
+      let jwt = localStorage.getItem('jwt');
+      let content = document.getElementById('content').value;
+      // 글 번호와 엄마 댓글 번호
+      let letterNum = document.getElementById('content').value;
+      let commentNum = document.getElementById('content').value;
+
+      if (content === '' || content === ' ') {
+        alert('내용을 입력하세요');
+        document.getElementById('content').focus();
+        return false;
+      }
+
+      let formData = new FormData();
+
+      let data = {content: content, letterNum: letterNum, commentNum: commentNum};
+      formData.append('fanCommentWriteDto', new Blob([JSON.stringify(data)], {type: 'application/json'}));
+
+
+      $.ajax({
+        type: 'POST',
+        url: '/fanLetter/comment/write',
+        contentType: 'application/json',
+        data: formData,
+        headers: { 'Authorization': 'Bearer '+ jwt },
+        dataType: 'json',
+        success: function(result) {
+          if (result === 'WRITE_OK') {
+            alert('작성 완료');
+            window.location.href = '/fanLetter/'+letterNum;
+          } else {
+            alert(result);
+          }
+        },
+        error: function(xhr, status, error) {
+          alert('error - '+xhr.status+'. 메시지 : '+xhr.statusText)
+          console.error(error);
+        }
+      });
+
+    })
+    })
+
+</script>
 </body>
 </th:block>
 </html>
