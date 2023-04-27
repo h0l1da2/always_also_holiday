@@ -1,16 +1,19 @@
 package today.also.hyuil.service.fanLetter;
 
+import org.apache.tomcat.util.http.fileupload.impl.FileSizeLimitExceededException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import today.also.hyuil.domain.fanLetter.FanBoard;
 import today.also.hyuil.domain.file.FileInfo;
 import today.also.hyuil.domain.member.Member;
+import today.also.hyuil.exception.FileNumbersLimitExceededException;
 import today.also.hyuil.exception.MemberNotFoundException;
 import today.also.hyuil.repository.fanLetter.FanLetterRepository;
 import today.also.hyuil.service.fanLetter.inter.FanLetterService;
 import today.also.hyuil.service.file.inter.FileService;
 import today.also.hyuil.service.member.inter.MemberJoinService;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -47,7 +50,7 @@ public class FanLetterServiceImpl implements FanLetterService {
     }
 
     @Override
-    public Map<String, Object> modifyLetter(String memberId, Long fanLetterNum) throws MemberNotFoundException {
+    public Map<String, Object> readLetter(String memberId, Long fanLetterNum) throws MemberNotFoundException {
         FanBoard fanBoard = fanLetterRepository.selectFanBoard(fanLetterNum);
         String writer = fanBoard.getMember().getMemberId();
 
@@ -65,5 +68,41 @@ public class FanLetterServiceImpl implements FanLetterService {
         }
 
         return map;
+    }
+
+    @Override
+    public FanBoard findLetter(Long num) {
+        return fanLetterRepository.selectFanBoard(num);
+    }
+
+    @Override
+    public void modifyLetter(Map<String, Object> map) throws FileNumbersLimitExceededException {
+        FanBoard fanBoard = (FanBoard) map.get("fanBoard");
+
+        fanLetterRepository.modifyFanBoard(fanBoard);
+
+        /**
+         * 파일 찾고, 갯수가 5개 이하일 경우만
+         * 맞춰서 넣을 수 있도록...
+         */
+
+        if (map.containsKey("fileInfoList")) {
+            List<FileInfo> fileInfoList = (List<FileInfo>) map.get("fileInfoList");
+            List<FileInfo> boardFiles = fileService.fileInfoList(fanBoard.getId());
+
+            int fileNumbers = boardFiles.size() + fileInfoList.size();
+
+            if (5 < fileNumbers) {
+                throw new FileNumbersLimitExceededException("기존 파일을 포함 5개 이상 업로드는 불가합니다");
+            }
+
+            for (FileInfo fileInfo : fileInfoList) {
+                fileInfo.fanBoardFile(fanBoard);
+                fileService.saveFileInfo(fileInfo);
+            }
+        }
+
+        fanLetterRepository.modifyFanBoard(fanBoard);
+
     }
 }

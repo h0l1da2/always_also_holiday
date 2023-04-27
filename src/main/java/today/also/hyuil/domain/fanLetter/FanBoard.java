@@ -38,4 +38,10 @@ public class FanBoard {
     public void writeMember(Member member) {
         this.member = member;
     }
+
+    public void modifyLetter(FanLetterWriteDto fanLetterWriteDto) {
+        this.title = fanLetterWriteDto.getTitle();
+        this.content = fanLetterWriteDto.getContent();
+        this.updateDate = new Date();
+    }
 }

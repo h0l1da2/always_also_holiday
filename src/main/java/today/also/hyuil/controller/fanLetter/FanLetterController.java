@@ -17,6 +17,7 @@ import today.also.hyuil.domain.file.FileInfo;
 import today.also.hyuil.domain.file.Files;
 import today.also.hyuil.domain.file.IsWhere;
 import today.also.hyuil.domain.file.Type;
+import today.also.hyuil.exception.FileNumbersLimitExceededException;
 import today.also.hyuil.exception.MemberNotFoundException;
 import today.also.hyuil.exception.fanLetter.MimeTypeNotMatchException;
 import today.also.hyuil.service.fanLetter.inter.FanLetterService;
@@ -25,10 +26,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 @Controller
 @RequestMapping("/fanLetter")
@@ -83,26 +81,13 @@ public class FanLetterController {
             if (isLetterHaveFiles(files)) {
                 for (MultipartFile multipartFile : files) {
 
-                    String fileUuid = UUID.randomUUID().toString();
-                    // path type mimeType
-                    String imgMimeType = setImgMimeType(multipartFile);
-                    Files file = new Files(multipartFile);
-                    file.fileUUID(fileUuid);
-
-                    // 파일 저장 -> java.io.File (path/UUID.jpg)
-                    saveFile(multipartFile, imgMimeType, fileUuid);
-
-                    file.imgMimeType(imgMimeType);
-
-                    file.filePath(filePath);
-                    file.fileType(Type.IMAGE);
+                    Files file = getFiles(multipartFile);
 
                     FileInfo fileInfo = new FileInfo(file);
                     fileInfo.whereFileIs(IsWhere.FAN_BOARD);
 
                     fileInfoList.add(fileInfo);
                 }
-
             }
 
             FanBoard writeLetter = fanLetterService.writeLetter(memberId, fanBoard, fileInfoList);
@@ -127,7 +112,6 @@ public class FanLetterController {
             return new ResponseEntity<>("FILE_UPLOAD_ERROR", HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
-        System.out.println("로직이 있을 경우 실패, 없을 경우 제대로 응답");
         return new ResponseEntity<>("WRITE_OK", HttpStatus.OK);
     }
 
@@ -142,7 +126,7 @@ public class FanLetterController {
              * 3. 사진은...? 일단 글만 보여주는 걸로 -> 사진도
              */
 
-            Map<String, Object> map = fanLetterService.modifyLetter(memberId, num);
+            Map<String, Object> map = fanLetterService.readLetter(memberId, num);
             modelInFanBoard(model, map);
 
             if (map.containsKey("fileInfoList")) {
@@ -155,6 +139,74 @@ public class FanLetterController {
         }
 
         return "fanLetter/modifyPage";
+    }
+
+    @ResponseBody
+    @PostMapping(value = "/modify/{num}", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
+    public ResponseEntity<String> modify(@PathVariable Long num, HttpServletRequest request,
+                                         @RequestPart(value = "image", required = false) List<MultipartFile> files,
+                                         @RequestPart(value = "fanLetterWriteDto") FanLetterWriteDto fanLetterWriteDto) {
+        try {
+            String memberId = getMemberIdInSession(request);
+//            String memberId = "aaaa1";
+
+            if (!writeDtoNullCheck(fanLetterWriteDto)) {
+                System.out.println("글 내용이 없음");
+                return new ResponseEntity<>("NOT_CONTENT", HttpStatus.BAD_REQUEST);
+            }
+
+            FanBoard findLetter = fanLetterService.findLetter(num);
+
+            if (findLetter == null) {
+                System.out.println("해당 글은 존재하지 않음");
+                return new ResponseEntity<>("NOT_FOUND", HttpStatus.NOT_FOUND);
+            }
+
+            if (!memberId.equals(findLetter.getMember().getMemberId())) {
+                System.out.println("본인이 쓴 글이 아님");
+                return new ResponseEntity<>("NOT_WRITER", HttpStatus.BAD_REQUEST);
+            }
+
+            // 기존 게시물에 수정한 내용 덮어쓰기
+            findLetter.modifyLetter(fanLetterWriteDto);
+
+
+            List<FileInfo> fileInfoList = new ArrayList<>();
+            if (isLetterHaveFiles(files)) {
+                for (MultipartFile multipartFile : files) {
+
+                    Files file = getFiles(multipartFile);
+
+                    FileInfo fileInfo = new FileInfo(file);
+                    fileInfo.whereFileIs(IsWhere.FAN_BOARD);
+
+                    fileInfoList.add(fileInfo);
+                }
+            }
+
+
+            Map<String, Object> map = new HashMap<>();
+
+            map.put("fanBoard", findLetter);
+            map.put("fileInfoList", fileInfoList);
+
+            fanLetterService.modifyLetter(map);
+
+        } catch (MemberNotFoundException e) {
+            e.printStackTrace();
+            return new ResponseEntity<>("NOT_LOGIN", HttpStatus.BAD_REQUEST);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return new ResponseEntity<>("FILE_UPLOAD_ERROR", HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (MimeTypeNotMatchException e) {
+            e.printStackTrace();
+            return new ResponseEntity<>("MIMETYPE_ERROR", HttpStatus.BAD_REQUEST);
+        } catch (FileNumbersLimitExceededException e) {
+            e.printStackTrace();
+            return new ResponseEntity<>("FILE_LIMIT_ERROR", HttpStatus.BAD_REQUEST);
+        }
+
+        return new ResponseEntity<>("MODIFY_OK", HttpStatus.OK);
     }
 
     private void modelInFileInfoList(Model model, Map<String, Object> map) {
@@ -176,10 +228,26 @@ public class FanLetterController {
         model.addAttribute("fanLetter", fanLetterWriteDto);
     }
 
-
     private void saveFile(MultipartFile multipartFile, String mimeType, String fileUuid) throws IOException {
         File fileIo = new File(filePath + fileUuid + mimeType);
         multipartFile.transferTo(fileIo);
+    }
+
+    private Files getFiles(MultipartFile multipartFile) throws MimeTypeNotMatchException, IOException {
+        String fileUuid = UUID.randomUUID().toString();
+        // path type mimeType
+        String imgMimeType = setImgMimeType(multipartFile);
+        Files file = new Files(multipartFile);
+        file.fileUUID(fileUuid);
+
+        // 파일 저장 -> java.io.File (path/UUID.jpg)
+        saveFile(multipartFile, imgMimeType, fileUuid);
+
+        file.imgMimeType(imgMimeType);
+
+        file.filePath(filePath);
+        file.fileType(Type.IMAGE);
+        return file;
     }
 
     private String getMemberIdInSession(HttpServletRequest request) throws MemberNotFoundException {

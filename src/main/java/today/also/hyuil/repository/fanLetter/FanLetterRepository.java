@@ -34,4 +34,7 @@ public class FanLetterRepository {
     public void selectFanBoardList() {
         query.select();
     }
+
+    public void modifyFanBoard(FanBoard fanBoard) {
+    }
 }

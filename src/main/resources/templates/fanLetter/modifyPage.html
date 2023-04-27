@@ -39,11 +39,12 @@
         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
           <div class="form-group">
             <h3>* (최대 5장) 업로드 된 이미지</h3>
-            <div id="preview" th:each="file : ${fileInfoList}">
+            <div id="originFiles" th:each="file : ${fileInfoList}">
               <p th:id="${file.lastModified}" th:text="${file.name}">
                 <button th:data-index="${file.lastModified}" class="btn btn-default file-remove-btn">X</button>
               </p>
             </div>
+            <div id="preview"></div>
           </div>
         </div>
         <!-- Button -->
@@ -110,10 +111,9 @@
         headers: { 'Authorization': 'Bearer '+ jwt },
         dataType: 'text',
         success: function(result) {
-          alert('success');
-          if (result === 'WRITE_OK') {
+          if (result === 'MODIFY_OK') {
             alert('수정 완료');
-            // window.location.href = '/fanLetter/' + num;
+            window.location.href = '/fanLetter/' + num;
           } else {
             alert(result);
           }
