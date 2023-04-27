@@ -58,8 +58,6 @@ public class FanLetterController {
     public ResponseEntity<String> write(@RequestPart(value = "image", required = false) List<MultipartFile> files,
                                         @RequestPart(value = "fanLetterWriteDto") FanLetterWriteDto fanLetterWriteDto,
                                 HttpServletRequest request) {
-        System.out.println("fanLetterWriteDto = " + fanLetterWriteDto);
-
 //      webPath 값을 지정하면 해당경로까지의 realPath를 추출하는 코드
 //        String folderPath = request.getSession().getServletContext().getRealPath(filePath);
 
@@ -118,8 +116,8 @@ public class FanLetterController {
     @GetMapping("/modify/{num}")
     public String modify(@PathVariable Long num, Model model, HttpServletRequest request) {
         try {
-//            String memberId = getMemberIdInSession(request);
-            String memberId = "aaaa1";
+            String memberId = getMemberIdInSession(request);
+//            String memberId = "aaaa1";
             /**
              * 1. 본인 글인지 검증
              * 2. 본인 글이 맞다면 내용 보여줌
