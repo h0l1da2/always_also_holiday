@@ -10,6 +10,7 @@ import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import today.also.hyuil.domain.dto.FanLetterViewDto;
 import today.also.hyuil.domain.dto.fanLetter.FanLetterWriteDto;
 import today.also.hyuil.domain.dto.fanLetter.FileDto;
 import today.also.hyuil.domain.fanLetter.FanBoard;
@@ -43,8 +44,27 @@ public class FanLetterController {
 
     @GetMapping
     public String fanLetterList(Model model) {
-
         return "fanLetter/boardList";
+    }
+
+    @GetMapping("/{num}")
+    public String fanLetter(@PathVariable Long num, Model model) {
+        Map<String, Object> map = fanLetterService.readLetter(num);
+
+        FanBoard fanBoard = (FanBoard) map.get("fanLetter");
+        List<FileInfo> fileInfoList = (List<FileInfo>) map.get("fileInfoList");
+
+        List<String> filePaths = new ArrayList<>();
+
+        for (FileInfo fileInfo : fileInfoList) {
+            String filePath = pathSubstring(fileInfo);
+            filePaths.add(filePath);
+        }
+
+        model.addAttribute("fanLetter", new FanLetterViewDto(fanBoard));
+        model.addAttribute("filePath", filePaths);
+
+        return "/fanLetter/viewPage";
     }
 
     @GetMapping("/write")
@@ -124,7 +144,7 @@ public class FanLetterController {
              * 3. 사진은...? 일단 글만 보여주는 걸로 -> 사진도
              */
 
-            Map<String, Object> map = fanLetterService.readLetter(memberId, num);
+            Map<String, Object> map = fanLetterService.findLetter(memberId, num);
             modelInFanBoard(model, map);
 
             if (map.containsKey("fileInfoList")) {
@@ -153,7 +173,9 @@ public class FanLetterController {
                 return new ResponseEntity<>("NOT_CONTENT", HttpStatus.BAD_REQUEST);
             }
 
-            FanBoard findLetter = fanLetterService.findLetter(num);
+            Map<String, Object> map = fanLetterService.readLetter(num);
+
+            FanBoard findLetter = (FanBoard) map.get("fanLetter");
 
             if (findLetter == null) {
                 System.out.println("해당 글은 존재하지 않음");
@@ -183,10 +205,10 @@ public class FanLetterController {
             }
 
 
-            Map<String, Object> map = new HashMap<>();
+            Map<String, Object> boardMap = new HashMap<>();
 
-            map.put("fanBoard", findLetter);
-            map.put("fileInfoList", fileInfoList);
+            boardMap.put("fanLetter", findLetter);
+            boardMap.put("fileInfoList", fileInfoList);
 
             fanLetterService.modifyLetter(map);
 
@@ -219,7 +241,7 @@ public class FanLetterController {
     }
 
     private void modelInFanBoard(Model model, Map<String, Object> map) {
-        FanBoard fanBoard = (FanBoard) map.get("fanBoard");
+        FanBoard fanBoard = (FanBoard) map.get("fanLetter");
         FanLetterWriteDto fanLetterWriteDto = new FanLetterWriteDto(
                 fanBoard.getTitle(), fanBoard.getContent()
         );
@@ -273,6 +295,13 @@ public class FanLetterController {
             throw new MimeTypeNotMatchException("올바른 확장자가 아닙니다");
         }
         return imgMimeType;
+    }
+
+    private String pathSubstring(FileInfo fileInfo) {
+        String filePath = fileInfo.getFile().getPath() + fileInfo.getFile().getUuid() + fileInfo.getFile().getMimeType();
+        int startPath = "/Users/holiday/IdeaProjects/also_hyuil/src/main/resources".length();
+        filePath = filePath.substring(startPath);
+        return filePath;
     }
 
     private boolean writeDtoNullCheck(FanLetterWriteDto fanLetterWriteDto) {

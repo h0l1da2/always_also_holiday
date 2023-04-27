@@ -1,6 +1,5 @@
 package today.also.hyuil.service.fanLetter;
 
-import org.apache.tomcat.util.http.fileupload.impl.FileSizeLimitExceededException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import today.also.hyuil.domain.fanLetter.FanBoard;
@@ -13,7 +12,6 @@ import today.also.hyuil.service.fanLetter.inter.FanLetterService;
 import today.also.hyuil.service.file.inter.FileService;
 import today.also.hyuil.service.member.inter.MemberJoinService;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -50,7 +48,7 @@ public class FanLetterServiceImpl implements FanLetterService {
     }
 
     @Override
-    public Map<String, Object> readLetter(String memberId, Long fanLetterNum) throws MemberNotFoundException {
+    public Map<String, Object> findLetter(String memberId, Long fanLetterNum) throws MemberNotFoundException {
         FanBoard fanBoard = fanLetterRepository.selectFanBoard(fanLetterNum);
         String writer = fanBoard.getMember().getMemberId();
 
@@ -59,7 +57,7 @@ public class FanLetterServiceImpl implements FanLetterService {
         }
 
         Map<String, Object> map = new HashMap<>();
-        map.put("fanBoard", fanBoard);
+        map.put("fanLetter", fanBoard);
 
         List<FileInfo> fileInfoList = fileService.fileInfoList(fanLetterNum);
 
@@ -71,13 +69,21 @@ public class FanLetterServiceImpl implements FanLetterService {
     }
 
     @Override
-    public FanBoard findLetter(Long num) {
-        return fanLetterRepository.selectFanBoard(num);
+    public Map<String, Object> readLetter(Long num) {
+
+        FanBoard fanBoard = fanLetterRepository.selectFanBoard(num);
+        List<FileInfo> fileInfoList = fileService.fileInfoList(fanBoard.getId());
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("fanLetter", fanBoard);
+        map.put("fileInfoList", fileInfoList);
+
+        return map;
     }
 
     @Override
     public void modifyLetter(Map<String, Object> map) throws FileNumbersLimitExceededException {
-        FanBoard fanBoard = (FanBoard) map.get("fanBoard");
+        FanBoard fanBoard = (FanBoard) map.get("fanLetter");
 
         fanLetterRepository.modifyFanBoard(fanBoard);
 
