@@ -6,6 +6,7 @@ import lombok.Data;
 public class FanCommentWriteDto {
 
     private Long letterNum;
+    // 부모 댓글 번호
     private Long commentNum;
     private String content;
 }

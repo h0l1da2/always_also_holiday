@@ -48,13 +48,14 @@
                 <div class="bdr-btm"></div>
                 <div class="row">
                   <div class="col-lg-12 col-md-12  col-sm-12 col-xs-12">
+                    <!--* 댓글 수, 닉네임, 작성날짜, 내용 *-->
                     <h1 class="comments-title mb30">(04) 댓글</h1>
                     <div class="comments-area mb40">
                       <ul class="comment-list listnone">
+
                         <li class="comment">
                           <div class="comment-body">
                             <div class="">
-
                               <div class="comment-header">
                                 <h4 class="user-title mb10">정아름</h4>
                                 <div class="comment-meta"><span class="comment-meta-date">작성날짜</span></div>
@@ -67,6 +68,7 @@
 
                             </div>
                           </div>
+
                           <ul class="childern listnone">
                             <li class="comment">
                               <div class="comment-body">
@@ -87,6 +89,7 @@
                             </li>
                           </ul>
                         </li>
+
                       </ul>
 
                     </div>
@@ -175,11 +178,14 @@
         headers: { 'Authorization': 'Bearer '+ jwt },
         dataType: 'json',
         success: function(result) {
-          if (result === 'WRITE_OK') {
+          if (result.data === 'WRITE_OK') {
             alert('작성 완료');
             window.location.href = '/fanLetter/'+letterNum;
+          } else if (result.data === 'MEMBER_NOT_FOUND') {
+            alert('로그인을 하세요');
+            window.location.href = '/loginForm';
           } else {
-            alert(result);
+            alert(result)
           }
         },
         error: function(xhr, status, error) {
