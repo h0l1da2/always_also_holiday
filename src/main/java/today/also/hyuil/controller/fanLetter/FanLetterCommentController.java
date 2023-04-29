@@ -1,35 +1,36 @@
 package today.also.hyuil.controller.fanLetter;
 
-import com.google.api.client.json.Json;
-import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import today.also.hyuil.domain.dto.fanLetter.CommentDto;
 import today.also.hyuil.domain.dto.fanLetter.FanCommentWriteDto;
 import today.also.hyuil.domain.fanLetter.Comment;
+import today.also.hyuil.domain.fanLetter.FanBoard;
 import today.also.hyuil.domain.fanLetter.ReplyType;
 import today.also.hyuil.domain.member.Member;
 import today.also.hyuil.exception.MemberNotFoundException;
 import today.also.hyuil.service.fanLetter.inter.FanLetterCommentService;
+import today.also.hyuil.service.fanLetter.inter.FanLetterService;
 import today.also.hyuil.service.member.inter.MemberJoinService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.util.Map;
 
 @RequestMapping("/fanLetter/comment")
 @RestController
 public class FanLetterCommentController {
 
+    private final FanLetterService fanLetterService;
     private final FanLetterCommentService fanLetterCommentService;
     private final MemberJoinService memberJoinService;
 
-    public FanLetterCommentController(FanLetterCommentService fanLetterCommentService, MemberJoinService memberJoinService) {
+    public FanLetterCommentController(FanLetterService fanLetterService, FanLetterCommentService fanLetterCommentService, MemberJoinService memberJoinService) {
+        this.fanLetterService = fanLetterService;
         this.fanLetterCommentService = fanLetterCommentService;
         this.memberJoinService = memberJoinService;
     }
@@ -58,7 +59,9 @@ public class FanLetterCommentController {
                 return badResponseEntity("MEMBER_NOT_FOUND");
             }
 
-            Comment comment = getComment(fanCommentWriteDto, member);
+            Map<String, Object> map = fanLetterService.readLetter(fanCommentWriteDto.getLetterNum());
+            FanBoard fanBoard = (FanBoard) map.get("fanLetter");
+            Comment comment = getComment(fanCommentWriteDto, member, fanBoard);
 
             // 작성 완료
             fanLetterCommentService.writeComment(comment);
@@ -80,12 +83,12 @@ public class FanLetterCommentController {
                 .body(jsonObject);
     }
 
-    private Comment getComment(FanCommentWriteDto fanCommentWriteDto, Member member) {
+    private Comment getComment(FanCommentWriteDto fanCommentWriteDto, Member member, FanBoard fanBoard) {
         Comment comment = new Comment();
         if (fanCommentWriteDto.getCommentNum() == null) {
-            comment.setCommentValues(member, ReplyType.COMMENT, fanCommentWriteDto);
+            comment.setCommentValues(member, ReplyType.COMMENT, fanCommentWriteDto, fanBoard);
         } else {
-            comment.setCommentValues(member, ReplyType.REPLY, fanCommentWriteDto);
+            comment.setCommentValues(member, ReplyType.REPLY, fanCommentWriteDto, fanBoard);
         }
         return comment;
     }

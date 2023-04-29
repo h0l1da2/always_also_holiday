@@ -20,9 +20,15 @@ public class Comment {
     private ReplyType replyType;
     private String content;
     private Date uploadDate;
+
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "fan_board_id")
+    private FanBoard fanBoard;
+
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "member_id")
     private Member member;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "comment_remover_id")
     private CommentRemover commentRemover;
@@ -30,10 +36,11 @@ public class Comment {
     public Comment() {
     }
 
-    public void setCommentValues(Member member, ReplyType replyType, FanCommentWriteDto fanCommentWriteDto) {
+    public void setCommentValues(Member member, ReplyType replyType, FanCommentWriteDto fanCommentWriteDto, FanBoard fanBoard) {
         this.content = fanCommentWriteDto.getContent();
         this.uploadDate = new Date();
         this.member = member;
+        this.fanBoard = fanBoard;
         this.replyType = replyType;
         this.rootId = fanCommentWriteDto.getCommentNum();
     }

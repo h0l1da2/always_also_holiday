@@ -21,6 +21,7 @@ import today.also.hyuil.domain.file.Type;
 import today.also.hyuil.exception.FileNumbersLimitExceededException;
 import today.also.hyuil.exception.MemberNotFoundException;
 import today.also.hyuil.exception.fanLetter.MimeTypeNotMatchException;
+import today.also.hyuil.service.fanLetter.inter.FanLetterCommentService;
 import today.also.hyuil.service.fanLetter.inter.FanLetterService;
 
 import javax.servlet.http.HttpServletRequest;
@@ -35,11 +36,13 @@ import java.util.*;
 public class FanLetterController {
 
     private final FanLetterService fanLetterService;
+    private final FanLetterCommentService fanLetterCommentService;
 
     @Value("${file.fan.letter.path}")
     private String filePath;
-    public FanLetterController(FanLetterService fanLetterService) {
+    public FanLetterController(FanLetterService fanLetterService, FanLetterCommentService fanLetterCommentService) {
         this.fanLetterService = fanLetterService;
+        this.fanLetterCommentService = fanLetterCommentService;
     }
 
     @GetMapping

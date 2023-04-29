@@ -6,6 +6,8 @@ import today.also.hyuil.domain.fanLetter.Comment;
 import today.also.hyuil.repository.fanLetter.FanLetterCommentRepository;
 import today.also.hyuil.service.fanLetter.inter.FanLetterCommentService;
 
+import java.util.List;
+
 @Transactional
 @Service
 public class FanLetterCommentServiceImpl implements FanLetterCommentService {
@@ -19,5 +21,10 @@ public class FanLetterCommentServiceImpl implements FanLetterCommentService {
     @Override
     public Comment writeComment(Comment comment) {
         return commentRepository.insertComment(comment);
+    }
+
+    @Override
+    public List<Comment> readComment(Long num) {
+        return null;
     }
 }
