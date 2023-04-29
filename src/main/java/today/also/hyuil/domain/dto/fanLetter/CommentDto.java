@@ -20,6 +20,7 @@ public class CommentDto {
 
     public CommentDto(Comment comment) {
         this.id = comment.getId();
+        this.replyId = comment.getRootId();
         this.content = comment.getContent();
         this.nickname = comment.getMember().getNickname();
         this.uploadDate = comment.getUploadDate();
