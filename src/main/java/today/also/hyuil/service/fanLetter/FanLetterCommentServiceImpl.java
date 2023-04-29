@@ -25,6 +25,6 @@ public class FanLetterCommentServiceImpl implements FanLetterCommentService {
 
     @Override
     public List<Comment> readComment(Long num) {
-        return null;
+        return commentRepository.selectComments(num);
     }
 }

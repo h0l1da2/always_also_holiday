@@ -18,10 +18,10 @@ public class CommentDto {
 
     }
 
-    public CommentDto(String nickname, Comment comment) {
+    public CommentDto(Comment comment) {
         this.id = comment.getId();
         this.content = comment.getContent();
-        this.nickname = nickname;
+        this.nickname = comment.getMember().getNickname();
         this.uploadDate = comment.getUploadDate();
     }
 }

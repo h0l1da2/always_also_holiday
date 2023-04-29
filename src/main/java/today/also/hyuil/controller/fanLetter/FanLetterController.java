@@ -11,8 +11,10 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import today.also.hyuil.domain.dto.FanLetterViewDto;
+import today.also.hyuil.domain.dto.fanLetter.CommentDto;
 import today.also.hyuil.domain.dto.fanLetter.FanLetterWriteDto;
 import today.also.hyuil.domain.dto.fanLetter.FileDto;
+import today.also.hyuil.domain.fanLetter.Comment;
 import today.also.hyuil.domain.fanLetter.FanBoard;
 import today.also.hyuil.domain.file.FileInfo;
 import today.also.hyuil.domain.file.Files;
@@ -64,8 +66,18 @@ public class FanLetterController {
             filePaths.add(filePath);
         }
 
+        List<Comment> commentList = fanLetterCommentService.readComment(num);
+
+        List<CommentDto> comments = new ArrayList<>();
+
+        for (Comment comment : commentList) {
+            CommentDto commentDto = new CommentDto(comment);
+            comments.add(commentDto);
+        }
+
         model.addAttribute("fanLetter", new FanLetterViewDto(fanBoard));
         model.addAttribute("filePath", filePaths);
+        model.addAttribute("comments", comments);
 
         return "/fanLetter/viewPage";
     }
