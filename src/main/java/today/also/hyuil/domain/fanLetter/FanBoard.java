@@ -22,7 +22,7 @@ public class FanBoard {
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "member_id")
     private Member member;
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "board_remover_id")
     private BoardRemover boardRemover;
 
@@ -43,5 +43,9 @@ public class FanBoard {
         this.title = fanLetterWriteDto.getTitle();
         this.content = fanLetterWriteDto.getContent();
         this.updateDate = new Date();
+    }
+
+    public void deleteFanLetter(BoardRemover boardRemover) {
+        this.boardRemover = boardRemover;
     }
 }

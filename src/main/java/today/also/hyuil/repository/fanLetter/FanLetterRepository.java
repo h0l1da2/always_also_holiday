@@ -3,6 +3,7 @@ package today.also.hyuil.repository.fanLetter;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
+import today.also.hyuil.domain.fanLetter.BoardRemover;
 import today.also.hyuil.domain.fanLetter.FanBoard;
 
 import javax.persistence.EntityManager;
@@ -36,5 +37,17 @@ public class FanLetterRepository {
     }
 
     public void modifyFanBoard(FanBoard fanBoard) {
+    }
+
+    public BoardRemover insertBoardRemover(BoardRemover boardRemover) {
+        em.persist(boardRemover);
+        em.close();
+        return boardRemover;
+    }
+
+    public void updateLetterRemover(Long boardNum, BoardRemover remover) {
+        FanBoard findBoard = em.find(FanBoard.class, boardNum);
+        findBoard.deleteFanLetter(remover);
+        em.close();
     }
 }

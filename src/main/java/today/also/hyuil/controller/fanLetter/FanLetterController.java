@@ -30,6 +30,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.AccessDeniedException;
 import java.util.*;
 
 @Controller
@@ -242,6 +243,28 @@ public class FanLetterController {
         }
 
         return new ResponseEntity<>("MODIFY_OK", HttpStatus.OK);
+    }
+
+    @PostMapping("/remove/{num}")
+    public ResponseEntity<String> deleteLetter(@PathVariable Long num, HttpServletRequest request) {
+        try {
+//            String memberId = getMemberIdInSession(request);
+            String memberId = "aaaa1";
+
+            fanLetterService.removeLetter(num, "MEMBER", memberId);
+
+        } catch (MemberNotFoundException e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest()
+                    .body("MEMBER_NOT_FOUND");
+        } catch (AccessDeniedException e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest()
+                    .body("NOT_YOUR_LETTER");
+        }
+
+        return ResponseEntity.ok()
+                .body("REMOVE_OK");
     }
 
     private void modelInFileInfoList(Model model, Map<String, Object> map) {

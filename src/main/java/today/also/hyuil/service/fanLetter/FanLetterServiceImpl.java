@@ -1,17 +1,22 @@
 package today.also.hyuil.service.fanLetter;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import today.also.hyuil.domain.fanLetter.BoardRemover;
 import today.also.hyuil.domain.fanLetter.FanBoard;
 import today.also.hyuil.domain.file.FileInfo;
+import today.also.hyuil.domain.member.Admin;
 import today.also.hyuil.domain.member.Member;
 import today.also.hyuil.exception.FileNumbersLimitExceededException;
 import today.also.hyuil.exception.MemberNotFoundException;
 import today.also.hyuil.repository.fanLetter.FanLetterRepository;
+import today.also.hyuil.service.admin.inter.AdminService;
 import today.also.hyuil.service.fanLetter.inter.FanLetterService;
 import today.also.hyuil.service.file.inter.FileService;
 import today.also.hyuil.service.member.inter.MemberJoinService;
 
+import java.nio.file.AccessDeniedException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,11 +27,13 @@ public class FanLetterServiceImpl implements FanLetterService {
 
     private final FanLetterRepository fanLetterRepository;
     private final MemberJoinService memberJoinService;
+    private final AdminService adminService;
     private final FileService fileService;
 
-    public FanLetterServiceImpl(FanLetterRepository fanLetterRepository, MemberJoinService memberJoinService, FileService fileService) {
+    public FanLetterServiceImpl(FanLetterRepository fanLetterRepository, MemberJoinService memberJoinService, AdminService adminService, FileService fileService) {
         this.fanLetterRepository = fanLetterRepository;
         this.memberJoinService = memberJoinService;
+        this.adminService = adminService;
         this.fileService = fileService;
     }
 
@@ -110,5 +117,38 @@ public class FanLetterServiceImpl implements FanLetterService {
 
         fanLetterRepository.modifyFanBoard(fanBoard);
 
+    }
+
+    @Override
+    public void removeLetter(Long num, String who, String memberId) throws MemberNotFoundException, AccessDeniedException {
+
+        Map<String, Object> map = readLetter(num);
+        FanBoard fanBoard = (FanBoard) map.get("fanLetter");
+
+        BoardRemover boardRemover = new BoardRemover();
+
+        if (who.equals("MEMBER")) {
+            Member member = memberJoinService.findMyAccount(memberId);
+
+            if (member == null) {
+                throw new MemberNotFoundException("해당 멤버 아이디를 찾을 수 없어요");
+            }
+            if (!fanBoard.getMember().getMemberId().equals(memberId)) {
+                System.out.println("본인 글이 아닙니다");
+                throw new AccessDeniedException("본인 글이 아닙니다");
+            }
+            boardRemover.memberRemove(member);
+        }
+        if (who.equals("ADMIN")) {
+            Admin admin = adminService.accountAdmin(memberId);
+
+            if (admin == null) {
+                throw new AccessDeniedException("해당 어드민 아이디를 찾을 수 없어요");
+            }
+            boardRemover.adminRemove(admin);
+        }
+
+        BoardRemover remover = fanLetterRepository.insertBoardRemover(boardRemover);
+        fanLetterRepository.updateLetterRemover(num, remover);
     }
 }

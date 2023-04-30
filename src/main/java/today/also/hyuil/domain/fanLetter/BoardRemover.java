@@ -13,7 +13,6 @@ public class BoardRemover {
 
     @Id @GeneratedValue
     private Long id;
-    private Date updateDate;
     private Date removeDate;
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "member_id")
@@ -21,4 +20,17 @@ public class BoardRemover {
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "admin_id")
     private Admin admin;
+
+    public BoardRemover() {
+
+    }
+
+    public void memberRemove(Member member) {
+        removeDate = new Date();
+        this.member = member;
+    }
+    public void adminRemove(Admin admin) {
+        removeDate = new Date();
+        this.admin = admin;
+    }
 }
