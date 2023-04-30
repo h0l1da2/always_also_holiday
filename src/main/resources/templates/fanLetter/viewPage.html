@@ -65,7 +65,7 @@
                                 <p th:text="${comment.content}"></p>
                               </div>
 <!--                              <div class="reply" id="replyBtn" th:if="${session.memberId != null}"><a class="btn btn-default btn-sm">Reply</a></div>-->
-                              <div class="reply replyBtn"><a class="btn btn-default btn-sm">Reply</a></div>
+                              <div class="reply replyBtn" id="replyBtn_${comment.id}"><a class="btn btn-default btn-sm">Reply</a></div>
                               <hr>
                             </div>
                           </div>
@@ -87,32 +87,9 @@
                             </li>
                           </ul>
                         </li>
-                        <div class="row replyArea" id="replyArea">
-                          <!--                <div class="row" th:if="${session.memberId != null}">-->
-<!--                          <div class="col-lg-12 col-md-12 col-md-12 col-sm-12">-->
-<!--                            <div class="leave-comments">-->
-<!--                              &lt;!&ndash; leave comments &ndash;&gt;-->
-<!--                              <h1 class="reply-title  mb40">댓글 작성</h1>-->
-<!--                              <form class="reply-form">-->
-<!--                                <div class="row">-->
-<!--                                  &lt;!&ndash; Textarea &ndash;&gt;-->
-<!--                                  <div class="form-group">-->
-<!--                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">-->
-<!--                                      <label class="control-label" for="textarea">내용 :</label>-->
-<!--                                      <textarea class="form-control" id="reContent" rows="6" placeholder=" "></textarea>-->
-<!--                                    </div>-->
-<!--                                  </div>-->
 
-<!--                                  <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">-->
-<!--                                    &lt;!&ndash; Button &ndash;&gt;-->
-<!--                                    <div class="form-group">-->
-<!--                                      <button type="button" id="reWriteBtn" name="writeBtn" class="btn btn-default">등록</button>-->
-<!--                                    </div>-->
-<!--                                  </div>-->
-<!--                                </div>-->
-<!--                              </form>-->
-<!--                            </div>-->
-<!--                          </div>-->
+                        <div class="row replyArea">
+                          <!--                <div class="row" th:if="${session.memberId != null}">-->
                         </div>
 
                       </ul>
@@ -169,20 +146,6 @@
     return letterNum;
   }
 
-  // const replyBtns = document.querySelectorAll('.replyBtn');
-  // replyBtns.forEach(replyBtn => {
-  //   replyBtn.addEventListener('click', () => {
-  //     let replyArea = document.getElementsByClassName('replyArea');
-  //
-  //
-  //
-  //   });
-  // });
-
-  function showReplyBtn() {
-    let replyBtn = replyBtnHtml();
-    $('#replyArea').html(replyBtn);
-  }
   function replyBtnHtml() {
     return  "                          <div class=\"col-lg-12 col-md-12 col-md-12 col-sm-12\">\n" +
             "                            <div class=\"leave-comments\">\n" +
@@ -213,12 +176,17 @@
 
   }
 
+  $(document).on('click', `.replyBtn`, function () {
+
+    // let allCommentDiv = $('.replyArea');
+    let commentDiv = $(this).closest('.commentDiv');
+    let replyArea = commentDiv.find('.replyArea');
+
+    // allCommentDiv.remove();
+    replyArea.html(replyBtnHtml());
+  });
 
   $( document ).ready( function() {
-
-    $('.replyBtn').click(function () {
-      showReplyBtn();
-    })
 
     $('#writeBtn').click(function () {
       let jwt = localStorage.getItem('jwt');
