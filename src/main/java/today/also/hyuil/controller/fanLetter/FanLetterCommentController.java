@@ -1,12 +1,10 @@
 package today.also.hyuil.controller.fanLetter;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import today.also.hyuil.domain.dto.fanLetter.FanCommentWriteDto;
 import today.also.hyuil.domain.fanLetter.Comment;
 import today.also.hyuil.domain.fanLetter.FanBoard;
@@ -35,8 +33,8 @@ public class FanLetterCommentController {
         this.memberJoinService = memberJoinService;
     }
 
-    @GetMapping("/write")
-    public ResponseEntity<JsonObject> write(@RequestBody FanCommentWriteDto fanCommentWriteDto, HttpServletRequest request) {
+    @PostMapping("/write")
+    public ResponseEntity<String> write(@RequestBody FanCommentWriteDto fanCommentWriteDto, HttpServletRequest request) {
 
         System.out.println("fanCommentWriteDto = " + fanCommentWriteDto);
         /**
@@ -44,14 +42,14 @@ public class FanLetterCommentController {
          */
         JsonObject jsonObject = new JsonObject();
 
-        try {
+//        try {
 
             if (!writeDtoNullCheck(fanCommentWriteDto)) {
                 System.out.println("comment NULL 들어옴");
                 return badResponseEntity("COMMENT_NULL");
             }
-            String memberId = getMemberIdInSession(request);
-//            String memberId = "aaaa1";
+//            String memberId = getMemberIdInSession(request);
+            String memberId = "aaaa1";
 
             Member member = memberJoinService.findMyAccount(memberId);
 
@@ -67,20 +65,23 @@ public class FanLetterCommentController {
             fanLetterCommentService.writeComment(comment);
             jsonObject.addProperty("data", "WRITE_OK");
 
-        } catch (MemberNotFoundException e) {
-            e.printStackTrace();
-            return badResponseEntity("MEMBER_NOT_FOUND");
-        }
-
+//        } catch (MemberNotFoundException e) {
+//            e.printStackTrace();
+//            return badResponseEntity("MEMBER_NOT_FOUND");
+//        }
+        Gson gson = new Gson();
+        String jsonResponse = gson.toJson(jsonObject);
         return ResponseEntity.ok()
-                .body(jsonObject);
+                .body(jsonResponse);
     }
 
-    private ResponseEntity<JsonObject> badResponseEntity(String cause) {
+    private ResponseEntity<String> badResponseEntity(String cause) {
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("data", cause);
+        Gson gson = new Gson();
+        String jsonResponse = gson.toJson(jsonObject);
         return ResponseEntity.badRequest()
-                .body(jsonObject);
+                .body(jsonResponse);
     }
 
     private Comment getComment(FanCommentWriteDto fanCommentWriteDto, Member member, FanBoard fanBoard) {
