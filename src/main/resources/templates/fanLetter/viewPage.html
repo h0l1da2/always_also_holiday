@@ -48,7 +48,8 @@
                 <div class="bdr-btm"></div>
                 <h1 class="comments-title mb30" th:text="댓글"></h1>
                 <div class="row commentDiv">
-                  <div class="col-lg-12 col-md-12  col-sm-12 col-xs-12">
+                  <div class="col-lg-12 col-md-12  col-sm-12 col-xs-12 commentsDivs">
+
                     <!-- 댓글 수, 닉네임, 작성날짜, 내용 -->
                     <div class="comments-area mb40" th:each="comment : ${comments}" th:if="${comment.replyId eq null}">
                       <ul class="comment-list listnone">
@@ -87,13 +88,12 @@
                             </li>
                           </ul>
                         </li>
-
                         <div class="row replyArea">
                           <!--                <div class="row" th:if="${session.memberId != null}">-->
                         </div>
-
                       </ul>
                     </div>
+
 
                   </div>
                 </div>
@@ -146,6 +146,24 @@
     return letterNum;
   }
 
+  function showReplyList() {
+    let letterNum = getLastPath();
+
+    $.ajax({
+      url: '/fanLetter/comment/' + letterNum,
+      type: 'GET',
+      success: function (result) {
+        commentsForm(result);
+
+      },
+      error: function(xhr, status, error) {
+        alert('error - '+xhr.status+'. 메시지 : '+xhr.statusText)
+        console.error(error);
+      }
+    });
+
+  }
+
   function replyBtnHtml() {
     return  "                          <div class=\"col-lg-12 col-md-12 col-md-12 col-sm-12\">\n" +
             "                            <div class=\"leave-comments\">\n" +
@@ -172,21 +190,98 @@
             "                            </div>\n" +
             "                          </div>\n";
 
-
-
   }
 
-  $(document).on('click', `.replyBtn`, function () {
+  function commentsForm(result) {
 
-    // let allCommentDiv = $('.replyArea');
-    let commentDiv = $(this).closest('.commentDiv');
-    let replyArea = commentDiv.find('.replyArea');
+    let listHtml = "";
 
-    // allCommentDiv.remove();
-    replyArea.html(replyBtnHtml());
-  });
+    for (let i in result) {
+      let id = result[i].id;
+      let replyId = result[i].replyId;
+      let content = result[i].content;
+      let nickname = result[i].nickname;
+      let uploadDate = result[i].uploadDate;
+
+      if (replyId == null) {
+        listHtml +=  "                    <div class=\"comments-area mb40\">\n" +
+                "                      <ul class=\"comment-list listnone\">\n" +
+                "                        <li class=\"comment\">\n" +
+                "\n" +
+                "                          <!-- 코멘트 id -->\n" +
+                "                          <div class=\"comment-body\">\n" +
+                "                            <div class=\"\">\n" +
+                "                              <div class=\"comment-header\">\n" +
+                "                                <h4 class=\"user-title mb10\" th:text=\""+nickname+"\"></h4>\n" +
+                "                                <div class=\"comment-meta\"><span class=\"comment-meta-date\" th:text=\"'작성날짜 '+"+uploadDate+"\">작성날짜</span></div>\n" +
+                "                              </div>\n" +
+                "                              <div class=\"comment-content\">\n" +
+                "                                <p th:text=\""+content+"\"></p>\n" +
+                "                              </div>\n" +
+                "<!--                              <div class=\"reply\" id=\"replyBtn\" th:if=\"${session.memberId != null}\"><a class=\"btn btn-default btn-sm\">Reply</a></div>-->\n" +
+                "                              <div class=\"reply replyBtn\" id=\"replyBtn_"+id+"\"><a class=\"btn btn-default btn-sm\">Reply</a></div>\n" +
+                "                              <hr>\n" +
+                "                            </div>\n" +
+                "                          </div>\n" +
+                "\n";
+      }
+      if (replyId === id) {
+        listHtml += "                          <ul class=\"childern listnone\"\">\n" +
+                "                            <li class=\"comment\">\n" +
+                "                              <div class=\"comment-body\">\n" +
+                "                                <div class=\"\">\n" +
+                "                                  <div class=\"comment-header\">\n" +
+                "                                    <input type=\"hidden\" id=\"commentId\" th:value=\""+id+"/>\n" +
+                "                                    <h4 class=\"user-title mb10\" th:text=\""+nickname+"\"></h4>\n" +
+                "                                    <div class=\"comment-meta\"><span class=\"comment-meta-date\" th:text=\"'작성날짜 '+"+uploadDate+"\">작성날짜</span></div>\n" +
+                "                                  </div>\n" +
+                "                                  <div class=\"comment-content\">\n" +
+                "                                    <p th:text=\""+content+"\"></p>\n" +
+                "                                  </div>\n" +
+                "                                </div>\n" +
+                "                              </div>\n" +
+                "                            </li>\n" +
+                "                          </ul>\n" +
+                "                        </li>\n" +
+                "                        <div class=\"row replyArea\""+id+">\n" +
+                "                          <!--                <div class=\"row\" th:if=\"${session.memberId != null}\">-->\n" +
+                "                        </div>\n" +
+                "                      </ul>\n" +
+                "                    </div>";
+
+      }
+
+      console.log(listHtml);
+
+      $('.commentsDivs').html(listHtml);
+
+      $('#replyBtn_' + id).click(function () {
+        let allCommentDiv = $('.commentDiv');
+        let commentDiv = $(this).closest('.commentDiv');
+        let replyArea = commentDiv.find('.replyArea'+id);
+
+        allCommentDiv.remove();
+        replyArea.html(replyBtnHtml());
+      });
+
+    }
+  }
+
+  // showReplyList();
 
   $( document ).ready( function() {
+
+    $('.replyBtn').click(function () {
+      let allCommentDiv = $('.commentDiv');
+      let commentDiv = $(this).closest('.commentDiv');
+      let replyArea = commentDiv.find('.replyArea');
+
+      if (replyArea.children().length == 0) {
+        replyArea.html(replyBtnHtml());
+      } else {
+        replyArea.remove();
+      }
+    });
 
     $('#writeBtn').click(function () {
       let jwt = localStorage.getItem('jwt');

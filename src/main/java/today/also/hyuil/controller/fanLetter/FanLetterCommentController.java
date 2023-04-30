@@ -5,6 +5,7 @@ import com.google.gson.JsonObject;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
+import today.also.hyuil.domain.dto.fanLetter.CommentDto;
 import today.also.hyuil.domain.dto.fanLetter.FanCommentWriteDto;
 import today.also.hyuil.domain.fanLetter.Comment;
 import today.also.hyuil.domain.fanLetter.FanBoard;
@@ -17,6 +18,8 @@ import today.also.hyuil.service.member.inter.MemberJoinService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 @RequestMapping("/fanLetter/comment")
@@ -31,6 +34,22 @@ public class FanLetterCommentController {
         this.fanLetterService = fanLetterService;
         this.fanLetterCommentService = fanLetterCommentService;
         this.memberJoinService = memberJoinService;
+    }
+
+    // TODO 댓글 비동기로 직접 넣도록 수정
+
+    @GetMapping("/{num}")
+    public List<CommentDto> showComments(@PathVariable Long num) {
+        List<Comment> commentList = fanLetterCommentService.readComment(num);
+
+        List<CommentDto> comments = new ArrayList<>();
+
+        for (Comment comment : commentList) {
+            CommentDto commentDto = new CommentDto(comment);
+            comments.add(commentDto);
+        }
+
+        return comments;
     }
 
     @PostMapping("/write")
