@@ -21,6 +21,10 @@
               <div class="post-content pinside30 outline">
                 <div class="mb60" th:object="${fanLetter}">
                   <h1 class="mb20 heading-line" th:text="*{title}"></h1>
+                  <div class="form-group">
+                    <button id="modifyBtn" name="modifyBtn" class="btn btn-default viewPageBtn">수정</button>
+                    <button id="removeBtn" name="removeBtn" class="btn btn-default viewPageBtn">삭제</button>
+                  </div>
                   <div class="meta"> <span class="meta-date" th:text="'작성시간 : ' + *{uploadDate}">시간오류</span></span> <span class="meta-comment">- (10) <a href="#">댓글</a></span> <span class="meta-author"> - 글쓴이 <a href="#" th:text="*{nickname}">X</a></span> </div>
                   <div class="post-image" th:each="file : ${filePath}"><img th:src="@{${file}}" class="img-responsive view-page" alt=""></div>
                   <br>
@@ -270,6 +274,41 @@
   // showReplyList();
 
   $( document ).ready( function() {
+
+    $('#removeBtn').click(function (){
+      let jwt = localStorage.getItem('jwt');
+      let letterNum = getLastPath();
+
+      if (confirm('정말 삭제하시겠습니까?') == false) {
+        return false;
+      }
+
+      $.ajax({
+        type: 'POST',
+        url: '/fanLetter/remove/'+letterNum,
+        contentType: 'application/json',
+        headers: { 'Authorization': 'Bearer '+ jwt },
+        success: function(result) {
+          if (result === 'REMOVE_OK') {
+            alert('삭제 완료');
+            window.location.href = '/fanLetter';
+          }
+        },
+        error: function(xhr, status, error) {
+          alert('error - '+xhr.status+'. 메시지 : '+xhr.statusText)
+          console.error(error);
+          if (error === 'MEMBER_NOT_FOUND') {
+            alert('로그인을 하세요');
+            window.location.href = '/loginForm';
+          } else if (error === 'NOT_YOUR_LETTER') {
+            alert('본인 글만 삭제 가능합니다');
+          }
+        }
+      });
+    });
+    $('#modifyBtn').click(function (){
+
+    });
 
     $('.replyBtn').click(function () {
       let allCommentDiv = $('.commentDiv');
