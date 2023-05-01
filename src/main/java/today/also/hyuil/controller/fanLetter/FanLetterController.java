@@ -57,6 +57,7 @@ public class FanLetterController {
         Page<FanLetterListDto> fanLetterList = fanLetterService.listMain(pageable);
 
         model.addAttribute("fanLetterList", fanLetterList);
+        model.addAttribute("nowPage", pageable.getPageNumber());
         return "fanLetter/boardList";
     }
 
