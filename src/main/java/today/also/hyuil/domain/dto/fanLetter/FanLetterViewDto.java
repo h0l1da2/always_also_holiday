@@ -1,4 +1,4 @@
-package today.also.hyuil.domain.dto;
+package today.also.hyuil.domain.dto.fanLetter;
 
 import lombok.Data;
 import today.also.hyuil.domain.fanLetter.FanBoard;

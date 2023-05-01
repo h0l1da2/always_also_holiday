@@ -1,12 +1,21 @@
 package today.also.hyuil.repository.fanLetter;
 
+import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
+import today.also.hyuil.domain.dto.fanLetter.FanLetterListDto;
 import today.also.hyuil.domain.fanLetter.BoardRemover;
 import today.also.hyuil.domain.fanLetter.FanBoard;
+import today.also.hyuil.domain.fanLetter.QFanBoard;
 
 import javax.persistence.EntityManager;
+import java.util.List;
+
+import static today.also.hyuil.domain.fanLetter.QFanBoard.fanBoard;
 
 @Transactional
 @Repository
@@ -32,8 +41,20 @@ public class FanLetterRepository {
         return fanBoard;
     }
 
-    public void selectFanBoardList() {
-        query.select();
+    public Page<FanLetterListDto> selectFanBoardList(Pageable pageable) {
+        List<FanLetterListDto> resultList = query
+                .select(Projections.constructor(FanLetterListDto.class,
+                        fanBoard.id, fanBoard.title, fanBoard.member.nickname, fanBoard.uploadDate, fanBoard.view))
+                .from(fanBoard)
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        Long total = query.select(fanBoard.count())
+                .from(fanBoard)
+                .fetchFirst();
+
+        return new PageImpl<>(resultList, pageable, total);
     }
 
     public void modifyFanBoard(FanBoard fanBoard) {

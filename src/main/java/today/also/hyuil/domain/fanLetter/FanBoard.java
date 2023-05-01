@@ -18,6 +18,7 @@ public class FanBoard {
     private String content;
     private Date uploadDate;
     private Date updateDate;
+    private Long view;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "member_id")
@@ -33,6 +34,7 @@ public class FanBoard {
         this.content = fanLetterWriteDto.getContent();
         this.updateDate = new Date();
         this.uploadDate = new Date();
+        this.view = 0L;
     }
 
     public void writeMember(Member member) {

@@ -2,6 +2,9 @@ package today.also.hyuil.controller.fanLetter;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -10,8 +13,9 @@ import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import today.also.hyuil.domain.dto.FanLetterViewDto;
+import today.also.hyuil.domain.dto.fanLetter.FanLetterViewDto;
 import today.also.hyuil.domain.dto.fanLetter.CommentDto;
+import today.also.hyuil.domain.dto.fanLetter.FanLetterListDto;
 import today.also.hyuil.domain.dto.fanLetter.FanLetterWriteDto;
 import today.also.hyuil.domain.dto.fanLetter.FileDto;
 import today.also.hyuil.domain.fanLetter.Comment;
@@ -49,7 +53,10 @@ public class FanLetterController {
     }
 
     @GetMapping
-    public String fanLetterList(Model model) {
+    public String fanLetterList(@PageableDefault Pageable pageable, Model model) {
+        Page<FanLetterListDto> fanLetterList = fanLetterService.listMain(pageable);
+
+        model.addAttribute("fanLetterList", fanLetterList);
         return "fanLetter/boardList";
     }
 

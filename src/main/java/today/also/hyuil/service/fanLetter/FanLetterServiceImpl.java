@@ -1,8 +1,10 @@
 package today.also.hyuil.service.fanLetter;
 
-import org.springframework.http.ResponseEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import today.also.hyuil.domain.dto.fanLetter.FanLetterListDto;
 import today.also.hyuil.domain.fanLetter.BoardRemover;
 import today.also.hyuil.domain.fanLetter.FanBoard;
 import today.also.hyuil.domain.file.FileInfo;
@@ -150,5 +152,10 @@ public class FanLetterServiceImpl implements FanLetterService {
 
         BoardRemover remover = fanLetterRepository.insertBoardRemover(boardRemover);
         fanLetterRepository.updateLetterRemover(num, remover);
+    }
+
+    @Override
+    public Page<FanLetterListDto> listMain(Pageable pageable) {
+        return fanLetterRepository.selectFanBoardList(pageable);
     }
 }
