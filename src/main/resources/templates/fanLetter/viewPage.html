@@ -56,7 +56,7 @@
                   <div class="col-lg-12 col-md-12  col-sm-12 col-xs-12 commentsDivs">
 
                     <!-- 댓글 수, 닉네임, 작성날짜, 내용 -->
-                    <div class="comments-area mb40" th:each="comment : ${comments}" th:if="${comment.replyId eq null}">
+                    <div class="comments-area mb40" th:each="comment : ${comments}" th:if="${comment.replyId eq null}" th:unless="${comment.uploadDate == null && comment.replyId eq null}">
                       <ul class="comment-list listnone">
                         <li class="comment">
 
@@ -87,13 +87,14 @@
                                     <input type="hidden" id="replyId" th:value="${reply.id}"/>
                                     <h4 class="user-title mb10" th:inline="text">
                                       [[${reply.nickname}]]
-                                      <a class="reply replyBtn btn btn-default btn-sm removeComBtn" role="button" th:onclick="'removeCom('+${reply.id}+')'">삭제</a>
+                                      <a class="reply replyBtn btn btn-default btn-sm removeComBtn" role="button" th:onclick="'removeCom('+${reply.id}+')'" th:unless="${reply.uploadDate == null}">삭제</a>
                                     </h4>
-                                    <div class="comment-meta"><span class="comment-meta-date" th:text="'작성날짜 '+${reply.uploadDate}">작성날짜</span></div>
+                                    <div class="comment-meta" th:unless="${reply.uploadDate == null}"><span class="comment-meta-date" th:text="'작성날짜 '+${reply.uploadDate}">작성날짜</span></div>
                                   </div>
                                   <div class="comment-content">
                                     <p th:text="${reply.content}"></p>
                                   </div>
+                                  <hr>
                                 </div>
                               </div>
                             </li>

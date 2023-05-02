@@ -48,4 +48,5 @@ public class Comment {
     public void removeComment(CommentRemover commentRemover) {
         this.commentRemover = commentRemover;
     }
+
 }

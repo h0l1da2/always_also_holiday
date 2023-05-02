@@ -81,7 +81,12 @@ public class FanLetterController {
         List<CommentDto> comments = new ArrayList<>();
 
         for (Comment comment : commentList) {
+
             CommentDto commentDto = new CommentDto(comment);
+
+            if (comment.getCommentRemover() != null) {
+                commentDto.itRemoved();
+            }
             comments.add(commentDto);
         }
 

@@ -25,4 +25,10 @@ public class CommentDto {
         this.nickname = comment.getMember().getNickname();
         this.uploadDate = comment.getUploadDate();
     }
+
+    public void itRemoved() {
+        this.content = "삭제 된 댓글입니다";
+        this.nickname = "";
+        this.uploadDate = null;
+    }
 }
