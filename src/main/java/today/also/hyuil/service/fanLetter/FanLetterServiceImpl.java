@@ -8,7 +8,6 @@ import today.also.hyuil.domain.dto.fanLetter.FanLetterListDto;
 import today.also.hyuil.domain.fanLetter.BoardRemover;
 import today.also.hyuil.domain.fanLetter.FanBoard;
 import today.also.hyuil.domain.file.FileInfo;
-import today.also.hyuil.domain.member.Admin;
 import today.also.hyuil.domain.member.Member;
 import today.also.hyuil.exception.FileNumbersLimitExceededException;
 import today.also.hyuil.exception.MemberNotFoundException;
@@ -40,8 +39,8 @@ public class FanLetterServiceImpl implements FanLetterService {
     }
 
     @Override
-    public FanBoard writeLetter(String memberId, FanBoard fanBoard, List<FileInfo> fileInfoList) throws MemberNotFoundException {
-        Member findMember = memberJoinService.findMyAccount(memberId);
+    public FanBoard writeLetter(Long id, FanBoard fanBoard, List<FileInfo> fileInfoList) throws MemberNotFoundException {
+        Member findMember = memberJoinService.findMyAccount(id);
         if (findMember == null) {
             throw new MemberNotFoundException("멤버가 없습니다");
         }
@@ -57,11 +56,11 @@ public class FanLetterServiceImpl implements FanLetterService {
     }
 
     @Override
-    public Map<String, Object> findLetter(String memberId, Long fanLetterNum) throws MemberNotFoundException {
+    public Map<String, Object> findLetter(Long id, Long fanLetterNum) throws MemberNotFoundException {
         FanBoard fanBoard = fanLetterRepository.selectFanBoard(fanLetterNum);
         String writer = fanBoard.getMember().getMemberId();
 
-        if (!writer.equals(memberId)) {
+        if (!writer.equals(id)) {
             throw new MemberNotFoundException("해당 멤버가 쓴 글이 아닙니다");
         }
 
@@ -122,7 +121,7 @@ public class FanLetterServiceImpl implements FanLetterService {
     }
 
     @Override
-    public void removeLetter(Long num, String who, String memberId) throws MemberNotFoundException, AccessDeniedException {
+    public void removeLetter(Long num, String who, Long id) throws MemberNotFoundException, AccessDeniedException {
 
         Map<String, Object> map = readLetter(num);
         FanBoard fanBoard = (FanBoard) map.get("fanLetter");
@@ -130,25 +129,25 @@ public class FanLetterServiceImpl implements FanLetterService {
         BoardRemover boardRemover = new BoardRemover();
 
         if (who.equals("MEMBER")) {
-            Member member = memberJoinService.findMyAccount(memberId);
+            Member member = memberJoinService.findMyAccount(id);
 
             if (member == null) {
                 throw new MemberNotFoundException("해당 멤버 아이디를 찾을 수 없어요");
             }
-            if (!fanBoard.getMember().getMemberId().equals(memberId)) {
+            if (!fanBoard.getMember().getId().equals(id)) {
                 System.out.println("본인 글이 아닙니다");
                 throw new AccessDeniedException("본인 글이 아닙니다");
             }
             boardRemover.memberRemove(member);
         }
-        if (who.equals("ADMIN")) {
-            Admin admin = adminService.accountAdmin(memberId);
-
-            if (admin == null) {
-                throw new AccessDeniedException("해당 어드민 아이디를 찾을 수 없어요");
-            }
-            boardRemover.adminRemove(admin);
-        }
+//        if (who.equals("ADMIN")) {
+//            Admin admin = adminService.accountAdmin(id);
+//
+//            if (admin == null) {
+//                throw new AccessDeniedException("해당 어드민 아이디를 찾을 수 없어요");
+//            }
+//            boardRemover.adminRemove(admin);
+//        }
 
         BoardRemover remover = fanLetterRepository.insertBoardRemover(boardRemover);
         fanLetterRepository.updateLetterRemover(num, remover);

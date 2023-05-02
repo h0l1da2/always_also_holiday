@@ -8,19 +8,21 @@ import today.also.hyuil.config.security.jwt.JwtTokenService;
 import today.also.hyuil.domain.dto.member.LoginDto;
 import today.also.hyuil.domain.member.Member;
 import today.also.hyuil.service.member.inter.MemberJoinService;
+import today.also.hyuil.service.web.WebService;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import java.util.HashMap;
 import java.util.Map;
 
 @Controller
 public class MemberLoginController {
 
+    private final WebService webService;
     private final MemberJoinService memberJoinService;
     private final JwtTokenService jwtTokenService;
 
-    public MemberLoginController(MemberJoinService memberJoinService, JwtTokenService jwtTokenService) {
+    public MemberLoginController(WebService webService, MemberJoinService memberJoinService, JwtTokenService jwtTokenService) {
+        this.webService = webService;
         this.memberJoinService = memberJoinService;
         this.jwtTokenService = jwtTokenService;
     }
@@ -55,7 +57,7 @@ public class MemberLoginController {
             errorMapReturn(map);
             return map;
         }
-        Member member = memberJoinService.findMyAccount(loginDto.getMemberId());
+        Member member = memberJoinService.findMyAccountMemberId(loginDto.getMemberId());
         Map<String, String> tokens = jwtTokenService.getTokens(
                 member.getMemberId(), member.getRole().getName());
         String refreshToken = tokens.get("refreshToken");
@@ -69,14 +71,9 @@ public class MemberLoginController {
          */
         map.put("JWT", accessToken);
 
-        sessionSetMemberId(loginDto.getMemberId(), request);
+        webService.sessionSetMember(member, request);
 
         return map;
-    }
-
-    private void sessionSetMemberId(String memberId, HttpServletRequest request) {
-        HttpSession session = request.getSession();
-        session.setAttribute("memberId", memberId);
     }
 
     private void errorMapReturn(Map map) {

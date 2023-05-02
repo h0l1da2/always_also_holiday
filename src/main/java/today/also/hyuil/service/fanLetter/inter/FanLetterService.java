@@ -14,10 +14,10 @@ import java.util.Map;
 
 public interface FanLetterService {
 
-    FanBoard writeLetter(String memberId, FanBoard fanBoard, List<FileInfo> fileInfoList) throws MemberNotFoundException;
-    Map<String, Object> findLetter(String memberId, Long fanLetterNum) throws MemberNotFoundException;
+    FanBoard writeLetter(Long id, FanBoard fanBoard, List<FileInfo> fileInfoList) throws MemberNotFoundException;
+    Map<String, Object> findLetter(Long id, Long fanLetterNum) throws MemberNotFoundException;
     Map<String, Object> readLetter(Long num);
     void modifyLetter(Map<String, Object> map) throws FileNumbersLimitExceededException;
-    void removeLetter(Long num, String who, String memberId) throws MemberNotFoundException, AccessDeniedException;
+    void removeLetter(Long num, String who, Long id) throws MemberNotFoundException, AccessDeniedException;
     Page<FanLetterListDto> listMain(Pageable pageable);
 }

@@ -18,9 +18,9 @@ import today.also.hyuil.exception.MemberNotFoundException;
 import today.also.hyuil.service.fanLetter.inter.FanLetterCommentService;
 import today.also.hyuil.service.fanLetter.inter.FanLetterService;
 import today.also.hyuil.service.member.inter.MemberJoinService;
+import today.also.hyuil.service.web.WebService;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import java.nio.file.AccessDeniedException;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,11 +30,13 @@ import java.util.Map;
 @RestController
 public class FanLetterCommentController {
 
+    private final WebService webService;
     private final FanLetterService fanLetterService;
     private final FanLetterCommentService fanLetterCommentService;
     private final MemberJoinService memberJoinService;
 
-    public FanLetterCommentController(FanLetterService fanLetterService, FanLetterCommentService fanLetterCommentService, MemberJoinService memberJoinService) {
+    public FanLetterCommentController(WebService webService, FanLetterService fanLetterService, FanLetterCommentService fanLetterCommentService, MemberJoinService memberJoinService) {
+        this.webService = webService;
         this.fanLetterService = fanLetterService;
         this.fanLetterCommentService = fanLetterCommentService;
         this.memberJoinService = memberJoinService;
@@ -65,16 +67,16 @@ public class FanLetterCommentController {
          */
         JsonObject jsonObject = new JsonObject();
 
-//        try {
+        try {
 
             if (!writeDtoNullCheck(fanCommentWriteDto)) {
                 System.out.println("comment NULL 들어옴");
                 return badResponseEntity("COMMENT_NULL");
             }
-//            String memberId = getMemberIdInSession(request);
-            String memberId = "aaaa1";
+            Long id = webService.getIdInSession(request);
+//            String memberId = "aaaa1";
 
-            Member member = memberJoinService.findMyAccount(memberId);
+            Member member = memberJoinService.findMyAccount(id);
 
             if (member == null) {
                 return badResponseEntity("MEMBER_NOT_FOUND");
@@ -88,10 +90,10 @@ public class FanLetterCommentController {
             fanLetterCommentService.writeComment(comment);
             jsonObject.addProperty("data", "WRITE_OK");
 
-//        } catch (MemberNotFoundException e) {
-//            e.printStackTrace();
-//            return badResponseEntity("MEMBER_NOT_FOUND");
-//        }
+        } catch (MemberNotFoundException e) {
+            e.printStackTrace();
+            return badResponseEntity("MEMBER_NOT_FOUND");
+        }
         Gson gson = new Gson();
         String jsonResponse = gson.toJson(jsonObject);
         return ResponseEntity.ok()
@@ -143,17 +145,6 @@ public class FanLetterCommentController {
             comment.setCommentValues(member, ReplyType.REPLY, fanCommentWriteDto, fanBoard);
         }
         return comment;
-    }
-
-    private String getMemberIdInSession(HttpServletRequest request) throws MemberNotFoundException {
-        HttpSession session = request.getSession();
-        String memberId = null;
-        try {
-            memberId = (String) session.getAttribute("memberId");
-        } catch (NullPointerException e) {
-            throw new MemberNotFoundException("세션에 아이디가 없음");
-        }
-        return memberId;
     }
 
     private boolean writeDtoNullCheck(FanCommentWriteDto fanCommentWriteDto) {

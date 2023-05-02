@@ -74,4 +74,10 @@ public class MemberRepository {
         }
         return member;
     }
+
+    public Member findByIdRole(Long id) {
+        Member member = em.find(Member.class, id);
+        member.getRole();
+        return member;
+    }
 }

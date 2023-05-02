@@ -38,7 +38,7 @@ public class CustomDefaultOAuth2UserService extends DefaultOAuth2UserService {
         // sns이름 + pk가 memberId
         String pkey = userInfo.getPkey();
         String memberId = userInfo.getMemberId();
-        Member member = memberJoinService.findMyAccount(memberId);
+        Member member = memberJoinService.findMyAccountMemberId(memberId);
 
         // 기존 가입 멤버가 아니라면 ?
         if (member == null) {

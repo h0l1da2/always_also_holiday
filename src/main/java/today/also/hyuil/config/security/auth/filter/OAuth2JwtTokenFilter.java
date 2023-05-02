@@ -20,18 +20,19 @@ import today.also.hyuil.config.security.jwt.JwtTokenService;
 import today.also.hyuil.domain.member.Member;
 import today.also.hyuil.domain.member.Sns;
 import today.also.hyuil.service.member.inter.MemberJoinService;
+import today.also.hyuil.service.web.WebService;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.security.PublicKey;
 import java.util.Map;
 
 public class OAuth2JwtTokenFilter extends OncePerRequestFilter {
 
+    private final WebService webService;
     private final JwtTokenService jwtTokenService;
     private final JwtTokenParser jwtTokenParser;
     private final MemberJoinService memberJoinService;
@@ -39,7 +40,8 @@ public class OAuth2JwtTokenFilter extends OncePerRequestFilter {
 
     private final KakaoJwk kakaoJwk;
     private final GoogleJwk googleJwk;
-    public OAuth2JwtTokenFilter(JwtTokenService jwtTokenService, JwtTokenParser jwtTokenParser, MemberJoinService memberJoinService, SnsInfo snsInfo, KakaoJwk kakaoJwk, GoogleJwk googleJwk) {
+    public OAuth2JwtTokenFilter(WebService webService, JwtTokenService jwtTokenService, JwtTokenParser jwtTokenParser, MemberJoinService memberJoinService, SnsInfo snsInfo, KakaoJwk kakaoJwk, GoogleJwk googleJwk) {
+        this.webService = webService;
         this.jwtTokenService = jwtTokenService;
         this.jwtTokenParser = jwtTokenParser;
         this.memberJoinService = memberJoinService;
@@ -48,6 +50,7 @@ public class OAuth2JwtTokenFilter extends OncePerRequestFilter {
         this.googleJwk = googleJwk;
     }
 
+    // TODO 세션에 닉네임 넣고, id 넣는 것으로 변경
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         System.out.println("토큰 생성/저장 필터");
@@ -144,7 +147,7 @@ public class OAuth2JwtTokenFilter extends OncePerRequestFilter {
 
             // 이 아래부터 공통 작업(토큰 만드는 작업)
             memberId = sns+sub;
-            Member member = memberJoinService.findMyAccount(memberId);
+            Member member = memberJoinService.findMyAccountMemberId(memberId);
             String accessToken = "";
             if (member != null) {
 
@@ -159,7 +162,7 @@ public class OAuth2JwtTokenFilter extends OncePerRequestFilter {
             String redirectUri = "/loginForm?redirect="+request.getRequestURI()+"&token="+accessToken;
             response.sendRedirect(redirectUri);
 
-            sessionSetMemberId(memberId, request);
+            webService.sessionSetMember(member, request);
 
         }
 
@@ -168,8 +171,4 @@ public class OAuth2JwtTokenFilter extends OncePerRequestFilter {
 
     }
 
-    private void sessionSetMemberId(String memberId, HttpServletRequest request) {
-        HttpSession session = request.getSession();
-        session.setAttribute("memberId", memberId);
-    }
 }

@@ -30,7 +30,7 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
 
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-        Member findMember = memberJoinService.findMyAccount(userDetails.getUsername());
+        Member findMember = memberJoinService.findMyAccountMemberId(userDetails.getUsername());
         Map<String, String> tokens = jwtTokenService.getTokens(findMember.getMemberId(), findMember.getRole().getName());
 
         String accessToken = tokens.get("accessToken");

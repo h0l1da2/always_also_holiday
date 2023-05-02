@@ -42,8 +42,13 @@ public class MemberJoinServiceImpl implements MemberJoinService {
     }
 
     @Override
-    public Member findMyAccount(String memberId) {
+    public Member findMyAccountMemberId(String memberId) {
         return memberRepository.findByMemberIdRole(memberId);
+    }
+
+    @Override
+    public Member findMyAccount(Long id) {
+        return memberRepository.findByIdRole(id);
     }
 
     @Override

@@ -13,11 +13,7 @@ import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import today.also.hyuil.domain.dto.fanLetter.FanLetterViewDto;
-import today.also.hyuil.domain.dto.fanLetter.CommentDto;
-import today.also.hyuil.domain.dto.fanLetter.FanLetterListDto;
-import today.also.hyuil.domain.dto.fanLetter.FanLetterWriteDto;
-import today.also.hyuil.domain.dto.fanLetter.FileDto;
+import today.also.hyuil.domain.dto.fanLetter.*;
 import today.also.hyuil.domain.fanLetter.Comment;
 import today.also.hyuil.domain.fanLetter.FanBoard;
 import today.also.hyuil.domain.file.FileInfo;
@@ -29,6 +25,7 @@ import today.also.hyuil.exception.MemberNotFoundException;
 import today.also.hyuil.exception.fanLetter.MimeTypeNotMatchException;
 import today.also.hyuil.service.fanLetter.inter.FanLetterCommentService;
 import today.also.hyuil.service.fanLetter.inter.FanLetterService;
+import today.also.hyuil.service.web.WebService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -42,12 +39,14 @@ import java.util.*;
 @PropertySource("classpath:application.yml")
 public class FanLetterController {
 
+    private final WebService webService;
     private final FanLetterService fanLetterService;
     private final FanLetterCommentService fanLetterCommentService;
 
     @Value("${file.fan.letter.path}")
     private String filePath;
-    public FanLetterController(FanLetterService fanLetterService, FanLetterCommentService fanLetterCommentService) {
+    public FanLetterController(WebService webService, FanLetterService fanLetterService, FanLetterCommentService fanLetterCommentService) {
+        this.webService = webService;
         this.fanLetterService = fanLetterService;
         this.fanLetterCommentService = fanLetterCommentService;
     }
@@ -63,7 +62,7 @@ public class FanLetterController {
 
     // TODO 이전글, 다음글 기능 추가 예정
     @GetMapping("/{num}")
-    public String fanLetter(@PathVariable Long num, Model model) {
+    public String fanLetter(@PathVariable Long num, Model model, HttpServletRequest request) {
         Map<String, Object> map = fanLetterService.readLetter(num);
 
         FanBoard fanBoard = (FanBoard) map.get("fanLetter");
@@ -90,9 +89,19 @@ public class FanLetterController {
             comments.add(commentDto);
         }
 
+
         model.addAttribute("fanLetter", new FanLetterViewDto(fanBoard, comments.size()*1L));
         model.addAttribute("filePath", filePaths);
         model.addAttribute("comments", comments);
+
+        try {
+            String nickname = webService.getNicknameInSession(request);
+            if (nickname.equals(fanBoard.getMember().getNickname())) {
+                model.addAttribute("nickname", nickname);
+            }
+        } catch (MemberNotFoundException e) {
+            System.out.println("로그인이 안 되어 있음");
+        }
 
         return "/fanLetter/viewPage";
     }
@@ -113,7 +122,7 @@ public class FanLetterController {
 
         try {
             // 세션에서 memberId 가져오기
-            String memberId = getMemberIdInSession(request);
+            Long id = webService.getIdInSession(request);
 //            String memberId = "aaaa1";
 
             if (!writeDtoNullCheck(fanLetterWriteDto)) {
@@ -138,7 +147,7 @@ public class FanLetterController {
                 }
             }
 
-            FanBoard writeLetter = fanLetterService.writeLetter(memberId, fanBoard, fileInfoList);
+            FanBoard writeLetter = fanLetterService.writeLetter(id, fanBoard, fileInfoList);
 
             if (writeLetter.getId() == null) {
                 System.out.println("작성 오류");
@@ -166,7 +175,7 @@ public class FanLetterController {
     @GetMapping("/modify/{num}")
     public String modify(@PathVariable Long num, Model model, HttpServletRequest request) {
         try {
-            String memberId = getMemberIdInSession(request);
+            Long id = webService.getIdInSession(request);
 //            String memberId = "aaaa1";
             /**
              * 1. 본인 글인지 검증
@@ -174,7 +183,7 @@ public class FanLetterController {
              * 3. 사진은...? 일단 글만 보여주는 걸로 -> 사진도
              */
 
-            Map<String, Object> map = fanLetterService.findLetter(memberId, num);
+            Map<String, Object> map = fanLetterService.findLetter(id, num);
             modelInFanBoard(model, map);
 
             if (map.containsKey("fileInfoList")) {
@@ -195,7 +204,7 @@ public class FanLetterController {
                                          @RequestPart(value = "image", required = false) List<MultipartFile> files,
                                          @RequestPart(value = "fanLetterWriteDto") FanLetterWriteDto fanLetterWriteDto) {
         try {
-            String memberId = getMemberIdInSession(request);
+            Long id = webService.getIdInSession(request);
 //            String memberId = "aaaa1";
 
             if (!writeDtoNullCheck(fanLetterWriteDto)) {
@@ -212,7 +221,7 @@ public class FanLetterController {
                 return new ResponseEntity<>("NOT_FOUND", HttpStatus.NOT_FOUND);
             }
 
-            if (!memberId.equals(findLetter.getMember().getMemberId())) {
+            if (!id.equals(findLetter.getId())) {
                 System.out.println("본인이 쓴 글이 아님");
                 return new ResponseEntity<>("NOT_WRITER", HttpStatus.BAD_REQUEST);
             }
@@ -262,10 +271,10 @@ public class FanLetterController {
     @PostMapping("/remove/{num}")
     public ResponseEntity<String> deleteLetter(@PathVariable Long num, HttpServletRequest request) {
         try {
-//            String memberId = getMemberIdInSession(request);
-            String memberId = "aaaa1";
+            Long id = webService.getIdInSession(request);
+//            String memberId = "aaaa1";
 
-            fanLetterService.removeLetter(num, "MEMBER", memberId);
+            fanLetterService.removeLetter(num, "MEMBER", id);
 
         } catch (MemberNotFoundException e) {
             e.printStackTrace();
@@ -320,17 +329,6 @@ public class FanLetterController {
         file.filePath(filePath);
         file.fileType(Type.IMAGE);
         return file;
-    }
-
-    private String getMemberIdInSession(HttpServletRequest request) throws MemberNotFoundException {
-        HttpSession session = request.getSession();
-        String memberId = null;
-        try {
-            memberId = (String) session.getAttribute("memberId");
-        } catch (NullPointerException e) {
-            throw new MemberNotFoundException("세션에 아이디가 없음");
-        }
-        return memberId;
     }
 
     private String setImgMimeType(MultipartFile multipartFile) throws MimeTypeNotMatchException {
