@@ -124,7 +124,7 @@
                           <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                             <!-- Button -->
                             <div class="form-group">
-                              <button type="button" id="writeBtn" name="writeBtn" class="btn btn-default">등록</button>
+                              <button type="button" id="writeBtn" name="writeBtn" class="btn btn-default" onclick="replyWrite(-10)">등록</button>
                             </div>
                           </div>
                         </div>
@@ -151,6 +151,54 @@
     } else {
       replyArea.empty();
     }
+  }
+
+  function replyWrite(commentId) {
+
+    let jwt = localStorage.getItem('jwt');
+    let content = '';
+    let commentNum = null;
+    if (commentId == -10) {
+    content = document.getElementById('content').value;
+    } else {
+    content = document.getElementById('content'+commentId).value;
+    commentNum = commentId;
+    }
+
+    // 글 번호와 엄마 댓글 번호
+    let letterNum = getLastPath();
+
+    if (content === '' || content === ' ') {
+      alert('내용을 입력하세요');
+      document.getElementById('content').focus();
+      return false;
+    }
+
+    let data = JSON.stringify({content: content, letterNum: letterNum, commentNum: commentNum});
+
+    $.ajax({
+      type: 'POST',
+      url: '/fanLetter/comment/write',
+      contentType: 'application/json',
+      data: data,
+      headers: { 'Authorization': 'Bearer '+ jwt },
+      dataType: 'json',
+      success: function(result) {
+        if (result.data === 'WRITE_OK') {
+          alert('작성 완료');
+          $('.commentDiv').load(location.href+' .commentDiv');
+        } else if (result.data === 'MEMBER_NOT_FOUND') {
+          alert('로그인을 하세요');
+          window.location.href = '/loginForm';
+        } else {
+          alert(result)
+        }
+      },
+      error: function(xhr, status, error) {
+        alert('error - '+xhr.status+'. 메시지 : '+xhr.statusText)
+        console.error(error);
+      }
+    });
   }
 
   function getLastPath() {
@@ -190,14 +238,14 @@
             "                                  <div class=\"form-group\">\n" +
             "                                    <div class=\"col-lg-12 col-md-12 col-sm-12 col-xs-12\">\n" +
             "                                      <label class=\"control-label\" for=\"textarea\">내용 :</label>\n" +
-            "                                      <textarea class=\"form-control\" id=\"reContent\" rows=\"6\" placeholder=\" \"></textarea>\n" +
+            "                                      <textarea class=\"form-control\" id=\"content"+commentId+"\" rows=\"6\" placeholder=\" \"></textarea>\n" +
             "                                    </div>\n" +
             "                                  </div>\n" +
             "\n" +
             "                                  <div class=\"col-lg-12 col-md-12 col-sm-12 col-xs-12\">\n" +
             "                                    <!-- Button -->\n" +
             "                                    <div class=\"form-group\">\n" +
-            "                                      <button type=\"button\" id=\"reWriteBtn"+commentId+"\" name=\"writeBtn\" class=\"btn btn-default\">등록</button>\n" +
+            "                                      <button type=\"button\" id=\"reWriteBtn"+commentId+"\" name=\"writeBtn\" class=\"btn btn-default\" onclick=\"replyWrite("+commentId+")\">등록</button>\n" +
             "                                    </div>\n" +
             "                                  </div>\n" +
             "                                </div>\n" +
@@ -322,90 +370,90 @@
       window.location.href = '/fanLetter/modify/' + letterNum;
     });
 
-    $('#writeBtn').click(function () {
-      let jwt = localStorage.getItem('jwt');
-      let content = document.getElementById('content').value;
+    // $('#writeBtn').click(function () {
+    //   let jwt = localStorage.getItem('jwt');
+    //   let content = document.getElementById('content').value;
+    //
+    //   // 글 번호와 엄마 댓글 번호
+    //   let letterNum = getLastPath();
+    //
+    //   alert(getLastPath());
+    //
+    //   if (content === '' || content === ' ') {
+    //     alert('내용을 입력하세요');
+    //     document.getElementById('content').focus();
+    //     return false;
+    //   }
+    //
+    //   let data = JSON.stringify({content: content, letterNum: letterNum});
+    //
+    //   $.ajax({
+    //     type: 'POST',
+    //     url: '/fanLetter/comment/write',
+    //     contentType: 'application/json',
+    //     data: data,
+    //     headers: { 'Authorization': 'Bearer '+ jwt },
+    //     dataType: 'json',
+    //     success: function(result) {
+    //       if (result.data === 'WRITE_OK') {
+    //         alert('작성 완료');
+    //         $('.commentDiv').load(location.href+' .commentDiv');
+    //       } else if (result.data === 'MEMBER_NOT_FOUND') {
+    //         alert('로그인을 하세요');
+    //         window.location.href = '/loginForm';
+    //       } else {
+    //         alert(result)
+    //       }
+    //     },
+    //     error: function(xhr, status, error) {
+    //       alert('error - '+xhr.status+'. 메시지 : '+xhr.statusText)
+    //       console.error(error);
+    //     }
+    //   });
+    //
+    // })
 
-      // 글 번호와 엄마 댓글 번호
-      let letterNum = getLastPath();
-
-      alert(getLastPath());
-
-      if (content === '' || content === ' ') {
-        alert('내용을 입력하세요');
-        document.getElementById('content').focus();
-        return false;
-      }
-
-      let data = JSON.stringify({content: content, letterNum: letterNum});
-
-      $.ajax({
-        type: 'POST',
-        url: '/fanLetter/comment/write',
-        contentType: 'application/json',
-        data: data,
-        headers: { 'Authorization': 'Bearer '+ jwt },
-        dataType: 'json',
-        success: function(result) {
-          if (result.data === 'WRITE_OK') {
-            alert('작성 완료');
-            $('.commentDiv').load(location.href+' .commentDiv');
-          } else if (result.data === 'MEMBER_NOT_FOUND') {
-            alert('로그인을 하세요');
-            window.location.href = '/loginForm';
-          } else {
-            alert(result)
-          }
-        },
-        error: function(xhr, status, error) {
-          alert('error - '+xhr.status+'. 메시지 : '+xhr.statusText)
-          console.error(error);
-        }
-      });
-
-    })
-
-    $('#reWriteBtn').click(function () {
-      let jwt = localStorage.getItem('jwt');
-      let content = document.getElementById('reContent').value;
-
-      // 글 번호와 엄마 댓글 번호
-      let letterNum = getLastPath();
-      let commentNum = document.getElementById('commentId').value;
-
-      if (content === '' || content === ' ') {
-        alert('내용을 입력하세요');
-        document.getElementById('content').focus();
-        return false;
-      }
-
-      let data = JSON.stringify({content: content, letterNum: letterNum, commentNum:commentNum});
-
-      $.ajax({
-        type: 'POST',
-        url: '/fanLetter/comment/write',
-        contentType: 'application/json',
-        data: data,
-        // headers: { 'Authorization': 'Bearer '+ jwt },
-        dataType: 'json',
-        success: function(result) {
-          if (result.data === 'WRITE_OK') {
-            alert('작성 완료');
-            $('.commentDiv').load(location.href+' .commentDiv');
-          } else if (result.data === 'MEMBER_NOT_FOUND') {
-            alert('로그인을 하세요');
-            window.location.href = '/loginForm';
-          } else {
-            alert(result)
-          }
-        },
-        error: function(xhr, status, error) {
-          alert('error - '+xhr.status+'. 메시지 : '+xhr.statusText)
-          console.error(error);
-        }
-      });
-
-    })
+    // $('#reWriteBtn').click(function () {
+    //   let jwt = localStorage.getItem('jwt');
+    //   let content = document.getElementById('reContent').value;
+    //
+    //   // 글 번호와 엄마 댓글 번호
+    //   let letterNum = getLastPath();
+    //   let commentNum = document.getElementById('commentId').value;
+    //
+    //   if (content === '' || content === ' ') {
+    //     alert('내용을 입력하세요');
+    //     document.getElementById('content').focus();
+    //     return false;
+    //   }
+    //
+    //   let data = JSON.stringify({content: content, letterNum: letterNum, commentNum:commentNum});
+    //
+    //   $.ajax({
+    //     type: 'POST',
+    //     url: '/fanLetter/comment/write',
+    //     contentType: 'application/json',
+    //     data: data,
+    //     // headers: { 'Authorization': 'Bearer '+ jwt },
+    //     dataType: 'json',
+    //     success: function(result) {
+    //       if (result.data === 'WRITE_OK') {
+    //         alert('작성 완료');
+    //         $('.commentDiv').load(location.href+' .commentDiv');
+    //       } else if (result.data === 'MEMBER_NOT_FOUND') {
+    //         alert('로그인을 하세요');
+    //         window.location.href = '/loginForm';
+    //       } else {
+    //         alert(result)
+    //       }
+    //     },
+    //     error: function(xhr, status, error) {
+    //       alert('error - '+xhr.status+'. 메시지 : '+xhr.statusText)
+    //       console.error(error);
+    //     }
+    //   });
+    //
+    // })
 
   })
 
