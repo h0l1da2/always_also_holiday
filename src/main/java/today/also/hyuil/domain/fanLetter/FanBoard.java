@@ -50,4 +50,8 @@ public class FanBoard {
     public void deleteFanLetter(BoardRemover boardRemover) {
         this.boardRemover = boardRemover;
     }
+
+    public void updateViewCnt() {
+        view++;
+    }
 }

@@ -80,7 +80,7 @@ public class FanLetterServiceImpl implements FanLetterService {
     @Override
     public Map<String, Object> readLetter(Long num) {
 
-        FanBoard fanBoard = fanLetterRepository.selectFanBoard(num);
+        FanBoard fanBoard = fanLetterRepository.selectAndViewCnt(num);
         List<FileInfo> fileInfoList = fileService.fileInfoList(fanBoard.getId());
 
         Map<String, Object> map = new HashMap<>();

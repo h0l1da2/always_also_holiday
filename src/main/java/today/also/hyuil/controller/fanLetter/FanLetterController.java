@@ -84,7 +84,7 @@ public class FanLetterController {
             comments.add(commentDto);
         }
 
-        model.addAttribute("fanLetter", new FanLetterViewDto(fanBoard));
+        model.addAttribute("fanLetter", new FanLetterViewDto(fanBoard, comments.size()*1L));
         model.addAttribute("filePath", filePaths);
         model.addAttribute("comments", comments);
 

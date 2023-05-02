@@ -41,6 +41,12 @@ public class FanLetterRepository {
         return fanBoard;
     }
 
+    public FanBoard selectAndViewCnt(Long num) {
+        FanBoard fanBoard = em.find(FanBoard.class, num);
+        fanBoard.updateViewCnt();
+        return fanBoard;
+    }
+
     public Page<FanLetterListDto> selectFanBoardList(Pageable pageable) {
         List<FanLetterListDto> resultList = query
                 .select(Projections.constructor(FanLetterListDto.class,
