@@ -45,4 +45,7 @@ public class Comment {
         this.rootId = fanCommentWriteDto.getCommentNum();
     }
 
+    public void removeComment(CommentRemover commentRemover) {
+        this.commentRemover = commentRemover;
+    }
 }

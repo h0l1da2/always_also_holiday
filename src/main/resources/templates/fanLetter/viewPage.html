@@ -64,7 +64,10 @@
                           <div class="comment-body" th:classappend="${comment.id}">
                             <div class="">
                               <div class="comment-header">
-                                <h4 class="user-title mb10" th:text="${comment.nickname}"></h4>
+                                <h4 class="user-title mb10" th:inline="text">
+                                  [[${comment.nickname}]]
+                                  <a class="reply replyBtn btn btn-default btn-sm removeComBtn" role="button" th:onclick="'removeCom('+${comment.id}+')'">삭제</a>
+                                </h4>
                                 <div class="comment-meta"><span class="comment-meta-date" th:text="'작성날짜 '+${comment.uploadDate}">작성날짜</span></div>
                               </div>
                               <div class="comment-content">
@@ -81,8 +84,11 @@
                               <div class="comment-body">
                                 <div class="">
                                   <div class="comment-header">
-                                    <input type="hidden" id="commentId" th:value="${comment.id}"/>
-                                    <h4 class="user-title mb10" th:text="${reply.nickname}"></h4>
+                                    <input type="hidden" id="replyId" th:value="${reply.id}"/>
+                                    <h4 class="user-title mb10" th:inline="text">
+                                      [[${reply.nickname}]]
+                                      <a class="reply replyBtn btn btn-default btn-sm removeComBtn" role="button" th:onclick="'removeCom('+${reply.id}+')'">삭제</a>
+                                    </h4>
                                     <div class="comment-meta"><span class="comment-meta-date" th:text="'작성날짜 '+${reply.uploadDate}">작성날짜</span></div>
                                   </div>
                                   <div class="comment-content">
@@ -142,6 +148,43 @@
   </div>
 </div>
 <script th:inline="javascript">
+
+  function removeCom(id) {
+    let jwt = localStorage.getItem('jwt');
+
+    if (confirm('정말 삭제하시겠습니까?') == false) {
+      return false;
+    }
+
+    let data = JSON.stringify({id: id});
+
+    $.ajax({
+      type: 'POST',
+      url: '/fanLetter/comment/remove',
+      contentType: 'application/json',
+      data: data,
+      headers: { 'Authorization': 'Bearer '+ jwt },
+      dataType: 'json',
+      success: function(result) {
+        if (result.data === 'REMOVE_OK') {
+          alert('삭제 완료');
+          $('.commentDiv').load(location.href+' .commentDiv');
+        }
+      },
+      error: function(xhr, status, error) {
+        console.log('error - '+xhr.status+'. 메시지 : '+xhr.statusText)
+        if (xhr.responseText === 'MEMBER_NOT_FOUND') {
+          alert('로그인을 하세요');
+          window.location.href = '/loginForm';
+        } else if (xhr.responseText === 'NOT_YOUR_COMMENT') {
+          alert('본인 댓글이 아닙니다');
+        } else {
+          alert(error)
+        }
+      }
+    });
+
+  }
 
   function replyBtnOn(commentId) {
     let replyArea = $('.re'+commentId);

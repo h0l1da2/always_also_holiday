@@ -2,9 +2,12 @@ package today.also.hyuil.controller.fanLetter;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import javassist.NotFoundException;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
+import today.also.hyuil.config.security.CustomUserDetails;
 import today.also.hyuil.domain.dto.fanLetter.CommentDto;
 import today.also.hyuil.domain.dto.fanLetter.FanCommentWriteDto;
 import today.also.hyuil.domain.fanLetter.Comment;
@@ -18,6 +21,7 @@ import today.also.hyuil.service.member.inter.MemberJoinService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.nio.file.AccessDeniedException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -92,6 +96,34 @@ public class FanLetterCommentController {
         String jsonResponse = gson.toJson(jsonObject);
         return ResponseEntity.ok()
                 .body(jsonResponse);
+    }
+
+    @PostMapping("/remove")
+    public ResponseEntity<String> remove(@RequestBody CommentDto commentDto, @AuthenticationPrincipal CustomUserDetails userDetails) {
+        try {
+            if (userDetails == null) {
+                return ResponseEntity.badRequest()
+                        .body("MEMBER_NOT_FOUND");
+            }
+            fanLetterCommentService.removeComment(commentDto.getId(), userDetails.getUsername());
+//            fanLetterCommentService.removeComment(commentDto.getId(), "aaaa1");
+        } catch (NotFoundException e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest()
+                    .body("COMMENT_NOT_FOUND");
+        } catch (AccessDeniedException e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest()
+                    .body("NOT_YOUR_COMMENT");
+        } catch (NumberFormatException e) {
+            System.out.println("타입 변환 에러(코멘트 파라미터가 숫자 타입이 아님)");
+            return ResponseEntity.badRequest()
+                    .body("BAD_COMMENT_ID");
+        }
+
+
+        return ResponseEntity.ok()
+                .body("REMOVE_OK");
     }
 
     private ResponseEntity<String> badResponseEntity(String cause) {

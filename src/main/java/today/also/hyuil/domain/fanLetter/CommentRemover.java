@@ -13,7 +13,6 @@ public class CommentRemover {
 
     @Id @GeneratedValue
     private Long id;
-    private Date updateDate;
     private Date removeDate;
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "member_id")
@@ -21,4 +20,13 @@ public class CommentRemover {
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "admin_id")
     private Admin admin;
+
+    public CommentRemover() {
+
+    }
+
+    public CommentRemover(Member member) {
+        this.removeDate = new Date();
+        this.member = member;
+    }
 }

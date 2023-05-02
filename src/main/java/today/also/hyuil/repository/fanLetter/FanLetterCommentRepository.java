@@ -4,6 +4,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import today.also.hyuil.domain.fanLetter.Comment;
+import today.also.hyuil.domain.fanLetter.CommentRemover;
 import today.also.hyuil.domain.fanLetter.QComment;
 import today.also.hyuil.domain.member.QMember;
 
@@ -39,5 +40,28 @@ public class FanLetterCommentRepository {
                 .fetchJoin()
                 .distinct()
                 .fetch();
+    }
+
+    public Comment selectComment(Long commentId) {
+        Comment comment = em.find(Comment.class, commentId);
+        comment.getMember();
+        em.close();
+        return comment;
+    }
+
+    public void deleteComment(Long commentId) {
+        Comment comment = em.find(Comment.class, commentId);
+    }
+
+    public CommentRemover insertCommentRemover(CommentRemover commentRemover) {
+        em.persist(commentRemover);
+        em.close();
+        return commentRemover;
+    }
+
+    public void updateRemover(Long id, CommentRemover commentRemover) {
+        Comment findComment = em.find(Comment.class, id);
+        findComment.removeComment(commentRemover);
+        em.close();
     }
 }
