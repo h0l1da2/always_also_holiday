@@ -61,7 +61,7 @@
                         <li class="comment">
 
                           <!-- 코멘트 id -->
-                          <div class="comment-body">
+                          <div class="comment-body" th:classappend="${comment.id}">
                             <div class="">
                               <div class="comment-header">
                                 <h4 class="user-title mb10" th:text="${comment.nickname}"></h4>
@@ -71,7 +71,7 @@
                                 <p th:text="${comment.content}"></p>
                               </div>
 <!--                              <div class="reply" id="replyBtn" th:if="${session.memberId != null}"><a class="btn btn-default btn-sm">Reply</a></div>-->
-                              <div class="reply replyBtn" id="replyBtn_${comment.id}"><a class="btn btn-default btn-sm">Reply</a></div>
+                              <div class="reply replyBtn" id="replyBtn"><a class="btn btn-default btn-sm" role="button" th:onclick="'replyBtnOn('+${comment.id}+')'">Reply</a></div>
                               <hr>
                             </div>
                           </div>
@@ -93,7 +93,7 @@
                             </li>
                           </ul>
                         </li>
-                        <div class="row replyArea">
+                        <div class="row replyArea" th:classappend="'re'+${comment.id}">
                           <!--                <div class="row" th:if="${session.memberId != null}">-->
                         </div>
                       </ul>
@@ -143,6 +143,16 @@
 </div>
 <script th:inline="javascript">
 
+  function replyBtnOn(commentId) {
+    let replyArea = $('.re'+commentId);
+
+    if (replyArea.children().length == 0) {
+      replyArea.html(replyBtnHtml(commentId));
+    } else {
+      replyArea.empty();
+    }
+  }
+
   function getLastPath() {
     var parts = window.location.href.split('/');
     var lastSegment = parts.pop() || parts.pop(); // 마지막 게시글번호 이후 uri 만 남김
@@ -169,7 +179,7 @@
 
   }
 
-  function replyBtnHtml() {
+  function replyBtnHtml(commentId) {
     return  "                          <div class=\"col-lg-12 col-md-12 col-md-12 col-sm-12\">\n" +
             "                            <div class=\"leave-comments\">\n" +
             "                              <!-- leave comments -->\n" +
@@ -187,7 +197,7 @@
             "                                  <div class=\"col-lg-12 col-md-12 col-sm-12 col-xs-12\">\n" +
             "                                    <!-- Button -->\n" +
             "                                    <div class=\"form-group\">\n" +
-            "                                      <button type=\"button\" id=\"reWriteBtn\" name=\"writeBtn\" class=\"btn btn-default\">등록</button>\n" +
+            "                                      <button type=\"button\" id=\"reWriteBtn"+commentId+"\" name=\"writeBtn\" class=\"btn btn-default\">등록</button>\n" +
             "                                    </div>\n" +
             "                                  </div>\n" +
             "                                </div>\n" +
@@ -310,18 +320,6 @@
     $('#modifyBtn').click(function (){
       let letterNum = getLastPath();
       window.location.href = '/fanLetter/modify/' + letterNum;
-    });
-
-    $('.replyBtn').click(function () {
-      let allCommentDiv = $('.commentDiv');
-      let commentDiv = $(this).closest('.commentDiv');
-      let replyArea = commentDiv.find('.replyArea');
-
-      if (replyArea.children().length == 0) {
-        replyArea.html(replyBtnHtml());
-      } else {
-        replyArea.remove();
-      }
     });
 
     $('#writeBtn').click(function () {
