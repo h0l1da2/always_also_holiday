@@ -64,7 +64,6 @@ public class FanLetterController {
         return "fanLetter/boardList";
     }
 
-    // TODO 이전글, 다음글 기능 추가 예정
     @GetMapping("/{num}")
     public String fanLetter(@PathVariable Long num, Model model, HttpServletRequest request) {
         // 글
