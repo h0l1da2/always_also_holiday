@@ -55,6 +55,7 @@ public class CustomOAuth2AuthorizationCodeGrantFilter extends OAuth2Authorizatio
         String code = request.getParameter("code");
 
         if (!StringUtils.hasText(code)) {
+            System.out.println("코드 없음");
             filterChain.doFilter(request, response);
             return;
         }
@@ -64,10 +65,12 @@ public class CustomOAuth2AuthorizationCodeGrantFilter extends OAuth2Authorizatio
         HttpSession session = request.getSession(false);
 
         if (session != null) {
+            System.out.println("세션 널");
             String originState = String.valueOf(session.getAttribute("state"));
             String state = request.getParameter("state");
 
             if (state.equals(originState) && StringUtils.hasText(code)) {
+                System.out.println("어썬티케이션생성");
                 /**
                  * 카카오 -
                  * state가 동일하고, 정상 응답이 왔을 경우(코드 받았음)

@@ -27,7 +27,6 @@ public class CustomOAuth2AuthorizationRequestResolver implements OAuth2Authoriza
     public OAuth2AuthorizationRequest resolve(HttpServletRequest request) {
         // /oauth2/** 요청일 때만 resolver 동작해야 함니다
         if (request.getRequestURI().startsWith(REQUEST_URL)) {
-            System.out.println("!!!!");
             String sns = request.getRequestURI().substring(REQUEST_URL.length());
             return this.resolve(request, sns);
         }
@@ -65,14 +64,14 @@ public class CustomOAuth2AuthorizationRequestResolver implements OAuth2Authoriza
     }
 
     private void setClientSession(HttpServletRequest request, String state, String sns) {
-        HttpSession session = request.getSession(false);
+        HttpSession session = request.getSession();
         if (session != null) {
             session.setAttribute(state, sns);
         }
     }
 
     private void setStateSession(HttpServletRequest request, String state) {
-        HttpSession session = request.getSession(false);
+        HttpSession session = request.getSession();
         if (session != null) {
             session.setAttribute("state", state);
         }
