@@ -72,8 +72,6 @@ public class MarketBuyController {
             model.addAttribute("prev", new PrevNextDto(prev.getId(), prev.getTitle()));
             model.addAttribute("next", new PrevNextDto(next.getId(), next.getTitle()));
 
-
-
         } catch (MemberNotFoundException e) {
             e.printStackTrace();
             return "redirect:/loginForm?redirectUrl=/market";
