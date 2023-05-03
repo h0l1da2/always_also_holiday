@@ -55,10 +55,10 @@
           <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 market-input">
             <!-- Text input-->
             <div class="form-group">
-              <label class=" control-label" for="howTrade">거래 방법 :</label>
-              <select class="form-control" th:field="*{howTrade}">
-                <option value="self">택배</option>
-                <option value="delivery">직거래</option>
+              <label class=" control-label" for="trade">거래 방법 :</label>
+              <select class="form-control" onchange="getTrade(this)" th:field="*{trade}">
+                <option value="DELIVERY" th:name="trade">택배</option>
+                <option value="DIRECT" th:name="trade">직거래</option>
               </select>
             </div>
           </div>
@@ -74,13 +74,86 @@
         <!-- Button -->
         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
           <div class="form-group">
-            <button id="singlebutton" name="singlebutton" class="btn btn-default">글쓰기</button>
+            <button type="button" id="writeBtn" class="btn btn-default">글쓰기</button>
           </div>
         </div>
       </form>
     </div>
   </div>
 </div>
+<script th:inline="javascript">
+
+  function getTrade() {
+    let trade = document.getElementById('trade');
+    let value = (trade.options[trade.selectedIndex].value);
+    alert(value);
+    return value;
+  }
+
+  $( document ).ready( function() {
+    $('#writeBtn').click(function () {
+      let jwt = localStorage.getItem('jwt');
+
+      let title = document.getElementById('title').value;
+      let name = document.getElementById('name').value;
+      let price = document.getElementById('price').value;
+      let quantity = document.getElementById('quantity').value;
+      let content = document.getElementById('content').value;
+      let trade = getTrade();
+
+      let check = /^[0-9]+$/;
+
+      if (title === '' | title === ' ') {
+        alert('제목을 입력하세요');
+        document.getElementById('title').focus();
+        return false;
+      }
+      if (name === '' | name === ' ') {
+        alert('물건을 입력하세요');
+        document.getElementById('name').focus();
+        return false;
+      }
+      if (!check.test(price)) {
+        alert('가격을 제대로 입력하세요');
+        document.getElementById('price').focus();
+        return false;
+      }
+      if (!check.test(quantity)) {
+        alert('수량을 제대로 입력하세요');
+        document.getElementById('quantity').focus();
+        return false;
+      }
+      if (content === '' | content === ' ') {
+        alert('내용을 입력하세요');
+        document.getElementById('content').focus();
+        return false;
+      }
+
+      $.ajax({
+        type: 'POST',
+        url: '/market/buy/write',
+        contentType: "application/json",
+        data: JSON.stringify({title: title, name: name, price: price, quantity: quantity, content: content, trade: trade}),
+        dataType: 'json',
+        headers: { 'Authorization': 'Bearer '+ jwt },
+        success: function (result) {
+          if(result === "WRITE_OK") {
+            alert("작성 완료");
+            window.location.href = '/market/' + result.id;
+          } else {
+            alert('뭔가 잘못됨');
+          }
+        },
+        error: function(xhr, status, error) {
+          alert('error - '+xhr.status+'. 메시지 : '+xhr.statusText)
+          console.error(error);
+        }
+      });
+
+
+    });
+  })
+</script>
 </body>
 </th:block>
 </html>

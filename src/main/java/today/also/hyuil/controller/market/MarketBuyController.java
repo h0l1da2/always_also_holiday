@@ -1,5 +1,6 @@
 package today.also.hyuil.controller.market;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -49,12 +50,17 @@ public class MarketBuyController {
         return "/market/buyWrite";
     }
 
-    // TODO 마켓 글쓰기
+    // TODO 수량, 가격 검증 로직 추가 필요 (널, 공백 체크)
+    @ResponseBody
     @PostMapping("/write")
-    public String write(@RequestBody BuyWriteDto buyWriteDto, HttpServletRequest request, Model model) {
-        try {
-            Long id = webService.getIdInSession(request);
-            Member member = memberJoinService.findMyAccount(id);
+    public ResponseEntity<String> write(@RequestBody BuyWriteDto buyWriteDto, HttpServletRequest request, Model model) {
+
+        System.out.println("buyWriteDto = " + buyWriteDto);
+
+//        try {
+//            Long id = webService.getIdInSession(request);
+//            Member member = memberJoinService.findMyAccount(id);
+            Member member = memberJoinService.findMyAccount(8L);
 
             Md md = new Md(buyWriteDto);
             Market market = new Market(Status.BUY, buyWriteDto, member, md);
@@ -69,15 +75,20 @@ public class MarketBuyController {
             Market prev = map.get("prev");
             Market next = map.get("next");
 
+        if (prev != null) {
             model.addAttribute("prev", new PrevNextDto(prev.getId(), prev.getTitle()));
+        }
+        if (next != null) {
             model.addAttribute("next", new PrevNextDto(next.getId(), next.getTitle()));
-
-        } catch (MemberNotFoundException e) {
-            e.printStackTrace();
-            return "redirect:/loginForm?redirectUrl=/market";
         }
 
-        return "market/buyView";
+//        } catch (MemberNotFoundException e) {
+//            e.printStackTrace();
+//            return "redirect:/loginForm?redirectUrl=/market";
+//        }
+
+        return ResponseEntity.ok()
+                .body("WRITE_OK");
     }
 
     private void forTestView(Model model) {
