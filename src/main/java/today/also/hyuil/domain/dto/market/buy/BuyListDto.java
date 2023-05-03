@@ -1,4 +1,4 @@
-package today.also.hyuil.domain.dto.market;
+package today.also.hyuil.domain.dto.market.buy;
 
 import lombok.Data;
 
