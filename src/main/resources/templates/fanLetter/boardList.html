@@ -21,7 +21,7 @@
           <h1 class="mb20 fan-letter-title">자유롭게 하고 싶은 이야기를 남겨주세요</h1>
           <div class="table-center">
             <div class="form-group write-title">
-              <button id="writeBtn" name="writeBtn" class="btn btn-default info-btn-form">글쓰기</button>
+              <button id="writeBtn" name="writeBtn" class="btn btn-default info-btn-form" th:unless="${session.id == null}">글쓰기</button>
             </div>
           </div>
           <table class="table">

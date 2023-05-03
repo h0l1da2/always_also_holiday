@@ -7,10 +7,12 @@ import org.springframework.web.bind.annotation.*;
 import today.also.hyuil.config.security.jwt.JwtTokenService;
 import today.also.hyuil.domain.dto.member.LoginDto;
 import today.also.hyuil.domain.member.Member;
+import today.also.hyuil.exception.MemberNotFoundException;
 import today.also.hyuil.service.member.inter.MemberJoinService;
 import today.also.hyuil.service.web.WebService;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -35,6 +37,17 @@ public class MemberLoginController {
         }
         return "member/loginForm";
     }
+
+    @PostMapping("/logout")
+    public String logout(HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
+
+        if (session != null) {
+            session.invalidate();
+        }
+
+        return "/index";
+       }
 
     @ResponseBody
     @PostMapping("/login")
