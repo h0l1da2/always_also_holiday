@@ -50,7 +50,6 @@ public class OAuth2JwtTokenFilter extends OncePerRequestFilter {
         this.googleJwk = googleJwk;
     }
 
-    // TODO 세션에 닉네임 넣고, id 넣는 것으로 변경
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         System.out.println("토큰 생성/저장 필터");

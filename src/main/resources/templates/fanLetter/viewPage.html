@@ -37,14 +37,15 @@
                   <div class="row">
                     <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
                       <div class="prev-post">
-                        <h5 class="prev-link"><a href="#" class="btn-link title">이전글</a></h5>
-                        <h4 class="prev-next-title"><a href="#" class="title">휴일이짱</a></h4>
+                        <h5 class="prev-link"><a class="btn-link title" th:if="${prev == null}">이전글</a></h5>
+                        <h5 class="prev-link"><a th:href="@{/fanLetter/} + ${prev.id}" class="btn-link title" th:unless="${prev == null}">이전글</a></h5>
+                        <h4 class="prev-next-title"><a th:href="@{/fanLetter/} + ${prev.id}" class="title" th:text="${prev.title}" th:if="${prev != null}">휴일이짱</a></h4>
                       </div>
                     </div>
                     <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
                       <div class="next-post">
-                        <h5 class="next-link"><a href="#" class="btn-link title">다음글</a></h5>
-                        <h4 class="next-prev-title"><a href="#" class="title">휴일굿</a></h4>
+                        <h5 class="next-link"><a th:href="@{/fanLetter/} + ${next.id}" class="btn-link title">다음글</a></h5>
+                        <h4 class="next-prev-title"><a th:href="@{/fanLetter/} + ${next.id}" class="title" th:text="${next.title}" th:if="${next != null}">휴일굿</a></h4>
                       </div>
                     </div>
                   </div>

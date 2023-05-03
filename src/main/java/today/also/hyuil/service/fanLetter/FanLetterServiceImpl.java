@@ -157,4 +157,20 @@ public class FanLetterServiceImpl implements FanLetterService {
     public Page<FanLetterListDto> listMain(Pageable pageable) {
         return fanLetterRepository.selectFanBoardList(pageable);
     }
+
+    @Override
+    public Map<String, FanBoard> prevNextLetter(Long id) {
+        Long prev = id - 1;
+        Long next = id + 1;
+
+        FanBoard prevLetter = fanLetterRepository.selectFanBoard(prev);
+        FanBoard nextLetter = fanLetterRepository.selectFanBoard(next);
+
+        Map<String, FanBoard> map = new HashMap<>();
+
+        map.put("prev", prevLetter);
+        map.put("next", nextLetter);
+
+        return map;
+    }
 }

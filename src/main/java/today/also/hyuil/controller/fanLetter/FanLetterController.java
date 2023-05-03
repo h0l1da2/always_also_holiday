@@ -63,6 +63,7 @@ public class FanLetterController {
     // TODO 이전글, 다음글 기능 추가 예정
     @GetMapping("/{num}")
     public String fanLetter(@PathVariable Long num, Model model, HttpServletRequest request) {
+        // 글
         Map<String, Object> map = fanLetterService.readLetter(num);
 
         FanBoard fanBoard = (FanBoard) map.get("fanLetter");
@@ -75,8 +76,8 @@ public class FanLetterController {
             filePaths.add(filePath);
         }
 
+        // 댓글
         List<Comment> commentList = fanLetterCommentService.readComment(num);
-
         List<CommentDto> comments = new ArrayList<>();
 
         for (Comment comment : commentList) {
@@ -89,11 +90,25 @@ public class FanLetterController {
             comments.add(commentDto);
         }
 
+        // 이전글 다음글
+        Map<String, FanBoard> prevNextLetter = fanLetterService.prevNextLetter(num);
+
+        FanBoard prevLetter = prevNextLetter.get("prev");
+        FanBoard nextLetter = prevNextLetter.get("next");
+
+        if (prevLetter != null) {
+            model.addAttribute("prev", new PrevNextDto(prevLetter));
+        }
+        if (nextLetter != null) {
+            model.addAttribute("next", new PrevNextDto(nextLetter));
+        }
+
 
         model.addAttribute("fanLetter", new FanLetterViewDto(fanBoard, comments.size()*1L));
         model.addAttribute("filePath", filePaths);
         model.addAttribute("comments", comments);
 
+        // 본인 글인지 확인
         try {
             String nickname = webService.getNicknameInSession(request);
             if (nickname.equals(fanBoard.getMember().getNickname())) {
