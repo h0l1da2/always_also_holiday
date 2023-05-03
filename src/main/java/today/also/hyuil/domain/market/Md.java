@@ -1,6 +1,7 @@
 package today.also.hyuil.domain.market;
 
 import lombok.Getter;
+import today.also.hyuil.domain.dto.market.buy.BuyWriteDto;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -15,4 +16,14 @@ public class Md {
     private Long price;
     private String name;
     private Long quantity;
+
+    public Md() {
+
+    }
+
+    public Md(BuyWriteDto buyWriteDto) {
+        this.price = buyWriteDto.getPrice();
+        this.name = buyWriteDto.getName();
+        this.quantity = buyWriteDto.getQuantity();
+    }
 }

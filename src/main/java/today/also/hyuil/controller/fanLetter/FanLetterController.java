@@ -100,10 +100,10 @@ public class FanLetterController {
         FanBoard nextLetter = prevNextLetter.get("next");
 
         if (prevLetter != null) {
-            model.addAttribute("prev", new PrevNextDto(prevLetter));
+            model.addAttribute("prev", new PrevNextDto(prevLetter.getId(), prevLetter.getTitle()));
         }
         if (nextLetter != null) {
-            model.addAttribute("next", new PrevNextDto(nextLetter));
+            model.addAttribute("next", new PrevNextDto(nextLetter.getId(), nextLetter.getTitle()));
         }
 
 

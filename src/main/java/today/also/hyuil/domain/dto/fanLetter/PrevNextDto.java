@@ -13,8 +13,8 @@ public class PrevNextDto {
 
     }
 
-    public PrevNextDto(FanBoard fanBoard) {
-        this.id = fanBoard.getId();
-        this.title = fanBoard.getTitle();
+    public PrevNextDto(Long id, String title) {
+        this.id = id;
+        this.title = title;
     }
 }
