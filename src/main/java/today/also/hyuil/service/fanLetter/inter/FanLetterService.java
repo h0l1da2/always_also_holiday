@@ -19,6 +19,6 @@ public interface FanLetterService {
     Map<String, Object> readLetter(Long num);
     void modifyLetter(Map<String, Object> map) throws FileNumbersLimitExceededException;
     void removeLetter(Long num, String who, Long id) throws MemberNotFoundException, AccessDeniedException;
-    Page<FanLetterListDto> listMain(Pageable pageable);
+    Page<FanBoard> listMain(Pageable pageable);
     Map<String, FanBoard> prevNextLetter(Long id);
 }

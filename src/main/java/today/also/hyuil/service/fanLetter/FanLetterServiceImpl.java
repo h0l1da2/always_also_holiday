@@ -1,7 +1,9 @@
 package today.also.hyuil.service.fanLetter;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import today.also.hyuil.domain.dto.fanLetter.FanLetterListDto;
@@ -11,6 +13,7 @@ import today.also.hyuil.domain.file.FileInfo;
 import today.also.hyuil.domain.member.Member;
 import today.also.hyuil.exception.FileNumbersLimitExceededException;
 import today.also.hyuil.exception.MemberNotFoundException;
+import today.also.hyuil.repository.fanLetter.FanLetterJpaRepository;
 import today.also.hyuil.repository.fanLetter.FanLetterRepository;
 import today.also.hyuil.service.admin.inter.AdminService;
 import today.also.hyuil.service.fanLetter.inter.FanLetterService;
@@ -27,12 +30,14 @@ import java.util.Map;
 public class FanLetterServiceImpl implements FanLetterService {
 
     private final FanLetterRepository fanLetterRepository;
+    private final FanLetterJpaRepository fanLetterJpaRepository;
     private final MemberJoinService memberJoinService;
     private final AdminService adminService;
     private final FileService fileService;
 
-    public FanLetterServiceImpl(FanLetterRepository fanLetterRepository, MemberJoinService memberJoinService, AdminService adminService, FileService fileService) {
+    public FanLetterServiceImpl(FanLetterRepository fanLetterRepository, FanLetterJpaRepository fanLetterJpaRepository, MemberJoinService memberJoinService, AdminService adminService, FileService fileService) {
         this.fanLetterRepository = fanLetterRepository;
+        this.fanLetterJpaRepository = fanLetterJpaRepository;
         this.memberJoinService = memberJoinService;
         this.adminService = adminService;
         this.fileService = fileService;
@@ -154,8 +159,14 @@ public class FanLetterServiceImpl implements FanLetterService {
     }
 
     @Override
-    public Page<FanLetterListDto> listMain(Pageable pageable) {
-        return fanLetterRepository.selectFanBoardList(pageable);
+    public Page<FanBoard> listMain(Pageable pageable) {
+
+        // 현재페이지 / 페이지사이즈(10) / id 기준 오름차순 정렬
+        Pageable pageRequest =
+                PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(),
+                Sort.Direction.DESC, "id");
+
+        return fanLetterJpaRepository.findAll(pageRequest);
     }
 
     @Override

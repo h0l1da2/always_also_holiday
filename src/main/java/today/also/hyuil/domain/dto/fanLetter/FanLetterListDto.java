@@ -1,6 +1,7 @@
 package today.also.hyuil.domain.dto.fanLetter;
 
 import lombok.Data;
+import today.also.hyuil.domain.fanLetter.FanBoard;
 
 import java.util.Date;
 
@@ -16,11 +17,11 @@ public class FanLetterListDto {
     public FanLetterListDto() {
     }
 
-    public FanLetterListDto(Long id, String title, String nickname, Date uploadDate, Long view) {
-        this.id = id;
-        this.title = title;
-        this.nickname = nickname;
-        this.uploadDate = uploadDate;
-        this.view = view;
+    public FanLetterListDto(FanBoard fanBoard) {
+        this.id = fanBoard.getId();
+        this.title = fanBoard.getTitle();
+        this.nickname = fanBoard.getMember().getNickname();
+        this.uploadDate = fanBoard.getUploadDate();
+        this.view = fanBoard.getView();
     }
 }

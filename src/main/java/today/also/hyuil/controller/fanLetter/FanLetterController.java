@@ -3,7 +3,9 @@ package today.also.hyuil.controller.fanLetter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -28,7 +30,6 @@ import today.also.hyuil.service.fanLetter.inter.FanLetterService;
 import today.also.hyuil.service.web.WebService;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.AccessDeniedException;
@@ -53,9 +54,12 @@ public class FanLetterController {
 
     @GetMapping
     public String fanLetterList(@PageableDefault Pageable pageable, Model model) {
-        Page<FanLetterListDto> fanLetterList = fanLetterService.listMain(pageable);
 
-        model.addAttribute("fanLetterList", fanLetterList);
+        Page<FanBoard> fanBoards = fanLetterService.listMain(pageable);
+        Page<FanLetterListDto> fanListDto =
+                fanBoards.map(fanBoard -> new FanLetterListDto(fanBoard));
+
+        model.addAttribute("fanLetterList", fanListDto);
         model.addAttribute("nowPage", pageable.getPageNumber());
         return "fanLetter/boardList";
     }
