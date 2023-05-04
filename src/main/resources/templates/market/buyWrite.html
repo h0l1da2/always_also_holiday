@@ -137,7 +137,7 @@
         headers: { 'Authorization': 'Bearer '+ jwt },
         success: function (result) {
           alert("작성 완료");
-          window.location.href = '/market/' + result;
+          window.location.href = '/market/buy/' + result;
         },
         error: function(xhr, status, error) {
           if (xhr.responseText === "DTO_NULL") {
