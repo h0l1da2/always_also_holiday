@@ -161,9 +161,28 @@ public class MarketBuyController {
     }
 
     @GetMapping("/modify/{id}")
-    public String modifyBuy(@PathVariable Long id) {
+    public String modifyBuy(@PathVariable Long id, Model model, HttpServletRequest request) {
+        try {
+            Long memberId = webService.getIdInSession(request);
+//            Long memberId = 8L;
 
-        return "market/buy/modifyBuy";
+            Market market = marketService.read(id);
+
+            // 글 작성자와 로그인 한 사용자가 다를 경우
+            if (!market.getMember().getId().equals(memberId))
+                return "redirect:/loginForm?redirectUrl=/market/buy";
+
+            model.addAttribute("market", new MarketViewDto(market));
+
+        } catch (MemberNotFoundException e) {
+            e.printStackTrace();
+            return "redirect:/loginForm?redirectUrl=/market/buy";
+        } catch (ThisEntityIsNull e) {
+            e.printStackTrace();
+            return "exception/notFound";
+        }
+
+        return "market/buy/buyModify";
     }
 
     @ResponseBody
