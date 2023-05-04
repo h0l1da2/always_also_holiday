@@ -48,8 +48,8 @@
           <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 market-input">
             <!-- Text input-->
             <div class="form-group">
-              <label class=" control-label" for="quantity">상태 :</label>
-              <input th:field="*{quantity}" type="text" class="form-control" placeholder="예) 미개봉" required>
+              <label class=" control-label" for="quantity">수량 :</label>
+              <input th:field="*{quantity}" type="text" class="form-control" placeholder="예) 3" required>
             </div>
           </div>
           <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 market-input">
@@ -86,7 +86,6 @@
   function getTrade() {
     let trade = document.getElementById('trade');
     let value = (trade.options[trade.selectedIndex].value);
-    alert(value);
     return value;
   }
 
@@ -137,15 +136,30 @@
         dataType: 'json',
         headers: { 'Authorization': 'Bearer '+ jwt },
         success: function (result) {
-          if(result === "WRITE_OK") {
-            alert("작성 완료");
-            window.location.href = '/market/' + result.id;
-          } else {
-            alert('뭔가 잘못됨');
-          }
+          alert("작성 완료");
+          window.location.href = '/market/' + result;
         },
         error: function(xhr, status, error) {
-          alert('error - '+xhr.status+'. 메시지 : '+xhr.statusText)
+          if (xhr.responseText === "DTO_NULL") {
+            alert("값이 제대로 가지 않음");
+          }
+          if (xhr.responseText === "MINIMUM_PRICE") {
+            alert("가격은 100원 이하는 불가능합니다");
+            document.getElementById('price').focus();
+          }
+          if (xhr.responseText === "MINIMUM_QUANTITY") {
+            alert("수량은 1개 이상 입력해주세요");
+            document.getElementById('quantity').focus();
+          }
+          if (xhr.responseText === "MEMBER_NOT_LOGIN") {
+            alert("로그인 해주세요");
+            window.location.href = '/loginForm?redirectUrl=/market';
+          }
+          if (xhr.responseText === "ONLY_NUMBER") {
+            alert("가격, 수량은 숫자만 입력해주세요");
+          }
+
+
           console.error(error);
         }
       });

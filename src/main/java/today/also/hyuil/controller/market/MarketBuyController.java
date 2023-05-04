@@ -3,6 +3,7 @@ package today.also.hyuil.controller.market;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import today.also.hyuil.domain.dto.fanLetter.PrevNextDto;
 import today.also.hyuil.domain.dto.market.MarketViewDto;
@@ -56,16 +57,32 @@ public class MarketBuyController {
     public ResponseEntity<String> write(@RequestBody BuyWriteDto buyWriteDto, HttpServletRequest request, Model model) {
 
         System.out.println("buyWriteDto = " + buyWriteDto);
+        Market writeMarket = new Market();
+        try {
+            Long id = webService.getIdInSession(request);
+            Member member = memberJoinService.findMyAccount(id);
 
-//        try {
-//            Long id = webService.getIdInSession(request);
-//            Member member = memberJoinService.findMyAccount(id);
-            Member member = memberJoinService.findMyAccount(8L);
+            if (!buyDtoNullCheck(buyWriteDto)) {
+                return ResponseEntity.badRequest()
+                        .body("DTO_NULL");
+            }
+
+            if (buyWriteDto.getPrice() < 100) {
+                return ResponseEntity.badRequest()
+                        .body("MINIMUM_PRICE");
+            }
+
+            if (buyWriteDto.getQuantity() < 1) {
+                return ResponseEntity.badRequest()
+                        .body("MINIMUM_QUANTITY");
+            }
+
+//            Member member = memberJoinService.findMyAccount(8L);
 
             Md md = new Md(buyWriteDto);
             Market market = new Market(Status.BUY, buyWriteDto, member, md);
 
-            Market writeMarket = marketService.writeBuy(market);
+            writeMarket = marketService.writeBuy(market);
 
             MarketViewDto marketViewDto = new MarketViewDto(writeMarket);
             model.addAttribute("market", marketViewDto);
@@ -75,20 +92,25 @@ public class MarketBuyController {
             Market prev = map.get("prev");
             Market next = map.get("next");
 
-        if (prev != null) {
-            model.addAttribute("prev", new PrevNextDto(prev.getId(), prev.getTitle()));
-        }
-        if (next != null) {
-            model.addAttribute("next", new PrevNextDto(next.getId(), next.getTitle()));
-        }
+            if (prev != null) {
+                model.addAttribute("prev", new PrevNextDto(prev.getId(), prev.getTitle()));
+            }
+            if (next != null) {
+                model.addAttribute("next", new PrevNextDto(next.getId(), next.getTitle()));
+            }
 
-//        } catch (MemberNotFoundException e) {
-//            e.printStackTrace();
-//            return "redirect:/loginForm?redirectUrl=/market";
-//        }
+        } catch (MemberNotFoundException e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest()
+                    .body("MEMBER_NOT_LOGIN");
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest()
+                    .body("ONLY_NUMBER");
+        }
 
         return ResponseEntity.ok()
-                .body("WRITE_OK");
+                .body(writeMarket.getId().toString());
     }
 
     private void forTestView(Model model) {
@@ -96,5 +118,30 @@ public class MarketBuyController {
         BuyListDto buyListDto = new BuyListDto(1L, "title", "huil", new Date(), 1L);
         buyList.add(buyListDto);
         model.addAttribute("buyList", buyList);
+    }
+
+    private boolean buyDtoNullCheck(BuyWriteDto buyWriteDto) {
+        if (buyWriteDto == null) {
+            return false;
+        }
+        if (!StringUtils.hasText(buyWriteDto.getTitle())) {
+            return false;
+        }
+        if (!StringUtils.hasText(buyWriteDto.getName())) {
+            return false;
+        }
+        if (!StringUtils.hasText(buyWriteDto.getContent())) {
+            return false;
+        }
+        if (!StringUtils.hasText(buyWriteDto.getTrade().toString())) {
+            return false;
+        }
+        if (buyWriteDto.getPrice() == null) {
+            return false;
+        }
+        if (buyWriteDto.getQuantity() == null) {
+            return false;
+        }
+        return true;
     }
 }
