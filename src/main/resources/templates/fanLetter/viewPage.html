@@ -67,7 +67,7 @@
                               <div class="comment-header">
                                 <h4 class="user-title mb10" th:inline="text">
                                   [[${comment.nickname}]]
-                                  <a class="reply replyBtn btn btn-default btn-sm removeComBtn" role="button" th:onclick="'removeCom('+${comment.id}+')'">삭제</a>
+                                  <a class="reply replyBtn btn btn-default btn-sm removeComBtn" role="button" th:onclick="'removeCom('+${comment.id}+')'" th:unless="${session.nickname != comment.nickname}">삭제</a>
                                 </h4>
                                 <div class="comment-meta"><span class="comment-meta-date" th:text="'작성날짜 '+${comment.uploadDate}">작성날짜</span></div>
                               </div>
@@ -88,7 +88,7 @@
                                     <input type="hidden" id="replyId" th:value="${reply.id}"/>
                                     <h4 class="user-title mb10" th:inline="text">
                                       [[${reply.nickname}]]
-                                      <a class="reply replyBtn btn btn-default btn-sm removeComBtn" role="button" th:onclick="'removeCom('+${reply.id}+')'" th:unless="${reply.uploadDate == null}">삭제</a>
+                                      <a class="reply replyBtn btn btn-default btn-sm removeComBtn" role="button" th:onclick="'removeCom('+${reply.id}+')'" th:unless="${reply.uploadDate == null || session.nickname != reply.nickname}">삭제</a>
                                     </h4>
                                     <div class="comment-meta" th:unless="${reply.uploadDate == null}"><span class="comment-meta-date" th:text="'작성날짜 '+${reply.uploadDate}">작성날짜</span></div>
                                   </div>
