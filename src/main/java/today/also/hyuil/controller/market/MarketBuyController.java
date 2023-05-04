@@ -1,6 +1,5 @@
 package today.also.hyuil.controller.market;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -13,11 +12,9 @@ import today.also.hyuil.domain.dto.fanLetter.PrevNextDto;
 import today.also.hyuil.domain.dto.market.MarketViewDto;
 import today.also.hyuil.domain.dto.market.buy.BuyListDto;
 import today.also.hyuil.domain.dto.market.buy.BuyWriteDto;
-import today.also.hyuil.domain.fanLetter.Comment;
-import today.also.hyuil.domain.fanLetter.FanBoard;
 import today.also.hyuil.domain.fanLetter.ReplyType;
 import today.also.hyuil.domain.market.Market;
-import today.also.hyuil.domain.market.MarketCom;
+import today.also.hyuil.domain.market.MarketComBuy;
 import today.also.hyuil.domain.market.Md;
 import today.also.hyuil.domain.market.Status;
 import today.also.hyuil.domain.member.Member;
@@ -128,10 +125,10 @@ public class MarketBuyController {
             }
 
             // 댓글
-            List<MarketCom> commentList = marketService.readComment(id);
+            List<MarketComBuy> commentList = marketService.readComment(id);
             List<CommentDto> comments = new ArrayList<>();
 
-            for (MarketCom comment : commentList) {
+            for (MarketComBuy comment : commentList) {
 
                 CommentDto commentDto = new CommentDto(comment);
 
@@ -163,7 +160,7 @@ public class MarketBuyController {
 
             if (!webService.commentWriteDtoNullCheck(commentWriteDto)) {
                 System.out.println("comment NULL 들어옴");
-                return badResponseEntity("COMMENT_NULL");
+                return webService.badResponseEntity("COMMENT_NULL");
             }
             Long id = webService.getIdInSession(request);
 //            String memberId = "aaaa1";
@@ -171,25 +168,28 @@ public class MarketBuyController {
             Member member = memberJoinService.findMyAccount(id);
 
             if (member == null) {
-                return badResponseEntity("MEMBER_NOT_FOUND");
+                return webService.badResponseEntity("MEMBER_NOT_FOUND");
             }
 
             Market market = marketService.read(commentWriteDto.getBoardNum());
-            MarketCom comment = getComment(commentWriteDto, member, market);
+            MarketComBuy comment = getComment(commentWriteDto, member, market);
 
             // 작성 완료
-            marketService.writeComment(comment);
+            marketService.writeBuyComment(comment);
             jsonObject.addProperty("data", "WRITE_OK");
 
         } catch (MemberNotFoundException e) {
             e.printStackTrace();
             return webService.badResponseEntity("MEMBER_NOT_FOUND");
+        } catch (ThisEntityIsNull e) {
+            e.printStackTrace();
+            return webService.badResponseEntity("MARKET_NOT_FOUND");
         }
         return webService.okResponseEntity(jsonObject);
     }
 
-    private MarketCom getComment(CommentWriteDto commentWriteDto, Member member, Market market) {
-        MarketCom comment = new MarketCom();
+    private MarketComBuy getComment(CommentWriteDto commentWriteDto, Member member, Market market) {
+        MarketComBuy comment = new MarketComBuy();
         if (commentWriteDto.getCommentNum() == null) {
             comment.setCommentValues(member, ReplyType.COMMENT, commentWriteDto, market);
         } else {
@@ -204,12 +204,6 @@ public class MarketBuyController {
         BuyListDto buyListDto = new BuyListDto(1L, "title", "huil", new Date(), 1L);
         buyList.add(buyListDto);
         model.addAttribute("buyList", buyList);
-    }
-
-    private ResponseEntity<String> badResponseEntity(String cause) {
-        JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("data", cause);
-        return okResponseEntity(jsonObject, ResponseEntity.badRequest());
     }
 
     private boolean buyDtoNullCheck(BuyWriteDto buyWriteDto) {

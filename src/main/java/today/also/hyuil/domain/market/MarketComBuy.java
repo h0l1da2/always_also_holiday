@@ -3,7 +3,6 @@ package today.also.hyuil.domain.market;
 import lombok.Getter;
 import today.also.hyuil.domain.dto.fanLetter.CommentWriteDto;
 import today.also.hyuil.domain.fanLetter.CommentRemover;
-import today.also.hyuil.domain.fanLetter.FanBoard;
 import today.also.hyuil.domain.fanLetter.ReplyType;
 import today.also.hyuil.domain.member.Member;
 
@@ -12,7 +11,7 @@ import java.util.Date;
 
 @Entity
 @Getter
-public class MarketCom {
+public class MarketComBuy {
 
     @Id @GeneratedValue
     private Long id;
@@ -33,7 +32,7 @@ public class MarketCom {
     private CommentRemover commentRemover;
     private Long rootId;
 
-    public MarketCom() {}
+    public MarketComBuy() {}
 
     public void setCommentValues(Member member, ReplyType replyType, CommentWriteDto commentWriteDto, Market market) {
         this.content = commentWriteDto.getContent();

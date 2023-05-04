@@ -4,13 +4,12 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import today.also.hyuil.domain.market.Market;
-import today.also.hyuil.domain.market.MarketCom;
-import today.also.hyuil.domain.market.QMarketCom;
+import today.also.hyuil.domain.market.MarketComBuy;
 
 import javax.persistence.EntityManager;
 import java.util.List;
 
-import static today.also.hyuil.domain.market.QMarketCom.marketCom;
+import static today.also.hyuil.domain.market.QMarketComBuy.marketComBuy;
 import static today.also.hyuil.domain.member.QMember.member;
 
 @Transactional
@@ -37,13 +36,19 @@ public class MarketRepository {
         return market;
     }
 
-    public List<MarketCom> selectMarketComments(Long id) {
-        return query.select(marketCom)
-                .from(marketCom)
-                .where(marketCom.market.id.eq(id))
-                .leftJoin(marketCom.member, member)
+    public List<MarketComBuy> selectMarketBuyComments(Long id) {
+        return query.select(marketComBuy)
+                .from(marketComBuy)
+                .where(marketComBuy.market.id.eq(id))
+                .leftJoin(marketComBuy.member, member)
                 .fetchJoin()
                 .distinct()
                 .fetch();
+    }
+
+    public MarketComBuy insertBuyComment(MarketComBuy comment) {
+        em.persist(comment);
+        em.close();
+        return comment;
     }
 }

@@ -3,7 +3,7 @@ package today.also.hyuil.service.market;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import today.also.hyuil.domain.market.Market;
-import today.also.hyuil.domain.market.MarketCom;
+import today.also.hyuil.domain.market.MarketComBuy;
 import today.also.hyuil.exception.ThisEntityIsNull;
 import today.also.hyuil.repository.market.MarketRepository;
 import today.also.hyuil.service.market.inter.MarketService;
@@ -51,7 +51,12 @@ public class MarketServiceImpl implements MarketService {
     }
 
     @Override
-    public List<MarketCom> readComment(Long id) {
-        return marketRepository.selectMarketComments(id);
+    public List<MarketComBuy> readComment(Long id) {
+        return marketRepository.selectMarketBuyComments(id);
+    }
+
+    @Override
+    public MarketComBuy writeBuyComment(MarketComBuy comment) {
+        return marketRepository.insertBuyComment(comment);
     }
 }

@@ -2,7 +2,7 @@ package today.also.hyuil.domain.dto.fanLetter;
 
 import lombok.Data;
 import today.also.hyuil.domain.fanLetter.Comment;
-import today.also.hyuil.domain.market.MarketCom;
+import today.also.hyuil.domain.market.MarketComBuy;
 
 import java.util.Date;
 
@@ -26,7 +26,7 @@ public class CommentDto {
         this.nickname = comment.getMember().getNickname();
         this.uploadDate = comment.getUploadDate();
     }
-    public CommentDto(MarketCom comment) {
+    public CommentDto(MarketComBuy comment) {
         this.id = comment.getId();
         this.replyId = comment.getRootId();
         this.content = comment.getContent();
