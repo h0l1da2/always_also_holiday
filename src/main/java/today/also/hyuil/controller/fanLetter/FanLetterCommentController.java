@@ -9,7 +9,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import today.also.hyuil.config.security.CustomUserDetails;
 import today.also.hyuil.domain.dto.fanLetter.CommentDto;
-import today.also.hyuil.domain.dto.fanLetter.FanCommentWriteDto;
+import today.also.hyuil.domain.dto.fanLetter.CommentWriteDto;
 import today.also.hyuil.domain.fanLetter.Comment;
 import today.also.hyuil.domain.fanLetter.FanBoard;
 import today.also.hyuil.domain.fanLetter.ReplyType;
@@ -59,9 +59,9 @@ public class FanLetterCommentController {
     }
 
     @PostMapping("/write")
-    public ResponseEntity<String> write(@RequestBody FanCommentWriteDto fanCommentWriteDto, HttpServletRequest request) {
+    public ResponseEntity<String> write(@RequestBody CommentWriteDto commentWriteDto, HttpServletRequest request) {
 
-        System.out.println("fanCommentWriteDto = " + fanCommentWriteDto);
+        System.out.println("fanCommentWriteDto = " + commentWriteDto);
         /**
          * 해당 글 번호, 부모 댓글 번호, 본인 아이디, 내용...
          */
@@ -69,7 +69,7 @@ public class FanLetterCommentController {
 
         try {
 
-            if (!writeDtoNullCheck(fanCommentWriteDto)) {
+            if (!writeDtoNullCheck(commentWriteDto)) {
                 System.out.println("comment NULL 들어옴");
                 return badResponseEntity("COMMENT_NULL");
             }
@@ -82,9 +82,9 @@ public class FanLetterCommentController {
                 return badResponseEntity("MEMBER_NOT_FOUND");
             }
 
-            Map<String, Object> map = fanLetterService.readLetter(fanCommentWriteDto.getLetterNum());
+            Map<String, Object> map = fanLetterService.readLetter(commentWriteDto.getLetterNum());
             FanBoard fanBoard = (FanBoard) map.get("fanLetter");
-            Comment comment = getComment(fanCommentWriteDto, member, fanBoard);
+            Comment comment = getComment(commentWriteDto, member, fanBoard);
 
             // 작성 완료
             fanLetterCommentService.writeComment(comment);
@@ -137,24 +137,24 @@ public class FanLetterCommentController {
                 .body(jsonResponse);
     }
 
-    private Comment getComment(FanCommentWriteDto fanCommentWriteDto, Member member, FanBoard fanBoard) {
+    private Comment getComment(CommentWriteDto commentWriteDto, Member member, FanBoard fanBoard) {
         Comment comment = new Comment();
-        if (fanCommentWriteDto.getCommentNum() == null) {
-            comment.setCommentValues(member, ReplyType.COMMENT, fanCommentWriteDto, fanBoard);
+        if (commentWriteDto.getCommentNum() == null) {
+            comment.setCommentValues(member, ReplyType.COMMENT, commentWriteDto, fanBoard);
         } else {
-            comment.setCommentValues(member, ReplyType.REPLY, fanCommentWriteDto, fanBoard);
+            comment.setCommentValues(member, ReplyType.REPLY, commentWriteDto, fanBoard);
         }
         return comment;
     }
 
-    private boolean writeDtoNullCheck(FanCommentWriteDto fanCommentWriteDto) {
-        if (fanCommentWriteDto == null) {
+    private boolean writeDtoNullCheck(CommentWriteDto commentWriteDto) {
+        if (commentWriteDto == null) {
             return false;
         }
-        if (fanCommentWriteDto.getLetterNum() == null) {
+        if (commentWriteDto.getLetterNum() == null) {
             return false;
         }
-        if (!StringUtils.hasText(fanCommentWriteDto.getContent())) {
+        if (!StringUtils.hasText(commentWriteDto.getContent())) {
             return false;
         }
         return true;

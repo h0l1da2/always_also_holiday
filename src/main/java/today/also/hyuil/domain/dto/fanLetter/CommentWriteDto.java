@@ -3,7 +3,7 @@ package today.also.hyuil.domain.dto.fanLetter;
 import lombok.Data;
 
 @Data
-public class FanCommentWriteDto {
+public class CommentWriteDto {
 
     private Long letterNum;
     // 부모 댓글 번호

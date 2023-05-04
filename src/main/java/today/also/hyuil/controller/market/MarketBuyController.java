@@ -1,15 +1,20 @@
 package today.also.hyuil.controller.market;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import today.also.hyuil.domain.dto.fanLetter.CommentDto;
+import today.also.hyuil.domain.dto.fanLetter.CommentWriteDto;
 import today.also.hyuil.domain.dto.fanLetter.PrevNextDto;
 import today.also.hyuil.domain.dto.market.MarketViewDto;
 import today.also.hyuil.domain.dto.market.buy.BuyListDto;
 import today.also.hyuil.domain.dto.market.buy.BuyWriteDto;
+import today.also.hyuil.domain.fanLetter.Comment;
+import today.also.hyuil.domain.fanLetter.FanBoard;
 import today.also.hyuil.domain.market.Market;
 import today.also.hyuil.domain.market.MarketCom;
 import today.also.hyuil.domain.market.Md;
@@ -143,6 +148,49 @@ public class MarketBuyController {
 
         return "market/buyView";
     }
+
+    @PostMapping("/comment/write")
+    public ResponseEntity<String> write(@RequestBody CommentWriteDto commentWriteDto, HttpServletRequest request) {
+
+        System.out.println("fanCommentWriteDto = " + commentWriteDto);
+        /**
+         * 해당 글 번호, 부모 댓글 번호, 본인 아이디, 내용...
+         */
+        JsonObject jsonObject = new JsonObject();
+
+        try {
+
+            if (!writeDtoNullCheck(commentWriteDto)) {
+                System.out.println("comment NULL 들어옴");
+                return badResponseEntity("COMMENT_NULL");
+            }
+            Long id = webService.getIdInSession(request);
+//            String memberId = "aaaa1";
+
+            Member member = memberJoinService.findMyAccount(id);
+
+            if (member == null) {
+                return badResponseEntity("MEMBER_NOT_FOUND");
+            }
+
+            Map<String, Object> map = fanLetterService.readLetter(commentWriteDto.getLetterNum());
+            FanBoard fanBoard = (FanBoard) map.get("fanLetter");
+            Comment comment = getComment(commentWriteDto, member, fanBoard);
+
+            // 작성 완료
+            fanLetterCommentService.writeComment(comment);
+            jsonObject.addProperty("data", "WRITE_OK");
+
+        } catch (MemberNotFoundException e) {
+            e.printStackTrace();
+            return badResponseEntity("MEMBER_NOT_FOUND");
+        }
+        Gson gson = new Gson();
+        String jsonResponse = gson.toJson(jsonObject);
+        return ResponseEntity.ok()
+                .body(jsonResponse);
+    }
+
 
     private void forTestView(Model model) {
         List<BuyListDto> buyList = new ArrayList<>();

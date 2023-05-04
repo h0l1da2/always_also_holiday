@@ -1,10 +1,9 @@
 package today.also.hyuil.domain.fanLetter;
 
 import lombok.Getter;
-import today.also.hyuil.domain.dto.fanLetter.FanCommentWriteDto;
+import today.also.hyuil.domain.dto.fanLetter.CommentWriteDto;
 import today.also.hyuil.domain.member.Member;
 
-import javax.annotation.Nullable;
 import javax.persistence.*;
 import java.util.Date;
 
@@ -36,13 +35,13 @@ public class Comment {
     public Comment() {
     }
 
-    public void setCommentValues(Member member, ReplyType replyType, FanCommentWriteDto fanCommentWriteDto, FanBoard fanBoard) {
-        this.content = fanCommentWriteDto.getContent();
+    public void setCommentValues(Member member, ReplyType replyType, CommentWriteDto commentWriteDto, FanBoard fanBoard) {
+        this.content = commentWriteDto.getContent();
         this.uploadDate = new Date();
         this.member = member;
         this.fanBoard = fanBoard;
         this.replyType = replyType;
-        this.rootId = fanCommentWriteDto.getCommentNum();
+        this.rootId = commentWriteDto.getCommentNum();
     }
 
     public void removeComment(CommentRemover commentRemover) {
