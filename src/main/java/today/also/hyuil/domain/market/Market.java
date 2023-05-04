@@ -77,4 +77,8 @@ public class Market {
         this.md.modifyMd(market.md.getPrice(), market.md.getQuantity(), market.md.getName());
         this.trade = market.getTrade();
     }
+
+    public void itRemove(MarketRemover marketRemover) {
+        this.marketRemover = marketRemover;
+    }
 }

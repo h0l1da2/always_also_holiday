@@ -81,4 +81,16 @@ public class MarketRepository {
         findMarket.updateNewMarket(market);
         em.close();
     }
+
+    public void updateMarketForRemove(Long marketId, MarketRemover marketRemover) {
+        Market market = em.find(Market.class, marketId);
+        market.itRemove(marketRemover);
+        em.close();
+    }
+
+    public MarketRemover insertMarketRemover(MarketRemover marketRemover) {
+        em.persist(marketRemover);
+        em.close();
+        return marketRemover;
+    }
 }

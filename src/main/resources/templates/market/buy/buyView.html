@@ -23,6 +23,10 @@
                 <div class="post-content pinside30 outline">
                   <div class="mb60">
                     <h1 class="mb20 heading-line" th:text="${market.title}">휴일이 신발 삽니다</h1>
+                    <div class="form-group">
+                    <button id="modifyBtn" name="modifyBtn" class="btn btn-default viewPageBtn" th:unless="${nickname == null}" onclick="clickModify()">수정</button>
+                    <button id="removeBtn" name="removeBtn" class="btn btn-default viewPageBtn" th:unless="${nickname == null}" onclick="clickRemove()">삭제</button>
+                    </div>
                     <h1 class="market-status" th:if="${market.status == 'BUY'}">구매중</h1>
                     <h1 class="market-status-compl" th:if="${market.status == 'COMPLETE'}">구매 완료</h1>
                     <div class="meta"> <span class="meta-date" th:text="'작성 날짜 '+${market.uploadDate}">작성시간</span>
@@ -159,6 +163,49 @@
     </div>
   </div>
 <script th:inline="javascript">
+
+  function clickModify () {
+    let jwt = localStorage.getItem('jwt');
+    let marketId = getLastPath();
+    window.location.href = '/market/buy/modify/' + marketId+'?token='+jwt;
+  }
+
+  function clickRemove() {
+    let jwt = localStorage.getItem('jwt');
+    let marketId = getLastPath();
+
+    if (confirm('정말 삭제하시겠습니까?') == false) {
+      return false;
+    }
+
+    $.ajax({
+      type: 'POST',
+      url: '/market/buy/remove/'+marketId,
+      contentType: 'application/json',
+      headers: { 'Authorization': 'Bearer '+ jwt },
+      success: function(result) {
+        if (result === 'REMOVE_OK') {
+          alert('삭제 완료');
+          window.location.href = '/market/buy';
+        }
+      },
+      error: function(xhr, status, error) {
+        if (xhr.responseText === "NOT_YOUR_MARKET") {
+          alert("본인 글만 지울 수 있습니다");
+          window.location.href = '/market/buy';
+        }
+        if (xhr.responseText === "MEMBER_NOT_FOUND") {
+          alert("로그인 해주세요");
+          window.location.href = '/loginForm?redirectUrl=/market';
+        }
+        if (xhr.responseText === "NOT_FOUND") {
+          alert("이미 삭제 된 글입니다");
+          window.location.href = '/market/buy';
+        }
+
+      }
+    });
+  }
 
   function getLastPath() {
     var parts = window.location.href.split('/');

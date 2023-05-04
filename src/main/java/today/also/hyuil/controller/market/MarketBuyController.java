@@ -63,7 +63,7 @@ public class MarketBuyController {
     }
 
     @GetMapping("/{id}")
-    public String read(@PathVariable Long id, Model model) {
+    public String read(@PathVariable Long id, Model model, HttpServletRequest request) {
 
         try {
             // 글 내용
@@ -101,6 +101,13 @@ public class MarketBuyController {
 
             model.addAttribute("comments", comments);
 
+            // 본인 글인지 확인
+            String nickname = webService.getNicknameInSession(request);
+            if (nickname.equals(market.getMember().getNickname())) {
+                model.addAttribute("nickname", nickname);
+            }
+        } catch (MemberNotFoundException e) {
+            System.out.println("로그인이 안 되어 있음");
         } catch (ThisEntityIsNull e) {
             e.printStackTrace();
             return "exception/notFound";
@@ -228,8 +235,32 @@ public class MarketBuyController {
         return webService.okResponseEntity(jsonObject);
     }
 
+    @PostMapping("/remove/{id}")
+    public ResponseEntity<String> deleteBuy(@PathVariable Long id, HttpServletRequest request) {
 
-    @ResponseBody
+        try {
+//            Long memberId = webService.getIdInSession(request);
+            Long memberId = 8L;
+
+            marketService.removeMarket(id, Who.MEMBER, memberId);
+
+//        } catch (MemberNotFoundException e) {
+//            e.printStackTrace();
+//            return webService.badResponseEntity("MEMBER_NOT_FOUND");
+        } catch (AccessDeniedException e) {
+            e.printStackTrace();
+            return webService.badResponseEntity("NOT_YOUR_MARKET");
+        } catch (NotFoundException e) {
+            e.printStackTrace();
+            return webService.badResponseEntity("NOT_FOUND");
+        }
+
+        return ResponseEntity.ok()
+                .body("REMOVE_OK");
+
+    }
+
+        @ResponseBody
     @PostMapping("/comment/remove")
     public ResponseEntity<String> remove(@RequestBody CommentDto commentDto, HttpServletRequest request) {
         JsonObject jsonObject = new JsonObject();

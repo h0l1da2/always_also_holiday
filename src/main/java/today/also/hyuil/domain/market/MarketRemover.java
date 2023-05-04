@@ -1,6 +1,7 @@
 package today.also.hyuil.domain.market;
 
 import lombok.Getter;
+import today.also.hyuil.domain.Who;
 import today.also.hyuil.domain.member.Admin;
 import today.also.hyuil.domain.member.Member;
 
@@ -17,7 +18,15 @@ public class MarketRemover {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "admin_id")
-    private Admin admin;
+    @Enumerated(EnumType.STRING)
+    private Who who;
+
+    public MarketRemover() {
+    }
+
+    public MarketRemover(Member member, Who who) {
+        this.removeDate = new Date();
+        this.member = member;
+        this.who = who;
+    }
 }

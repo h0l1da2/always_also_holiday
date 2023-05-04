@@ -22,4 +22,5 @@ public interface MarketService {
     void removeBuyComment(Long commentId, Long memberId, Who who) throws NotFoundException, AccessDeniedException;
     Page<Market> listMain(Pageable pageable);
     void modifyMarket(Long id, Market market);
+    void removeMarket(Long marketId, Who who, Long memberId) throws NotFoundException, AccessDeniedException;
 }

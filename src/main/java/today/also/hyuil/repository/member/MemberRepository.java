@@ -80,4 +80,10 @@ public class MemberRepository {
         member.getRole();
         return member;
     }
+
+    public Member findById(Long id) {
+        Member member = em.find(Member.class, id);
+        em.close();
+        return member;
+    }
 }

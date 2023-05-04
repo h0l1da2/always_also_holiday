@@ -11,10 +11,12 @@ import today.also.hyuil.domain.Who;
 import today.also.hyuil.domain.market.MarketComRemover;
 import today.also.hyuil.domain.market.Market;
 import today.also.hyuil.domain.market.MarketCom;
-import today.also.hyuil.domain.market.Md;
+import today.also.hyuil.domain.market.MarketRemover;
+import today.also.hyuil.domain.member.Member;
 import today.also.hyuil.exception.ThisEntityIsNull;
 import today.also.hyuil.repository.market.MarketJpaRepository;
 import today.also.hyuil.repository.market.MarketRepository;
+import today.also.hyuil.repository.member.MemberRepository;
 import today.also.hyuil.service.market.inter.MarketService;
 
 import java.nio.file.AccessDeniedException;
@@ -28,10 +30,12 @@ public class MarketServiceImpl implements MarketService {
 
     private final MarketRepository marketRepository;
     private final MarketJpaRepository marketJpaRepository;
+    private final MemberRepository memberRepository;
 
-    public MarketServiceImpl(MarketRepository marketRepository, MarketJpaRepository marketJpaRepository) {
+    public MarketServiceImpl(MarketRepository marketRepository, MarketJpaRepository marketJpaRepository, MemberRepository memberRepository) {
         this.marketRepository = marketRepository;
         this.marketJpaRepository = marketJpaRepository;
+        this.memberRepository = memberRepository;
     }
 
     @Override
@@ -102,6 +106,26 @@ public class MarketServiceImpl implements MarketService {
     @Override
     public void modifyMarket(Long id, Market market) {
         marketRepository.updateMarket(id, market);
+    }
+
+    @Override
+    public void removeMarket(Long marketId, Who who, Long memberId) throws NotFoundException, AccessDeniedException {
+        Market findMarket = marketRepository.seleteMarket(marketId);
+
+        if (findMarket == null) {
+            throw new NotFoundException("해당 글은 없는 글입니다");
+        }
+        Member findMember = memberRepository.findById(memberId);
+
+        if (!findMember.getId().equals(findMarket.getMember().getId())) {
+            throw new AccessDeniedException("본인 글만 삭제 가능합니다");
+        }
+
+        MarketRemover marketRemover = new MarketRemover(findMember, who);
+
+        MarketRemover remover = marketRepository.insertMarketRemover(marketRemover);
+
+        marketRepository.updateMarketForRemove(marketId, remover);
     }
 
 }

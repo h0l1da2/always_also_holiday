@@ -411,8 +411,9 @@
       });
     });
     $('#modifyBtn').click(function (){
+      let jwt = localStorage.getItem('jwt');
       let letterNum = getLastPath();
-      window.location.href = '/fanLetter/modify/' + letterNum;
+      window.location.href = '/fanLetter/modify/' + letterNum+'?token='+jwt;
     });
 
     // $('#writeBtn').click(function () {

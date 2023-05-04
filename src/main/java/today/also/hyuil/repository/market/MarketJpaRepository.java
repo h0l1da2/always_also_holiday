@@ -11,4 +11,5 @@ public interface MarketJpaRepository extends Repository<Market, Long> {
     @Query(value = "SELECT DISTINCT m FROM Market m LEFT JOIN FETCH m.member",
             countQuery = "SELECT COUNT(DISTINCT m) FROM Member m")
     Page<Market> findAll(Pageable pageable);
+    Market findById(Long id);
 }
