@@ -32,7 +32,6 @@ import today.also.hyuil.service.web.WebService;
 import javax.servlet.http.HttpServletRequest;
 import java.nio.file.AccessDeniedException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -59,13 +58,62 @@ public class MarketBuyController {
 
         model.addAttribute("marketList", marketListDto);
         model.addAttribute("nowPage", pageable.getPageNumber());
-        return "market/buyList";
+        return "market/buy/buyList";
     }
+
+    @GetMapping("/{id}")
+    public String read(@PathVariable Long id, Model model) {
+
+        try {
+            // 글 내용
+            Market market = marketService.read(id);
+
+            MarketViewDto marketViewDto = new MarketViewDto(market);
+            model.addAttribute("market", marketViewDto);
+
+            // 이전글 , 다음글
+            Map<String, Market> map = marketService.prevNextMarket(market.getId());
+            Market prev = map.get("prev");
+            Market next = map.get("next");
+
+            if (prev != null) {
+                model.addAttribute("prev", new PrevNextDto(prev.getId(), prev.getTitle()));
+            }
+            if (next != null) {
+                model.addAttribute("next", new PrevNextDto(next.getId(), next.getTitle()));
+            }
+
+            // 댓글
+            List<MarketCom> commentList = marketService.readBuyComment(id);
+            List<CommentDto> comments = new ArrayList<>();
+
+
+            for (MarketCom comment : commentList) {
+
+                CommentDto commentDto = new CommentDto(comment);
+
+                if (comment.getMarketComRemover() != null) {
+                    commentDto.itRemoved();
+                }
+                comments.add(commentDto);
+            }
+
+            model.addAttribute("comments", comments);
+
+        } catch (ThisEntityIsNull e) {
+            e.printStackTrace();
+            return "exception/notFound";
+        }
+
+
+        return "market/buy/buyView";
+    }
+
 
     @GetMapping("/write")
     public String write(Model model) {
         model.addAttribute("buy", new BuyWriteDto());
-        return "/market/buyWrite";
+        return "/market/buy/buyWrite";
     }
 
     @ResponseBody
@@ -112,53 +160,10 @@ public class MarketBuyController {
                 .body(writeMarket.getId().toString());
     }
 
-    // TODO view 오르도록 수정 필요
-    @GetMapping("/{id}")
-    public String read(@PathVariable Long id, Model model) {
+    @GetMapping("/modify/{id}")
+    public String modifyBuy(@PathVariable Long id) {
 
-        try {
-            // 글 내용
-            Market market = marketService.read(id);
-
-            MarketViewDto marketViewDto = new MarketViewDto(market);
-            model.addAttribute("market", marketViewDto);
-
-            // 이전글 , 다음글
-            Map<String, Market> map = marketService.prevNextMarket(market.getId());
-            Market prev = map.get("prev");
-            Market next = map.get("next");
-
-            if (prev != null) {
-                model.addAttribute("prev", new PrevNextDto(prev.getId(), prev.getTitle()));
-            }
-            if (next != null) {
-                model.addAttribute("next", new PrevNextDto(next.getId(), next.getTitle()));
-            }
-
-            // 댓글
-            List<MarketCom> commentList = marketService.readBuyComment(id);
-            List<CommentDto> comments = new ArrayList<>();
-
-
-            for (MarketCom comment : commentList) {
-
-                CommentDto commentDto = new CommentDto(comment);
-
-                if (comment.getMarketComRemover() != null) {
-                    commentDto.itRemoved();
-                }
-                comments.add(commentDto);
-            }
-
-            model.addAttribute("comments", comments);
-
-        } catch (ThisEntityIsNull e) {
-            e.printStackTrace();
-            return "exception/notFound";
-        }
-
-
-        return "market/buyView";
+        return "market/buy/modifyBuy";
     }
 
     @ResponseBody
