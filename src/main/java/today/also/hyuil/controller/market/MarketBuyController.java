@@ -57,7 +57,6 @@ public class MarketBuyController {
         return "/market/buyWrite";
     }
 
-    // TODO 수량, 가격 검증 로직 추가 필요 (널, 공백 체크)
     @ResponseBody
     @PostMapping("/write")
     public ResponseEntity<String> write(@RequestBody BuyWriteDto buyWriteDto, HttpServletRequest request, Model model) {
@@ -125,8 +124,9 @@ public class MarketBuyController {
             }
 
             // 댓글
-            List<MarketComBuy> commentList = marketService.readComment(id);
+            List<MarketComBuy> commentList = marketService.readBuyComment(id);
             List<CommentDto> comments = new ArrayList<>();
+
 
             for (MarketComBuy comment : commentList) {
 
@@ -137,6 +137,8 @@ public class MarketBuyController {
                 }
                 comments.add(commentDto);
             }
+
+            model.addAttribute("comments", comments);
 
         } catch (ThisEntityIsNull e) {
             e.printStackTrace();
@@ -163,7 +165,7 @@ public class MarketBuyController {
                 return webService.badResponseEntity("COMMENT_NULL");
             }
             Long id = webService.getIdInSession(request);
-//            String memberId = "aaaa1";
+//            Long id = 8L;
 
             Member member = memberJoinService.findMyAccount(id);
 

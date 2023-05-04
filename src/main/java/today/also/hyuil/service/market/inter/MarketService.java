@@ -11,6 +11,6 @@ public interface MarketService {
     Market writeBuy(Market market);
     Map<String, Market> prevNextMarket(Long id);
     Market read(Long id) throws ThisEntityIsNull;
-    List<MarketComBuy> readComment(Long id);
+    List<MarketComBuy> readBuyComment(Long id);
     MarketComBuy writeBuyComment(MarketComBuy comment);
 }

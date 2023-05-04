@@ -51,7 +51,7 @@ public class MarketServiceImpl implements MarketService {
     }
 
     @Override
-    public List<MarketComBuy> readComment(Long id) {
+    public List<MarketComBuy> readBuyComment(Long id) {
         return marketRepository.selectMarketBuyComments(id);
     }
 
