@@ -5,11 +5,13 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
+import today.also.hyuil.domain.dto.fanLetter.CommentDto;
 import today.also.hyuil.domain.dto.fanLetter.PrevNextDto;
 import today.also.hyuil.domain.dto.market.MarketViewDto;
 import today.also.hyuil.domain.dto.market.buy.BuyListDto;
 import today.also.hyuil.domain.dto.market.buy.BuyWriteDto;
 import today.also.hyuil.domain.market.Market;
+import today.also.hyuil.domain.market.MarketCom;
 import today.also.hyuil.domain.market.Md;
 import today.also.hyuil.domain.market.Status;
 import today.also.hyuil.domain.member.Member;
@@ -78,8 +80,6 @@ public class MarketBuyController {
                         .body("MINIMUM_QUANTITY");
             }
 
-//            Member member = memberJoinService.findMyAccount(8L);
-
             Md md = new Md(buyWriteDto);
             Market market = new Market(Status.BUY, buyWriteDto, member, md);
 
@@ -121,10 +121,25 @@ public class MarketBuyController {
                 model.addAttribute("next", new PrevNextDto(next.getId(), next.getTitle()));
             }
 
+            // 댓글
+            List<MarketCom> commentList = marketService.readComment(id);
+            List<CommentDto> comments = new ArrayList<>();
+
+            for (MarketCom comment : commentList) {
+
+                CommentDto commentDto = new CommentDto(comment);
+
+                if (comment.getCommentRemover() != null) {
+                    commentDto.itRemoved();
+                }
+                comments.add(commentDto);
+            }
+
         } catch (ThisEntityIsNull e) {
             e.printStackTrace();
             return "exception/notFound";
         }
+
 
         return "market/buyView";
     }

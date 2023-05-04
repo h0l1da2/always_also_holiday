@@ -2,7 +2,6 @@ package today.also.hyuil.domain.dto.market;
 
 import lombok.Data;
 import today.also.hyuil.domain.market.Market;
-import today.also.hyuil.domain.market.Status;
 import today.also.hyuil.domain.market.Trade;
 
 import java.util.Date;
@@ -12,27 +11,32 @@ public class MarketViewDto {
 
     private Long view;
     private String title;
-    private Status status;
+    private String status;
     private Date uploadDate;
     private String nickname;
     private String name;
     private Long price;
     private Long quantity;
-    private Trade trade;
+    private String trade;
+    private String content;
 
     public MarketViewDto() {
     }
 
     public MarketViewDto(Market market) {
         this.view = market.getView();
+        this.content = market.getContent();
         this.title = market.getTitle();
-        this.status = market.getStatus();
+        this.status = market.getStatus().toString();
         this.uploadDate = market.getUploadDate();
         this.nickname = market.getMember().getNickname();
         this.name = market.getMd().getName();
         this.price = market.getMd().getPrice();
         this.quantity = market.getMd().getQuantity();
-        this.trade = market.getTrade();
-
+        if (market.getTrade().equals(Trade.DELIVERY)) {
+            this.trade = "택배";
+        } else {
+            this.trade = "직거래";
+        }
     }
 }

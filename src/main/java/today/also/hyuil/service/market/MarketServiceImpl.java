@@ -3,11 +3,13 @@ package today.also.hyuil.service.market;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import today.also.hyuil.domain.market.Market;
+import today.also.hyuil.domain.market.MarketCom;
 import today.also.hyuil.exception.ThisEntityIsNull;
 import today.also.hyuil.repository.market.MarketRepository;
 import today.also.hyuil.service.market.inter.MarketService;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Transactional
@@ -46,5 +48,10 @@ public class MarketServiceImpl implements MarketService {
             throw new ThisEntityIsNull("해당 아이디의 구매글이 없습니다");
         }
         return market;
+    }
+
+    @Override
+    public List<MarketCom> readComment(Long id) {
+        return marketRepository.selectMarketComments(id);
     }
 }
