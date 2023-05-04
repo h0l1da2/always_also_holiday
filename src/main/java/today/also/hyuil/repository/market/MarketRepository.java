@@ -3,6 +3,7 @@ package today.also.hyuil.repository.market;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
+import org.yaml.snakeyaml.error.Mark;
 import today.also.hyuil.domain.market.MarketComRemover;
 import today.also.hyuil.domain.market.Market;
 import today.also.hyuil.domain.market.MarketCom;
@@ -70,5 +71,11 @@ public class MarketRepository {
         MarketCom MarketCom = em.find(MarketCom.class, id);
         MarketCom.itRemove(remover);
         em.close();
+    }
+
+    public Market seleteAndViewCntMarket(Long id) {
+        Market market = em.find(Market.class, id);
+        market.updateViewCnt();
+        return market;
     }
 }

@@ -53,7 +53,7 @@ public class MarketServiceImpl implements MarketService {
 
     @Override
     public Market read(Long id) throws ThisEntityIsNull {
-        Market market = marketRepository.seleteMarket(id);
+        Market market = marketRepository.seleteAndViewCntMarket(id);
 
         if (market == null) {
             throw new ThisEntityIsNull("해당 아이디의 구매글이 없습니다");

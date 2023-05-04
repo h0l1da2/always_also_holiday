@@ -47,4 +47,8 @@ public class Market {
         this.trade = buyWriteDto.getTrade();
         this.view = 0L;
     }
+
+    public void updateViewCnt() {
+        this.view++;
+    }
 }
