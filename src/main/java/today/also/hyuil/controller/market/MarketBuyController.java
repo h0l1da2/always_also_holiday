@@ -11,33 +11,28 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 import today.also.hyuil.domain.Who;
-import today.also.hyuil.domain.dto.fanLetter.*;
+import today.also.hyuil.domain.dto.fanLetter.BoardListDto;
+import today.also.hyuil.domain.dto.fanLetter.CommentDto;
+import today.also.hyuil.domain.dto.fanLetter.CommentWriteDto;
+import today.also.hyuil.domain.dto.fanLetter.PrevNextDto;
 import today.also.hyuil.domain.dto.market.MarketViewDto;
 import today.also.hyuil.domain.dto.market.buy.BuyWriteDto;
 import today.also.hyuil.domain.fanLetter.ReplyType;
-import today.also.hyuil.domain.file.FileInfo;
-import today.also.hyuil.domain.file.Files;
-import today.also.hyuil.domain.file.IsWhere;
 import today.also.hyuil.domain.market.Market;
 import today.also.hyuil.domain.market.MarketCom;
 import today.also.hyuil.domain.market.Md;
 import today.also.hyuil.domain.market.Status;
 import today.also.hyuil.domain.member.Member;
-import today.also.hyuil.exception.FileNumbersLimitExceededException;
 import today.also.hyuil.exception.MemberNotFoundException;
 import today.also.hyuil.exception.ThisEntityIsNull;
-import today.also.hyuil.exception.fanLetter.MimeTypeNotMatchException;
 import today.also.hyuil.service.market.inter.MarketService;
 import today.also.hyuil.service.member.inter.MemberJoinService;
 import today.also.hyuil.service.web.WebService;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
 import java.nio.file.AccessDeniedException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -197,8 +192,8 @@ public class MarketBuyController {
                                          @RequestBody BuyWriteDto buyWriteDto) {
         JsonObject jsonObject = new JsonObject();
         try {
-//            Long memberId = webService.getIdInSession(request);
-            Long memberId = 8L;
+            Long memberId = webService.getIdInSession(request);
+//            Long memberId = 8L;
 
             if (!buyDtoNullCheck(buyWriteDto)) {
                 System.out.println("글 내용이 없음");
@@ -222,9 +217,9 @@ public class MarketBuyController {
             marketService.modifyMarket(id, findMarket);
             jsonObject.addProperty("data", "MODIFY_OK");
 
-//        } catch (MemberNotFoundException e) {
-//            e.printStackTrace();
-//            return webService.badResponseEntity("NOT_LOGIN");
+        } catch (MemberNotFoundException e) {
+            e.printStackTrace();
+            return webService.badResponseEntity("NOT_LOGIN");
         } catch (ThisEntityIsNull e) {
             e.printStackTrace();
             return webService.badResponseEntity("NOT_FOUND");

@@ -62,10 +62,9 @@ public class CustomOAuth2AuthorizationCodeGrantFilter extends OAuth2Authorizatio
 
         String requestURI = request.getRequestURL().toString();
 
-        HttpSession session = request.getSession(false);
+        HttpSession session = request.getSession();
 
         if (session != null) {
-            System.out.println("세션 널");
             String originState = String.valueOf(session.getAttribute("state"));
             String state = request.getParameter("state");
 
