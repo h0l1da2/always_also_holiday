@@ -14,7 +14,8 @@ import today.also.hyuil.domain.market.Md;
 import today.also.hyuil.domain.market.Status;
 import today.also.hyuil.domain.member.Member;
 import today.also.hyuil.exception.MemberNotFoundException;
-import today.also.hyuil.service.market.MarketService;
+import today.also.hyuil.exception.ThisEntityIsNull;
+import today.also.hyuil.service.market.inter.MarketService;
 import today.also.hyuil.service.member.inter.MemberJoinService;
 import today.also.hyuil.service.web.WebService;
 
@@ -84,21 +85,6 @@ public class MarketBuyController {
 
             writeMarket = marketService.writeBuy(market);
 
-            MarketViewDto marketViewDto = new MarketViewDto(writeMarket);
-            model.addAttribute("market", marketViewDto);
-
-            // 이전글 , 다음글
-            Map<String, Market> map = marketService.prevNextMarket(writeMarket.getId());
-            Market prev = map.get("prev");
-            Market next = map.get("next");
-
-            if (prev != null) {
-                model.addAttribute("prev", new PrevNextDto(prev.getId(), prev.getTitle()));
-            }
-            if (next != null) {
-                model.addAttribute("next", new PrevNextDto(next.getId(), next.getTitle()));
-            }
-
         } catch (MemberNotFoundException e) {
             e.printStackTrace();
             return ResponseEntity.badRequest()
@@ -111,6 +97,36 @@ public class MarketBuyController {
 
         return ResponseEntity.ok()
                 .body(writeMarket.getId().toString());
+    }
+
+    @GetMapping("/{id}")
+    public String read(@PathVariable Long id, Model model) {
+
+        try {
+            // 글 내용
+            Market market = marketService.read(id);
+
+            MarketViewDto marketViewDto = new MarketViewDto(market);
+            model.addAttribute("market", marketViewDto);
+
+            // 이전글 , 다음글
+            Map<String, Market> map = marketService.prevNextMarket(market.getId());
+            Market prev = map.get("prev");
+            Market next = map.get("next");
+
+            if (prev != null) {
+                model.addAttribute("prev", new PrevNextDto(prev.getId(), prev.getTitle()));
+            }
+            if (next != null) {
+                model.addAttribute("next", new PrevNextDto(next.getId(), next.getTitle()));
+            }
+
+        } catch (ThisEntityIsNull e) {
+            e.printStackTrace();
+            return "exception/notFound";
+        }
+
+        return "market/buyView";
     }
 
     private void forTestView(Model model) {
