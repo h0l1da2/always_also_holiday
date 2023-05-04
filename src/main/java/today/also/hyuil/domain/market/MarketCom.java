@@ -1,7 +1,9 @@
 package today.also.hyuil.domain.market;
 
 import lombok.Getter;
+import today.also.hyuil.domain.dto.fanLetter.CommentWriteDto;
 import today.also.hyuil.domain.fanLetter.CommentRemover;
+import today.also.hyuil.domain.fanLetter.FanBoard;
 import today.also.hyuil.domain.fanLetter.ReplyType;
 import today.also.hyuil.domain.member.Member;
 
@@ -32,4 +34,13 @@ public class MarketCom {
     private Long rootId;
 
     public MarketCom() {}
+
+    public void setCommentValues(Member member, ReplyType replyType, CommentWriteDto commentWriteDto, Market market) {
+        this.content = commentWriteDto.getContent();
+        this.uploadDate = new Date();
+        this.member = member;
+        this.market = market;
+        this.replyType = replyType;
+        this.rootId = commentWriteDto.getCommentNum();
+    }
 }

@@ -5,7 +5,6 @@ import com.google.gson.JsonObject;
 import javassist.NotFoundException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import today.also.hyuil.config.security.CustomUserDetails;
 import today.also.hyuil.domain.dto.fanLetter.CommentDto;
@@ -69,9 +68,9 @@ public class FanLetterCommentController {
 
         try {
 
-            if (!writeDtoNullCheck(commentWriteDto)) {
+            if (!webService.commentWriteDtoNullCheck(commentWriteDto)) {
                 System.out.println("comment NULL 들어옴");
-                return badResponseEntity("COMMENT_NULL");
+                return webService.badResponseEntity("COMMENT_NULL");
             }
             Long id = webService.getIdInSession(request);
 //            String memberId = "aaaa1";
@@ -79,10 +78,10 @@ public class FanLetterCommentController {
             Member member = memberJoinService.findMyAccount(id);
 
             if (member == null) {
-                return badResponseEntity("MEMBER_NOT_FOUND");
+                return webService.badResponseEntity("MEMBER_NOT_FOUND");
             }
 
-            Map<String, Object> map = fanLetterService.readLetter(commentWriteDto.getLetterNum());
+            Map<String, Object> map = fanLetterService.readLetter(commentWriteDto.getBoardNum());
             FanBoard fanBoard = (FanBoard) map.get("fanLetter");
             Comment comment = getComment(commentWriteDto, member, fanBoard);
 
@@ -92,12 +91,9 @@ public class FanLetterCommentController {
 
         } catch (MemberNotFoundException e) {
             e.printStackTrace();
-            return badResponseEntity("MEMBER_NOT_FOUND");
+            return webService.badResponseEntity("MEMBER_NOT_FOUND");
         }
-        Gson gson = new Gson();
-        String jsonResponse = gson.toJson(jsonObject);
-        return ResponseEntity.ok()
-                .body(jsonResponse);
+        return webService.okResponseEntity(jsonObject);
     }
 
     @PostMapping("/remove")
@@ -128,14 +124,6 @@ public class FanLetterCommentController {
                 .body("REMOVE_OK");
     }
 
-    private ResponseEntity<String> badResponseEntity(String cause) {
-        JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("data", cause);
-        Gson gson = new Gson();
-        String jsonResponse = gson.toJson(jsonObject);
-        return ResponseEntity.badRequest()
-                .body(jsonResponse);
-    }
 
     private Comment getComment(CommentWriteDto commentWriteDto, Member member, FanBoard fanBoard) {
         Comment comment = new Comment();
@@ -145,19 +133,6 @@ public class FanLetterCommentController {
             comment.setCommentValues(member, ReplyType.REPLY, commentWriteDto, fanBoard);
         }
         return comment;
-    }
-
-    private boolean writeDtoNullCheck(CommentWriteDto commentWriteDto) {
-        if (commentWriteDto == null) {
-            return false;
-        }
-        if (commentWriteDto.getLetterNum() == null) {
-            return false;
-        }
-        if (!StringUtils.hasText(commentWriteDto.getContent())) {
-            return false;
-        }
-        return true;
     }
 
 

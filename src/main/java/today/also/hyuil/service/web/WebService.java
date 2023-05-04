@@ -1,6 +1,11 @@
 package today.also.hyuil.service.web;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
+import today.also.hyuil.domain.dto.fanLetter.CommentWriteDto;
 import today.also.hyuil.domain.member.Member;
 import today.also.hyuil.exception.MemberNotFoundException;
 
@@ -38,6 +43,35 @@ public class WebService {
             throw new MemberNotFoundException("세션에 닉네임이 없음");
         }
         return nickname;
+    }
+
+    public ResponseEntity<String> okResponseEntity(JsonObject jsonObject) {
+        Gson gson = new Gson();
+        String jsonResponse = gson.toJson(jsonObject);
+        return ResponseEntity.ok()
+                .body(jsonResponse);
+    }
+
+    public ResponseEntity<String> badResponseEntity(String cause) {
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("data", cause);
+        Gson gson = new Gson();
+        String jsonResponse = gson.toJson(jsonObject);
+        return ResponseEntity.badRequest()
+                .body(jsonResponse);
+    }
+
+    public boolean commentWriteDtoNullCheck(CommentWriteDto commentWriteDto) {
+        if (commentWriteDto == null) {
+            return false;
+        }
+        if (commentWriteDto.getBoardNum() == null) {
+            return false;
+        }
+        if (!StringUtils.hasText(commentWriteDto.getContent())) {
+            return false;
+        }
+        return true;
     }
 
 }
