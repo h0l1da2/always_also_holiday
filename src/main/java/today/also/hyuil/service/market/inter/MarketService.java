@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable;
 import today.also.hyuil.domain.Who;
 import today.also.hyuil.domain.market.Market;
 import today.also.hyuil.domain.market.MarketCom;
+import today.also.hyuil.domain.market.Md;
 import today.also.hyuil.exception.ThisEntityIsNull;
 
 import java.nio.file.AccessDeniedException;
@@ -20,4 +21,5 @@ public interface MarketService {
     MarketCom writeBuyComment(MarketCom comment);
     void removeBuyComment(Long commentId, Long memberId, Who who) throws NotFoundException, AccessDeniedException;
     Page<Market> listMain(Pageable pageable);
+    void modifyMarket(Long id, Market market);
 }

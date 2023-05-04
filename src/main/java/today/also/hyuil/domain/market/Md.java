@@ -26,4 +26,10 @@ public class Md {
         this.name = buyWriteDto.getName();
         this.quantity = buyWriteDto.getQuantity();
     }
+
+    public void modifyMd(Long price, Long quantity, String name) {
+        this.price = price;
+        this.quantity = quantity;
+        this.name = name;
+    }
 }

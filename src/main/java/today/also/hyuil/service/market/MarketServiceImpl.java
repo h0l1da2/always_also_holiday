@@ -11,6 +11,7 @@ import today.also.hyuil.domain.Who;
 import today.also.hyuil.domain.market.MarketComRemover;
 import today.also.hyuil.domain.market.Market;
 import today.also.hyuil.domain.market.MarketCom;
+import today.also.hyuil.domain.market.Md;
 import today.also.hyuil.exception.ThisEntityIsNull;
 import today.also.hyuil.repository.market.MarketJpaRepository;
 import today.also.hyuil.repository.market.MarketRepository;
@@ -97,4 +98,10 @@ public class MarketServiceImpl implements MarketService {
 
         return marketJpaRepository.findAll(pageRequest);
     }
+
+    @Override
+    public void modifyMarket(Long id, Market market) {
+        marketRepository.updateMarket(id, market);
+    }
+
 }

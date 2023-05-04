@@ -47,8 +47,34 @@ public class Market {
         this.trade = buyWriteDto.getTrade();
         this.view = 0L;
     }
+    public Market(Status status, BuyWriteDto buyWriteDto, Md md) {
+        this.title = buyWriteDto.getTitle();
+        this.content = buyWriteDto.getContent();
+        this.status = status;
+        this.uploadDate = new Date();
+        this.updateDate = new Date();
+        this.md = md;
+        this.trade = buyWriteDto.getTrade();
+        this.view = 0L;
+    }
 
     public void updateViewCnt() {
         this.view++;
+    }
+
+    public void changeToBuyWriteDto(BuyWriteDto buyWriteDto) {
+        this.title = buyWriteDto.getTitle();
+        this.content = buyWriteDto.getContent();
+        this.updateDate = new Date();
+        this.md.modifyMd(buyWriteDto.getPrice(), buyWriteDto.getQuantity(), buyWriteDto.getName());
+        this.trade = buyWriteDto.getTrade();
+    }
+
+    public void updateNewMarket(Market market) {
+        this.title = market.getTitle();
+        this.content = market.getContent();
+        this.updateDate = new Date();
+        this.md.modifyMd(market.md.getPrice(), market.md.getQuantity(), market.md.getName());
+        this.trade = market.getTrade();
     }
 }

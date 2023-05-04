@@ -28,7 +28,7 @@ public class WebService {
             String stringId = String.valueOf(session.getAttribute("id"));
             id = Long.parseLong(stringId);
 
-        } catch (NullPointerException e) {
+        } catch (NumberFormatException e) {
             throw new MemberNotFoundException("세션에 아이디가 없음");
         }
         return id;

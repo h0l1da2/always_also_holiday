@@ -74,7 +74,7 @@
         <!-- Button -->
         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
           <div class="form-group">
-            <button type="button" id="writeBtn" class="btn btn-default">글쓰기</button>
+            <button type="button" id="modifyBtn" class="btn btn-default">글수정</button>
           </div>
         </div>
       </form>
@@ -83,6 +83,14 @@
 </div>
 <script th:inline="javascript">
 
+  function getNum() {
+    let url = window.location.href;
+
+    let start = url.lastIndexOf('/') + 1;
+    let end = url.length;
+    return url.substring(start, end);
+  }
+
   function getTrade() {
     let trade = document.getElementById('trade');
     let value = (trade.options[trade.selectedIndex].value);
@@ -90,7 +98,9 @@
   }
 
   $( document ).ready( function() {
-    $('#writeBtn').click(function () {
+
+    $('#modifyBtn').click(function () {
+
       let jwt = localStorage.getItem('jwt');
 
       let title = document.getElementById('title').value;
@@ -99,6 +109,7 @@
       let quantity = document.getElementById('quantity').value;
       let content = document.getElementById('content').value;
       let trade = getTrade();
+      let num = getNum();
 
       let check = /^[0-9]+$/;
 
@@ -128,16 +139,18 @@
         return false;
       }
 
+
       $.ajax({
         type: 'POST',
-        url: '/market/buy/write',
+        url: '/market/buy/modify/'+num,
         contentType: "application/json",
         data: JSON.stringify({title: title, name: name, price: price, quantity: quantity, content: content, trade: trade}),
-        dataType: 'json',
         headers: { 'Authorization': 'Bearer '+ jwt },
-        success: function (result) {
-          alert("작성 완료");
-          window.location.href = '/market/buy/' + result;
+        dataType: 'text',
+        success: function(result) {
+          alert('수정 완료');
+          window.location.href = '/market/buy/' + num;
+
         },
         error: function(xhr, status, error) {
           if (xhr.responseText === "DTO_NULL") {
@@ -163,10 +176,9 @@
           console.error(error);
         }
       });
-
-
-    });
+    })
   })
+
 </script>
 </body>
 </th:block>
