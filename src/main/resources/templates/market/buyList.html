@@ -51,18 +51,18 @@
             </tr>
             </tbody>
           </table>
-<!--          <div class="table-center"-->
-<!--          th:with="-->
-<!--          start=${(buyList.number/10) * 10 + 1},-->
-<!--          end=(${(buyList.totalPages == 0) ? 1 : (start + 9 < buyList.totalPages ? start + 9 : buyList.totalPages)})">-->
-<!--            &lt;!&ndash; 현재페이지 &ndash;&gt;-->
-<!--              <a class="board-number this-page" th:if="${start > 1}"  th:href="@{/market/buy(page=${start - 2})}">&lt;</a>-->
-<!--            <th:block th:each="page: ${#numbers.sequence(start, end)}">-->
-<!--            <a class="board-number" th:text="${page}" th:href="@{/market/buy(page=${page - 1})}"-->
-<!--               th:classappend="${nowPage + 1 == page} ? 'this-page' : ''">1</a>-->
-<!--            </th:block>-->
-<!--            <a class="board-number this-page" th:if="${end < buyList.totalPages}" th:href="@{/market/buy(page=${start + 9})}">&gt;</a>-->
-<!--          </div>-->
+          <div class="table-center"
+          th:with="
+          start=${(marketList.number/10) * 10 + 1},
+          end=(${(marketList.totalPages == 0) ? 1 : (start + 9 < marketList.totalPages ? start + 9 : marketList.totalPages)})">
+            <!-- 현재페이지 -->
+              <a class="board-number this-page" th:if="${start > 1}"  th:href="@{/market/buy(page=${start - 2})}">&lt;</a>
+            <th:block th:each="page: ${#numbers.sequence(start, end)}">
+            <a class="board-number" th:text="${page}" th:href="@{/market/buy(page=${page - 1})}"
+               th:classappend="${nowPage + 1 == page} ? 'this-page' : ''">1</a>
+            </th:block>
+            <a class="board-number this-page" th:if="${end < marketList.totalPages}" th:href="@{/market/buy(page=${start + 9})}">&gt;</a>
+          </div>
         </div>
       </div>
     </div>
