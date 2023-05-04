@@ -1,13 +1,17 @@
 package today.also.hyuil.service.market;
 
+import javassist.NotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import today.also.hyuil.domain.Who;
+import today.also.hyuil.domain.market.MarketComRemover;
 import today.also.hyuil.domain.market.Market;
-import today.also.hyuil.domain.market.MarketComBuy;
+import today.also.hyuil.domain.market.MarketCom;
 import today.also.hyuil.exception.ThisEntityIsNull;
 import today.also.hyuil.repository.market.MarketRepository;
 import today.also.hyuil.service.market.inter.MarketService;
 
+import java.nio.file.AccessDeniedException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,12 +55,30 @@ public class MarketServiceImpl implements MarketService {
     }
 
     @Override
-    public List<MarketComBuy> readBuyComment(Long id) {
+    public List<MarketCom> readBuyComment(Long id) {
         return marketRepository.selectMarketBuyComments(id);
     }
 
     @Override
-    public MarketComBuy writeBuyComment(MarketComBuy comment) {
+    public MarketCom writeBuyComment(MarketCom comment) {
         return marketRepository.insertBuyComment(comment);
+    }
+
+    @Override
+    public void removeBuyComment(Long commentId, Long memberId, Who who) throws NotFoundException, AccessDeniedException {
+        MarketCom comment = marketRepository.findByIdMarketCom(commentId);
+
+        if (comment == null) {
+            throw new NotFoundException("해당 댓글을 찾을 수 없습니다");
+        }
+
+        if (!comment.getMember().getId().equals(memberId)) {
+            throw new AccessDeniedException("댓글을 쓴 본인만 삭제가 가능합니다");
+        }
+
+        MarketComRemover remover = marketRepository.insertMarketComRemover(
+                new MarketComRemover(comment.getMember(), who));
+
+        marketRepository.updateMarketComRemover(comment.getId(), remover);
     }
 }

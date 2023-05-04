@@ -2,7 +2,6 @@ package today.also.hyuil.domain.market;
 
 import lombok.Getter;
 import today.also.hyuil.domain.dto.fanLetter.CommentWriteDto;
-import today.also.hyuil.domain.fanLetter.CommentRemover;
 import today.also.hyuil.domain.fanLetter.ReplyType;
 import today.also.hyuil.domain.member.Member;
 
@@ -11,7 +10,7 @@ import java.util.Date;
 
 @Entity
 @Getter
-public class MarketComBuy {
+public class MarketCom {
 
     @Id @GeneratedValue
     private Long id;
@@ -28,11 +27,11 @@ public class MarketComBuy {
     @JoinColumn(name = "member_id")
     private Member member;
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "comment_remover_id")
-    private CommentRemover commentRemover;
+    @JoinColumn(name = "market_com_remover_id")
+    private MarketComRemover marketComRemover;
     private Long rootId;
 
-    public MarketComBuy() {}
+    public MarketCom() {}
 
     public void setCommentValues(Member member, ReplyType replyType, CommentWriteDto commentWriteDto, Market market) {
         this.content = commentWriteDto.getContent();
@@ -41,5 +40,9 @@ public class MarketComBuy {
         this.market = market;
         this.replyType = replyType;
         this.rootId = commentWriteDto.getCommentNum();
+    }
+
+    public void itRemove(MarketComRemover remover) {
+        this.marketComRemover = remover;
     }
 }

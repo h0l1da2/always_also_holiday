@@ -1,11 +1,15 @@
 package today.also.hyuil.controller.market;
 
 import com.google.gson.JsonObject;
+import javassist.NotFoundException;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
+import today.also.hyuil.config.security.CustomUserDetails;
+import today.also.hyuil.domain.Who;
 import today.also.hyuil.domain.dto.fanLetter.CommentDto;
 import today.also.hyuil.domain.dto.fanLetter.CommentWriteDto;
 import today.also.hyuil.domain.dto.fanLetter.PrevNextDto;
@@ -14,7 +18,7 @@ import today.also.hyuil.domain.dto.market.buy.BuyListDto;
 import today.also.hyuil.domain.dto.market.buy.BuyWriteDto;
 import today.also.hyuil.domain.fanLetter.ReplyType;
 import today.also.hyuil.domain.market.Market;
-import today.also.hyuil.domain.market.MarketComBuy;
+import today.also.hyuil.domain.market.MarketCom;
 import today.also.hyuil.domain.market.Md;
 import today.also.hyuil.domain.market.Status;
 import today.also.hyuil.domain.member.Member;
@@ -25,6 +29,7 @@ import today.also.hyuil.service.member.inter.MemberJoinService;
 import today.also.hyuil.service.web.WebService;
 
 import javax.servlet.http.HttpServletRequest;
+import java.nio.file.AccessDeniedException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -124,15 +129,15 @@ public class MarketBuyController {
             }
 
             // 댓글
-            List<MarketComBuy> commentList = marketService.readBuyComment(id);
+            List<MarketCom> commentList = marketService.readBuyComment(id);
             List<CommentDto> comments = new ArrayList<>();
 
 
-            for (MarketComBuy comment : commentList) {
+            for (MarketCom comment : commentList) {
 
                 CommentDto commentDto = new CommentDto(comment);
 
-                if (comment.getCommentRemover() != null) {
+                if (comment.getMarketComRemover() != null) {
                     commentDto.itRemoved();
                 }
                 comments.add(commentDto);
@@ -149,6 +154,36 @@ public class MarketBuyController {
         return "market/buyView";
     }
 
+    @ResponseBody
+    @PostMapping("/comment/remove")
+    public ResponseEntity<String> remove(@RequestBody CommentDto commentDto, HttpServletRequest request) {
+        JsonObject jsonObject = new JsonObject();
+        try {
+            Long memberId = webService.getIdInSession(request);
+
+            marketService.removeBuyComment(commentDto.getId(), memberId, Who.MEMBER);
+            jsonObject.addProperty("data", "REMOVE_OK");
+        } catch (MemberNotFoundException e) {
+            e.printStackTrace();
+            return webService.badResponseEntity("MEMBER_NOT_FOUND");
+        } catch (NotFoundException e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest()
+                    .body("COMMENT_NOT_FOUND");
+        } catch (AccessDeniedException e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest()
+                    .body("NOT_YOUR_COMMENT");
+        } catch (NumberFormatException e) {
+            System.out.println("타입 변환 에러(코멘트 파라미터가 숫자 타입이 아님)");
+            return ResponseEntity.badRequest()
+                    .body("BAD_COMMENT_ID");
+        }
+
+        return webService.okResponseEntity(jsonObject);
+    }
+
+    @ResponseBody
     @PostMapping("/comment/write")
     public ResponseEntity<String> write(@RequestBody CommentWriteDto commentWriteDto, HttpServletRequest request) {
 
@@ -174,7 +209,7 @@ public class MarketBuyController {
             }
 
             Market market = marketService.read(commentWriteDto.getBoardNum());
-            MarketComBuy comment = getComment(commentWriteDto, member, market);
+            MarketCom comment = getComment(commentWriteDto, member, market);
 
             // 작성 완료
             marketService.writeBuyComment(comment);
@@ -190,8 +225,8 @@ public class MarketBuyController {
         return webService.okResponseEntity(jsonObject);
     }
 
-    private MarketComBuy getComment(CommentWriteDto commentWriteDto, Member member, Market market) {
-        MarketComBuy comment = new MarketComBuy();
+    private MarketCom getComment(CommentWriteDto commentWriteDto, Member member, Market market) {
+        MarketCom comment = new MarketCom();
         if (commentWriteDto.getCommentNum() == null) {
             comment.setCommentValues(member, ReplyType.COMMENT, commentWriteDto, market);
         } else {

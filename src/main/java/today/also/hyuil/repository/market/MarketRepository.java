@@ -3,13 +3,15 @@ package today.also.hyuil.repository.market;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
+import today.also.hyuil.domain.market.MarketComRemover;
 import today.also.hyuil.domain.market.Market;
-import today.also.hyuil.domain.market.MarketComBuy;
+import today.also.hyuil.domain.market.MarketCom;
+import today.also.hyuil.domain.market.QMarketCom;
 
 import javax.persistence.EntityManager;
 import java.util.List;
 
-import static today.also.hyuil.domain.market.QMarketComBuy.marketComBuy;
+import static today.also.hyuil.domain.market.QMarketCom.marketCom;
 import static today.also.hyuil.domain.member.QMember.member;
 
 @Transactional
@@ -36,19 +38,38 @@ public class MarketRepository {
         return market;
     }
 
-    public List<MarketComBuy> selectMarketBuyComments(Long id) {
-        return query.select(marketComBuy)
-                .from(marketComBuy)
-                .where(marketComBuy.market.id.eq(id))
-                .leftJoin(marketComBuy.member, member)
+    public List<MarketCom> selectMarketBuyComments(Long id) {
+        return query.select(marketCom)
+                .from(marketCom)
+                .where(marketCom.market.id.eq(id))
+                .leftJoin(marketCom.member, member)
                 .fetchJoin()
                 .distinct()
                 .fetch();
     }
 
-    public MarketComBuy insertBuyComment(MarketComBuy comment) {
+    public MarketCom insertBuyComment(MarketCom comment) {
         em.persist(comment);
         em.close();
         return comment;
+    }
+
+    public MarketCom findByIdMarketCom(Long commentId) {
+        MarketCom comment = em.find(MarketCom.class, commentId);
+        comment.getMember();
+        em.close();
+        return comment;
+    }
+
+    public MarketComRemover insertMarketComRemover(MarketComRemover marketComRemover) {
+        em.persist(marketComRemover);
+        em.close();
+        return marketComRemover;
+    }
+
+    public void updateMarketComRemover(Long id, MarketComRemover remover) {
+        MarketCom MarketCom = em.find(MarketCom.class, id);
+        MarketCom.itRemove(remover);
+        em.close();
     }
 }
