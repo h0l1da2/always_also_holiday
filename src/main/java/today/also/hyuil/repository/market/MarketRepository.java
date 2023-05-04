@@ -6,7 +6,6 @@ import org.springframework.transaction.annotation.Transactional;
 import today.also.hyuil.domain.market.MarketComRemover;
 import today.also.hyuil.domain.market.Market;
 import today.also.hyuil.domain.market.MarketCom;
-import today.also.hyuil.domain.market.QMarketCom;
 
 import javax.persistence.EntityManager;
 import java.util.List;

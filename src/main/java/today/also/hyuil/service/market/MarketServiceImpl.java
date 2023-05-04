@@ -1,6 +1,10 @@
 package today.also.hyuil.service.market;
 
 import javassist.NotFoundException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import today.also.hyuil.domain.Who;
@@ -8,6 +12,7 @@ import today.also.hyuil.domain.market.MarketComRemover;
 import today.also.hyuil.domain.market.Market;
 import today.also.hyuil.domain.market.MarketCom;
 import today.also.hyuil.exception.ThisEntityIsNull;
+import today.also.hyuil.repository.market.MarketJpaRepository;
 import today.also.hyuil.repository.market.MarketRepository;
 import today.also.hyuil.service.market.inter.MarketService;
 
@@ -21,9 +26,11 @@ import java.util.Map;
 public class MarketServiceImpl implements MarketService {
 
     private final MarketRepository marketRepository;
+    private final MarketJpaRepository marketJpaRepository;
 
-    public MarketServiceImpl(MarketRepository marketRepository) {
+    public MarketServiceImpl(MarketRepository marketRepository, MarketJpaRepository marketJpaRepository) {
         this.marketRepository = marketRepository;
+        this.marketJpaRepository = marketJpaRepository;
     }
 
     @Override
@@ -80,5 +87,14 @@ public class MarketServiceImpl implements MarketService {
                 new MarketComRemover(comment.getMember(), who));
 
         marketRepository.updateMarketComRemover(comment.getId(), remover);
+    }
+
+    @Override
+    public Page<Market> listMain(Pageable pageable) {
+        // 현재페이지 / 페이지사이즈(10) / id 기준 오름차순
+        Pageable pageRequest =
+                PageRequest.of(pageable.getPageNumber(), 10, Sort.Direction.DESC, "id");
+
+        return marketJpaRepository.findAll(pageRequest);
     }
 }

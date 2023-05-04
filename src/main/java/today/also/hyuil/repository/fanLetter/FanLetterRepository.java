@@ -7,10 +7,9 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
-import today.also.hyuil.domain.dto.fanLetter.FanLetterListDto;
+import today.also.hyuil.domain.dto.fanLetter.BoardListDto;
 import today.also.hyuil.domain.fanLetter.BoardRemover;
 import today.also.hyuil.domain.fanLetter.FanBoard;
-import today.also.hyuil.domain.fanLetter.QFanBoard;
 
 import javax.persistence.EntityManager;
 import java.util.List;
@@ -47,9 +46,9 @@ public class FanLetterRepository {
         return fanBoard;
     }
 
-    public Page<FanLetterListDto> selectFanBoardList(Pageable pageable) {
-        List<FanLetterListDto> resultList = query
-                .select(Projections.constructor(FanLetterListDto.class,
+    public Page<BoardListDto> selectFanBoardList(Pageable pageable) {
+        List<BoardListDto> resultList = query
+                .select(Projections.constructor(BoardListDto.class,
                         fanBoard.id, fanBoard.title, fanBoard.member.nickname, fanBoard.uploadDate, fanBoard.view))
                 .from(fanBoard)
                 .offset(pageable.getOffset())

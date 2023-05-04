@@ -1,6 +1,8 @@
 package today.also.hyuil.service.market.inter;
 
 import javassist.NotFoundException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import today.also.hyuil.domain.Who;
 import today.also.hyuil.domain.market.Market;
 import today.also.hyuil.domain.market.MarketCom;
@@ -17,4 +19,5 @@ public interface MarketService {
     List<MarketCom> readBuyComment(Long id);
     MarketCom writeBuyComment(MarketCom comment);
     void removeBuyComment(Long commentId, Long memberId, Who who) throws NotFoundException, AccessDeniedException;
+    Page<Market> listMain(Pageable pageable);
 }

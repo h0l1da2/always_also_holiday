@@ -2,11 +2,12 @@ package today.also.hyuil.domain.dto.fanLetter;
 
 import lombok.Data;
 import today.also.hyuil.domain.fanLetter.FanBoard;
+import today.also.hyuil.domain.market.Market;
 
 import java.util.Date;
 
 @Data
-public class FanLetterListDto {
+public class BoardListDto {
 
     private Long id;
     private String title;
@@ -14,14 +15,22 @@ public class FanLetterListDto {
     private Date uploadDate;
     private Long view;
 
-    public FanLetterListDto() {
+    public BoardListDto() {
     }
 
-    public FanLetterListDto(FanBoard fanBoard) {
+    public BoardListDto(FanBoard fanBoard) {
         this.id = fanBoard.getId();
         this.title = fanBoard.getTitle();
         this.nickname = fanBoard.getMember().getNickname();
         this.uploadDate = fanBoard.getUploadDate();
         this.view = fanBoard.getView();
+    }
+
+    public BoardListDto(Market market) {
+        this.id = market.getId();
+        this.title = market.getTitle();
+        this.nickname = market.getMember().getNickname();
+        this.uploadDate = market.getUploadDate();
+        this.view = market.getView();
     }
 }

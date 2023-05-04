@@ -2,19 +2,20 @@ package today.also.hyuil.controller.market;
 
 import com.google.gson.JsonObject;
 import javassist.NotFoundException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
-import today.also.hyuil.config.security.CustomUserDetails;
 import today.also.hyuil.domain.Who;
+import today.also.hyuil.domain.dto.fanLetter.BoardListDto;
 import today.also.hyuil.domain.dto.fanLetter.CommentDto;
 import today.also.hyuil.domain.dto.fanLetter.CommentWriteDto;
 import today.also.hyuil.domain.dto.fanLetter.PrevNextDto;
 import today.also.hyuil.domain.dto.market.MarketViewDto;
-import today.also.hyuil.domain.dto.market.buy.BuyListDto;
 import today.also.hyuil.domain.dto.market.buy.BuyWriteDto;
 import today.also.hyuil.domain.fanLetter.ReplyType;
 import today.also.hyuil.domain.market.Market;
@@ -50,10 +51,15 @@ public class MarketBuyController {
     }
 
     @GetMapping
-    public String main(Model model) {
-        // Test 용
-        forTestView(model);
-        return "/market/buyList";
+    public String main(@PageableDefault Pageable pageable, Model model) {
+
+        Page<Market> marketList = marketService.listMain(pageable);
+        Page<BoardListDto> marketListDto =
+                marketList.map(market -> new BoardListDto(market));
+
+        model.addAttribute("marketList", marketListDto);
+        model.addAttribute("nowPage", pageable.getPageNumber());
+        return "market/buyList";
     }
 
     @GetMapping("/write")
@@ -106,6 +112,7 @@ public class MarketBuyController {
                 .body(writeMarket.getId().toString());
     }
 
+    // TODO view 오르도록 수정 필요
     @GetMapping("/{id}")
     public String read(@PathVariable Long id, Model model) {
 
@@ -233,14 +240,6 @@ public class MarketBuyController {
             comment.setCommentValues(member, ReplyType.REPLY, commentWriteDto, market);
         }
         return comment;
-    }
-
-
-    private void forTestView(Model model) {
-        List<BuyListDto> buyList = new ArrayList<>();
-        BuyListDto buyListDto = new BuyListDto(1L, "title", "huil", new Date(), 1L);
-        buyList.add(buyListDto);
-        model.addAttribute("buyList", buyList);
     }
 
     private boolean buyDtoNullCheck(BuyWriteDto buyWriteDto) {

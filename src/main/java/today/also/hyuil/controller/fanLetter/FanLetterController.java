@@ -3,9 +3,7 @@ package today.also.hyuil.controller.fanLetter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -56,8 +54,8 @@ public class FanLetterController {
     public String fanLetterList(@PageableDefault Pageable pageable, Model model) {
 
         Page<FanBoard> fanBoards = fanLetterService.listMain(pageable);
-        Page<FanLetterListDto> fanListDto =
-                fanBoards.map(fanBoard -> new FanLetterListDto(fanBoard));
+        Page<BoardListDto> fanListDto =
+                fanBoards.map(fanBoard -> new BoardListDto(fanBoard));
 
         model.addAttribute("fanLetterList", fanListDto);
         model.addAttribute("nowPage", pageable.getPageNumber());

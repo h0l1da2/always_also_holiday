@@ -2,7 +2,6 @@ package today.also.hyuil.service.fanLetter.inter;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import today.also.hyuil.domain.dto.fanLetter.FanLetterListDto;
 import today.also.hyuil.domain.fanLetter.FanBoard;
 import today.also.hyuil.domain.file.FileInfo;
 import today.also.hyuil.exception.FileNumbersLimitExceededException;

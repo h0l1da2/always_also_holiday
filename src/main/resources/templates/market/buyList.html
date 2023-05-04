@@ -35,9 +35,9 @@
             </tr>
             </thead>
             <tbody>
-            <tr th:each="buy : ${buyList}">
+            <tr th:each="buy : ${marketList}">
               <td class="table-center" th:text="${buy.id}">1</td>
-              <td class="td-title" th:inline="text"><a th:href="@{/fanLetter/}+${buy.id}">[[${buy.title}]]</a></td>
+              <td class="td-title" th:inline="text"><a th:href="@{/market/buy/}+${buy.id}">[[${buy.title}]]</a></td>
               <td class="table-center" th:text="${buy.nickname}">후일사랑</td>
               <td class="table-center" th:text="${buy.uploadDate}">2023-03-08 23:12</td>
               <td class="table-center" th:text="${buy.view}">0</td>
