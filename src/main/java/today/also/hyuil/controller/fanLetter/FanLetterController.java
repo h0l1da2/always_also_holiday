@@ -69,12 +69,7 @@ public class FanLetterController {
         FanBoard fanBoard = (FanBoard) map.get("fanLetter");
         List<FileInfo> fileInfoList = (List<FileInfo>) map.get("fileInfoList");
 
-        List<String> filePaths = new ArrayList<>();
-
-        for (FileInfo fileInfo : fileInfoList) {
-            String filePath = pathSubstring(fileInfo);
-            filePaths.add(filePath);
-        }
+        List<String> filePaths = webService.getFilePaths(fileInfoList);
 
         // 댓글
         List<Comment> commentList = fanLetterCommentService.readComment(num);
@@ -120,6 +115,8 @@ public class FanLetterController {
 
         return "/fanLetter/viewPage";
     }
+
+
 
     @GetMapping("/write")
     public String write(Model model) {
@@ -299,13 +296,6 @@ public class FanLetterController {
                 fanBoard.getTitle(), fanBoard.getContent()
         );
         model.addAttribute("fanLetter", fanLetterWriteDto);
-    }
-
-    private String pathSubstring(FileInfo fileInfo) {
-        String filePath = fileInfo.getFile().getPath() + fileInfo.getFile().getUuid() + fileInfo.getFile().getMimeType();
-        int startPath = "/Users/holiday/IdeaProjects/also_hyuil/src/main/resources".length();
-        filePath = filePath.substring(startPath);
-        return filePath;
     }
 
     private boolean writeDtoNullCheck(FanLetterWriteDto fanLetterWriteDto) {

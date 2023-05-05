@@ -9,7 +9,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import today.also.hyuil.domain.Who;
 import today.also.hyuil.domain.dto.fanLetter.BoardListDto;
@@ -98,7 +97,7 @@ public class MarketBuyController {
             }
 
             // 댓글
-            List<MarketCom> commentList = marketService.readBuyComment(id);
+            List<MarketCom> commentList = marketService.readComments(id);
             List<CommentDto> comments = new ArrayList<>();
 
 

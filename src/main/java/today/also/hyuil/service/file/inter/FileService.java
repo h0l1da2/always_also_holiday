@@ -7,5 +7,6 @@ import java.util.List;
 public interface FileService {
 
     FileInfo saveFileInfo(FileInfo fileInfo);
-    List<FileInfo> fileInfoList(Long letterNum);
+    List<FileInfo> fileInfoListForFanBoard(Long letterNum);
+    List<FileInfo> fileInfoListForMarket(Long marketId);
 }

@@ -24,8 +24,13 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    public List<FileInfo> fileInfoList(Long letterNum) {
-        return fileRepository.selectInfoList(letterNum);
+    public List<FileInfo> fileInfoListForFanBoard(Long letterNum) {
+        return fileRepository.selectInfoListForFanBoard(letterNum);
+    }
+
+    @Override
+    public List<FileInfo> fileInfoListForMarket(Long marketId) {
+        return fileRepository.selectInfoListForMarket(marketId);
     }
 
 }

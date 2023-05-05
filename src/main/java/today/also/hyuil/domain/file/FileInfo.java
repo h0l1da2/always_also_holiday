@@ -3,6 +3,7 @@ package today.also.hyuil.domain.file;
 import lombok.Getter;
 import today.also.hyuil.domain.fanLetter.FanBoard;
 import today.also.hyuil.domain.market.Market;
+import today.also.hyuil.domain.market.MarketSell;
 
 import javax.persistence.*;
 
@@ -23,6 +24,9 @@ public class FileInfo {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "market_id")
     private Market market;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "market_sell_id")
+    private MarketSell marketSell;
 
     public FileInfo() {}
 
@@ -40,6 +44,10 @@ public class FileInfo {
     }
     public void marketFile(Market market) {
         this.market = market;
+        this.isWhere = IsWhere.MARKET;
+    }
+    public void marketSellFile(MarketSell marketSell) {
+        this.marketSell = marketSell;
         this.isWhere = IsWhere.MARKET;
     }
 }

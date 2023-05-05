@@ -9,17 +9,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import today.also.hyuil.domain.Who;
 import today.also.hyuil.domain.file.FileInfo;
-import today.also.hyuil.domain.market.MarketComRemover;
-import today.also.hyuil.domain.market.Market;
-import today.also.hyuil.domain.market.MarketCom;
-import today.also.hyuil.domain.market.MarketRemover;
+import today.also.hyuil.domain.market.*;
 import today.also.hyuil.domain.member.Member;
 import today.also.hyuil.exception.ThisEntityIsNull;
-import today.also.hyuil.repository.market.inter.MarketJpaRepository;
-import today.also.hyuil.repository.market.inter.MarketRepository;
+import today.also.hyuil.repository.market.inter.MarketSellRepository;
 import today.also.hyuil.repository.member.MemberRepository;
 import today.also.hyuil.service.file.inter.FileService;
-import today.also.hyuil.service.market.inter.MarketService;
+import today.also.hyuil.repository.market.inter.MarketSellJpaRepository;
+import today.also.hyuil.service.market.inter.MarketSellService;
 
 import java.nio.file.AccessDeniedException;
 import java.util.HashMap;
@@ -28,14 +25,14 @@ import java.util.Map;
 
 @Transactional
 @Service
-public class MarketServiceImpl implements MarketService {
+public class MarketSellServiceImpl implements MarketSellService {
 
-    private final MarketRepository marketRepository;
-    private final MarketJpaRepository marketJpaRepository;
+    private final MarketSellRepository marketRepository;
+    private final MarketSellJpaRepository marketJpaRepository;
     private final MemberRepository memberRepository;
     private final FileService fileService;
 
-    public MarketServiceImpl(MarketRepository marketRepository, MarketJpaRepository marketJpaRepository, MemberRepository memberRepository, FileService fileService) {
+    public MarketSellServiceImpl(MarketSellRepository marketRepository, MarketSellJpaRepository marketJpaRepository, MemberRepository memberRepository, FileService fileService) {
         this.marketRepository = marketRepository;
         this.marketJpaRepository = marketJpaRepository;
         this.memberRepository = memberRepository;
@@ -43,26 +40,26 @@ public class MarketServiceImpl implements MarketService {
     }
 
     @Override
-    public Market writeBuy(Market market) {
+    public MarketSell writeBuy(MarketSell market) {
         return marketRepository.insertMarket(market);
     }
 
     @Override
-    public Map<String, Market> prevNextMarket(Long id) {
+    public Map<String, MarketSell> prevNextMarket(Long id) {
         Long prev = id - 1;
         Long next = id + 1;
-        Market prevMarket = marketRepository.seleteMarket(prev);
-        Market nextMarket = marketRepository.seleteMarket(next);
+        MarketSell prevMarket = marketRepository.seleteMarket(prev);
+        MarketSell nextMarket = marketRepository.seleteMarket(next);
 
-        Map<String, Market> map = new HashMap<>();
+        Map<String, MarketSell> map = new HashMap<>();
         map.put("prev", prevMarket);
         map.put("next", nextMarket);
         return map;
     }
 
     @Override
-    public Market read(Long id) throws ThisEntityIsNull {
-        Market market = marketRepository.seleteAndViewCntMarket(id);
+    public MarketSell read(Long id) throws ThisEntityIsNull {
+        MarketSell market = marketRepository.seleteAndViewCntMarket(id);
 
         if (market == null) {
             throw new ThisEntityIsNull("해당 아이디의 구매글이 없습니다");
@@ -71,18 +68,18 @@ public class MarketServiceImpl implements MarketService {
     }
 
     @Override
-    public List<MarketCom> readComments(Long id) {
+    public List<MarketSellCom> readComments(Long id) {
         return marketRepository.selectMarketComments(id);
     }
 
     @Override
-    public MarketCom writeBuyComment(MarketCom comment) {
+    public MarketSellCom writeBuyComment(MarketSellCom comment) {
         return marketRepository.insertBuyComment(comment);
     }
 
     @Override
     public void removeBuyComment(Long commentId, Long memberId, Who who) throws NotFoundException, AccessDeniedException {
-        MarketCom comment = marketRepository.findByIdMarketCom(commentId);
+        MarketSellCom comment = marketRepository.findByIdMarketCom(commentId);
 
         if (comment == null) {
             throw new NotFoundException("해당 댓글을 찾을 수 없습니다");
@@ -92,14 +89,14 @@ public class MarketServiceImpl implements MarketService {
             throw new AccessDeniedException("댓글을 쓴 본인만 삭제가 가능합니다");
         }
 
-        MarketComRemover remover = marketRepository.insertMarketComRemover(
-                new MarketComRemover(comment.getMember(), who));
+        MarketSellComRemover remover = marketRepository.insertMarketComRemover(
+                new MarketSellComRemover(comment.getMember(), who));
 
         marketRepository.updateMarketComRemover(comment.getId(), remover);
     }
 
     @Override
-    public Page<Market> listMain(Pageable pageable) {
+    public Page<MarketSell> listMain(Pageable pageable) {
         // 현재페이지 / 페이지사이즈(10) / id 기준 오름차순
         Pageable pageRequest =
                 PageRequest.of(pageable.getPageNumber(), 10, Sort.Direction.DESC, "id");
@@ -108,13 +105,13 @@ public class MarketServiceImpl implements MarketService {
     }
 
     @Override
-    public void modifyMarket(Long id, Market market) {
+    public void modifyMarket(Long id, MarketSell market) {
         marketRepository.updateMarket(id, market);
     }
 
     @Override
     public void removeMarket(Long marketId, Who who, Long memberId) throws NotFoundException, AccessDeniedException {
-        Market findMarket = marketRepository.seleteMarket(marketId);
+        MarketSell findMarket = marketRepository.seleteMarket(marketId);
 
         if (findMarket == null) {
             throw new NotFoundException("해당 글은 없는 글입니다");
@@ -125,22 +122,22 @@ public class MarketServiceImpl implements MarketService {
             throw new AccessDeniedException("본인 글만 삭제 가능합니다");
         }
 
-        MarketRemover marketRemover = new MarketRemover(findMember, who);
+        MarketSellRemover marketRemover = new MarketSellRemover(findMember, who);
 
-        MarketRemover remover = marketRepository.insertMarketRemover(marketRemover);
+        MarketSellRemover remover = marketRepository.insertMarketRemover(marketRemover);
 
         marketRepository.updateMarketForRemove(marketId, remover);
     }
 
     @Override
-    public Market writeSell(Long memberId, Market market, List<FileInfo> fileInfoList) {
+    public MarketSell writeSell(Long memberId, MarketSell market, List<FileInfo> fileInfoList) {
         Member member = memberRepository.findById(memberId);
 
         market.iAmSeller(member);
-        Market writeMarket = marketRepository.insertMarket(market);
+        MarketSell writeMarket = marketRepository.insertMarket(market);
 
         for (FileInfo fileInfo : fileInfoList) {
-            fileInfo.marketFile(writeMarket);
+            fileInfo.marketSellFile(writeMarket);
             fileService.saveFileInfo(fileInfo);
         }
 
@@ -149,7 +146,7 @@ public class MarketServiceImpl implements MarketService {
 
     @Override
     public Map<String, Object> readSellPage(Long id) {
-        Market market = marketRepository.seleteAndViewCntMarket(id);
+        MarketSell market = marketRepository.seleteAndViewCntMarket(id);
         List<FileInfo> fileInfoList = fileService.fileInfoListForMarket(market.getId());
 
         Map<String, Object> map = new HashMap<>();

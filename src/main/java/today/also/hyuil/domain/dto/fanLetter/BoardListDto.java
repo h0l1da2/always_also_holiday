@@ -3,6 +3,7 @@ package today.also.hyuil.domain.dto.fanLetter;
 import lombok.Data;
 import today.also.hyuil.domain.fanLetter.FanBoard;
 import today.also.hyuil.domain.market.Market;
+import today.also.hyuil.domain.market.MarketSell;
 
 import java.util.Date;
 
@@ -27,6 +28,13 @@ public class BoardListDto {
     }
 
     public BoardListDto(Market market) {
+        this.id = market.getId();
+        this.title = market.getTitle();
+        this.nickname = market.getMember().getNickname();
+        this.uploadDate = market.getUploadDate();
+        this.view = market.getView();
+    }
+    public BoardListDto(MarketSell market) {
         this.id = market.getId();
         this.title = market.getTitle();
         this.nickname = market.getMember().getNickname();

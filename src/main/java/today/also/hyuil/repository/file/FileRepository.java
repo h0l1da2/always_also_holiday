@@ -4,8 +4,6 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import today.also.hyuil.domain.file.FileInfo;
-import today.also.hyuil.domain.file.QFileInfo;
-import today.also.hyuil.domain.file.QFiles;
 
 import javax.persistence.EntityManager;
 
@@ -32,10 +30,19 @@ public class FileRepository {
         return fileInfo;
     }
 
-    public List<FileInfo> selectInfoList(Long letterNum) {
+    public List<FileInfo> selectInfoListForFanBoard(Long letterNum) {
         return query.select(fileInfo)
                 .from(fileInfo)
                 .where(fileInfo.fanBoard.id.eq(letterNum))
+                .leftJoin(fileInfo.file, files)
+                .fetchJoin()
+                .distinct()
+                .fetch();
+    }
+    public List<FileInfo> selectInfoListForMarket(Long marketId) {
+        return query.select(fileInfo)
+                .from(fileInfo)
+                .where(fileInfo.market.id.eq(marketId))
                 .leftJoin(fileInfo.file, files)
                 .fetchJoin()
                 .distinct()

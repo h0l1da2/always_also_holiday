@@ -71,7 +71,7 @@ public class FanLetterServiceImpl implements FanLetterService {
         Map<String, Object> map = new HashMap<>();
         map.put("fanLetter", fanBoard);
 
-        List<FileInfo> fileInfoList = fileService.fileInfoList(fanLetterNum);
+        List<FileInfo> fileInfoList = fileService.fileInfoListForFanBoard(fanLetterNum);
 
         if (fileInfoList.size() != 0) {
             map.put("fileInfoList", fileInfoList);
@@ -84,7 +84,7 @@ public class FanLetterServiceImpl implements FanLetterService {
     public Map<String, Object> readLetter(Long num) {
 
         FanBoard fanBoard = fanLetterRepository.selectAndViewCnt(num);
-        List<FileInfo> fileInfoList = fileService.fileInfoList(fanBoard.getId());
+        List<FileInfo> fileInfoList = fileService.fileInfoListForFanBoard(fanBoard.getId());
 
         Map<String, Object> map = new HashMap<>();
         map.put("fanLetter", fanBoard);
@@ -106,7 +106,7 @@ public class FanLetterServiceImpl implements FanLetterService {
 
         if (map.containsKey("fileInfoList")) {
             List<FileInfo> fileInfoList = (List<FileInfo>) map.get("fileInfoList");
-            List<FileInfo> boardFiles = fileService.fileInfoList(fanBoard.getId());
+            List<FileInfo> boardFiles = fileService.fileInfoListForFanBoard(fanBoard.getId());
 
             int fileNumbers = boardFiles.size() + fileInfoList.size();
 

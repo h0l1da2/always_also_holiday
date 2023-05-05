@@ -158,7 +158,22 @@ public class WebService {
         File fileIo = new File(filePath + fileUuid + mimeType);
         multipartFile.transferTo(fileIo);
     }
+    public List<String> getFilePaths(List<FileInfo> fileInfoList) {
+        List<String> filePaths = new ArrayList<>();
 
+        for (FileInfo fileInfo : fileInfoList) {
+            String filePath = pathSubstring(fileInfo);
+            filePaths.add(filePath);
+        }
+        return filePaths;
+    }
+
+    private String pathSubstring(FileInfo fileInfo) {
+        String filePath = fileInfo.getFile().getPath() + fileInfo.getFile().getUuid() + fileInfo.getFile().getMimeType();
+        int startPath = "/Users/holiday/IdeaProjects/also_hyuil/src/main/resources".length();
+        filePath = filePath.substring(startPath);
+        return filePath;
+    }
     private String setImgMimeType(MultipartFile multipartFile) throws MimeTypeNotMatchException {
         String imgMimeType = "";
         if (multipartFile.getContentType().contains("image/jpeg")) {

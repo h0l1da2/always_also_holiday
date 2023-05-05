@@ -19,19 +19,14 @@ import today.also.hyuil.domain.Who;
 import today.also.hyuil.domain.dto.fanLetter.*;
 import today.also.hyuil.domain.dto.market.MarketViewDto;
 import today.also.hyuil.domain.dto.market.MarketWriteDto;
-import today.also.hyuil.domain.fanLetter.FanBoard;
 import today.also.hyuil.domain.fanLetter.ReplyType;
 import today.also.hyuil.domain.file.FileInfo;
-import today.also.hyuil.domain.file.Files;
-import today.also.hyuil.domain.file.IsWhere;
-import today.also.hyuil.domain.market.Market;
-import today.also.hyuil.domain.market.MarketCom;
-import today.also.hyuil.domain.market.Md;
-import today.also.hyuil.domain.market.Status;
+import today.also.hyuil.domain.market.*;
 import today.also.hyuil.domain.member.Member;
 import today.also.hyuil.exception.MemberNotFoundException;
 import today.also.hyuil.exception.ThisEntityIsNull;
 import today.also.hyuil.exception.fanLetter.MimeTypeNotMatchException;
+import today.also.hyuil.service.market.inter.MarketSellService;
 import today.also.hyuil.service.market.inter.MarketService;
 import today.also.hyuil.service.member.inter.MemberJoinService;
 import today.also.hyuil.service.web.WebService;
@@ -49,12 +44,12 @@ import java.util.Map;
 public class MarketSellController {
 
     private final WebService webService;
-    private final MarketService marketService;
+    private final MarketSellService marketService;
     private final MemberJoinService memberJoinService;
     @Value("${file.fan.market.path}")
     private String filePath;
 
-    public MarketSellController(WebService webService, MarketService marketService, MemberJoinService memberJoinService) {
+    public MarketSellController(WebService webService, MarketSellService marketService, MemberJoinService memberJoinService) {
         this.webService = webService;
         this.marketService = marketService;
         this.memberJoinService = memberJoinService;
@@ -65,7 +60,7 @@ public class MarketSellController {
     @GetMapping
     public String main(@PageableDefault Pageable pageable, Model model) {
 
-        Page<Market> marketList = marketService.listMain(pageable);
+        Page<MarketSell> marketList = marketService.listMain(pageable);
 
         /**
          * 1. 서버에서 필터링하는 법
@@ -82,58 +77,58 @@ public class MarketSellController {
     }
 
     @GetMapping("/{id}")
-    public String read(@PathVariable Long id, Model model, HttpServletRequest request) {
+    public String fanLetter(@PathVariable Long id, Model model, HttpServletRequest request) {
+        // 글
+        Map<String, Object> map = marketService.readSellPage(id);
 
+        MarketSell market = (MarketSell) map.get("market");
+        List<FileInfo> fileInfoList = (List<FileInfo>) map.get("fileInfoList");
+
+        List<String> filePaths = webService.getFilePaths(fileInfoList);
+
+        // 댓글 - Buy와 중복 코드인데... 어떡하지? 고민..
+        List<MarketSellCom> commentList = marketService.readComments(id);
+        List<CommentDto> comments = new ArrayList<>();
+
+        for (MarketSellCom comment : commentList) {
+
+            CommentDto commentDto = new CommentDto(comment);
+
+            if (comment.getMarketSellComRemover() != null) {
+                commentDto.itRemoved();
+            }
+            comments.add(commentDto);
+        }
+
+        // 이전글 다음글
+        Map<String, MarketSell> prevNextMarket = marketService.prevNextMarket(id);
+
+        MarketSell prevMarket = prevNextMarket.get("prev");
+        MarketSell nextMarket = prevNextMarket.get("next");
+
+        if (prevMarket != null) {
+            model.addAttribute("prev", new PrevNextDto(prevMarket.getId(), prevMarket.getTitle()));
+        }
+        if (nextMarket != null) {
+            model.addAttribute("next", new PrevNextDto(nextMarket.getId(), nextMarket.getTitle()));
+        }
+
+
+        model.addAttribute("market", new MarketViewDto(market));
+        model.addAttribute("filePath", filePaths);
+        model.addAttribute("comments", comments);
+
+        // 본인 글인지 확인
         try {
-            // 글 내용
-            Market market = marketService.read(id);
-
-            MarketViewDto marketViewDto = new MarketViewDto(market);
-            model.addAttribute("market", marketViewDto);
-
-            // 이전글 , 다음글
-            Map<String, Market> map = marketService.prevNextMarket(market.getId());
-            Market prev = map.get("prev");
-            Market next = map.get("next");
-
-            if (prev != null) {
-                model.addAttribute("prev", new PrevNextDto(prev.getId(), prev.getTitle()));
-            }
-            if (next != null) {
-                model.addAttribute("next", new PrevNextDto(next.getId(), next.getTitle()));
-            }
-
-            // 댓글
-            List<MarketCom> commentList = marketService.readBuyComment(id);
-            List<CommentDto> comments = new ArrayList<>();
-
-
-            for (MarketCom comment : commentList) {
-
-                CommentDto commentDto = new CommentDto(comment);
-
-                if (comment.getMarketComRemover() != null) {
-                    commentDto.itRemoved();
-                }
-                comments.add(commentDto);
-            }
-
-            model.addAttribute("comments", comments);
-
-            // 본인 글인지 확인
             String nickname = webService.getNicknameInSession(request);
             if (nickname.equals(market.getMember().getNickname())) {
                 model.addAttribute("nickname", nickname);
             }
         } catch (MemberNotFoundException e) {
             System.out.println("로그인이 안 되어 있음");
-        } catch (ThisEntityIsNull e) {
-            e.printStackTrace();
-            return "exception/notFound";
         }
 
-
-        return "market/sell/sellView";
+        return "/market/sell/sellView";
     }
 
 
@@ -161,14 +156,14 @@ public class MarketSellController {
             }
 
             Md md = new Md(marketWriteDto);
-            Market market = new Market(Status.SELL, marketWriteDto, md);
+            MarketSell market = new MarketSell(Status.SELL, marketWriteDto, md);
 
 
             // 이미지 파일이 존재할 경우
             // 여기에서 뭔가 문제가 발생
             List<FileInfo> fileInfoList = webService.getFileInfoList(files, filePath);
 
-            Market writSell = marketService.writeSell(id, market, fileInfoList);
+            MarketSell writSell = marketService.writeSell(id, market, fileInfoList);
 
             if (writSell.getId() == null) {
                 System.out.println("작성 오류");
@@ -200,7 +195,7 @@ public class MarketSellController {
             Long memberId = webService.getIdInSession(request);
 //            Long memberId = 8L;
 
-            Market market = marketService.read(id);
+            MarketSell market = marketService.read(id);
 
             // 글 작성자와 로그인 한 사용자가 다를 경우
             if (!market.getMember().getId().equals(memberId))
@@ -233,7 +228,7 @@ public class MarketSellController {
                 return webService.badResponseEntity("NOT_CONTENT");
             }
 
-            Market findMarket = marketService.read(id);
+            MarketSell findMarket = marketService.read(id);
 
             if (findMarket == null) {
                 System.out.println("해당 글은 존재하지 않음");
@@ -340,8 +335,8 @@ public class MarketSellController {
                 return webService.badResponseEntity("MEMBER_NOT_FOUND");
             }
 
-            Market market = marketService.read(commentWriteDto.getBoardNum());
-            MarketCom comment = getComment(commentWriteDto, member, market);
+            MarketSell market = marketService.read(commentWriteDto.getBoardNum());
+            MarketSellCom comment = getComment(commentWriteDto, member, market);
 
             // 작성 완료
             marketService.writeBuyComment(comment);
@@ -357,8 +352,8 @@ public class MarketSellController {
         return webService.okResponseEntity(jsonObject);
     }
 
-    private MarketCom getComment(CommentWriteDto commentWriteDto, Member member, Market market) {
-        MarketCom comment = new MarketCom();
+    private MarketSellCom getComment(CommentWriteDto commentWriteDto, Member member, MarketSell market) {
+        MarketSellCom comment = new MarketSellCom();
         if (commentWriteDto.getCommentNum() == null) {
             comment.setCommentValues(member, ReplyType.COMMENT, commentWriteDto, market);
         } else {
