@@ -21,15 +21,26 @@
               <div class="post-holder mb30">
                 <div class="post-content pinside30 outline">
                   <div class="mb60">
-                    <h1 class="mb20 heading-line">휴일이 신발 팝니다</h1><h1 class="market-status">판매중</h1><h1 class="market-status-compl">판매 완료</h1>
-                    <div class="meta"> <span class="meta-date">작성시간</span> <span class="meta-comment">- (10) <a href="#">댓글</a></span> <span class="meta-author"> - 글쓴이 <a href="#">휴일이</a></span> </div>
+                    <h1 class="mb20 heading-line">휴일이 신발 팝니다</h1>
+                    <h1 class="mb20 heading-line" th:text="${market.title}">휴일이 신발 삽니다</h1>
+                    <div class="form-group">
+                      <button id="modifyBtn" name="modifyBtn" class="btn btn-default viewPageBtn" th:unless="${nickname == null}" onclick="clickModify()">수정</button>
+                      <button id="removeBtn" name="removeBtn" class="btn btn-default viewPageBtn" th:unless="${nickname == null}" onclick="clickRemove()">삭제</button>
+                    </div>
+                    <h1 class="market-status" th:if="${market.status == 'SELL'}">판매중</h1>
+                    <h1 class="market-status-compl" th:if="${market.status == 'COMPLETE'}">판매 완료</h1>
+                    <div class="meta"> <span class="meta-date" th:text="'작성 날짜 '+${market.uploadDate}">작성시간</span>
+                      <span class="meta-comment" th:inline="text">- (10) <a href="#">댓글</a></span> <span class="meta-author">
+                        - 글쓴이 <a href="#" th:text="${market.nickname}">휴일이</a></span>
+                      <span class="meta-author"> - 조회수 <a href="#" th:text="${market.view}">X</a></span>
+                    </div>
                     <div class="post-image" th:each="file : ${filePath}"><img th:src="@{${file}}" class="img-responsive view-page" alt=""></div>
                     <br>
-                    <h1>휴일이 신발 2020px</h1>
-                    판매 가격 <h1>10000 원</h1>
-                    상태 <h1>미개봉</h1>
-                    거래 방식 <h1>택배</h1>
-                    <p>사랑해요사랑해요사랑해요사랑해요사랑해요사랑해요사랑해요사랑해요사랑해요사랑해요사랑해요사랑해요사랑해요사랑해요사랑해요사랑해요사랑해요사랑해요사랑해요사랑해요사랑해요사랑해요사랑해요사랑해요사랑해요사랑해요사랑해요사랑해요사랑해요사랑해요사랑해요사랑해요사랑해요사랑해요사랑해요사랑해요사랑해요사랑해요사랑해요사랑해요사랑해요사랑해요사랑해요사랑해요사랑해요사랑해요사랑해요사랑해요사랑해요사랑해요사랑해요사랑해요사랑해요사랑해요사랑해요사랑해요사랑해요사랑해요사랑해요사랑해요사랑해요사랑해요사랑해요사랑해요사랑해요사랑해요사랑해요사랑해요사랑해요사랑해요사랑해요사랑해요사랑해요사랑해요사랑해요사랑해요사랑해요사랑해요사랑해요사랑해요사랑해요사랑해요사랑해요사랑해요사랑해요사랑해요사랑해요사랑해요사랑해요사랑해요사랑해요사랑해요사랑해요사랑해요사랑해요사랑해요사랑해요사랑해요사랑해요</p>
+                    <h1 th:text="${market.name}">휴일이 신발 2020px</h1>
+                    구매 가격 <h1 th:text="${market.price}+' 원'">10000 원</h1>
+                    수량 <h1 th:text="${market.quantity}+' 개'">1 개</h1>
+                    거래 방식 <h1 th:text="${market.trade}">택배</h1>
+                    <p th:text="${market.content}">내용</p>
                   </div>
 
                   <div class="bdr-btm"></div>
@@ -37,14 +48,14 @@
                     <div class="row">
                       <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
                         <div class="prev-post">
-                          <h5 class="prev-link"><a th:href="@{/market/buy/} + ${prev.id}" class="btn-link title" th:unless="${prev == null}">이전글</a></h5>
-                          <h4 class="prev-next-title"><a th:href="@{/market/buy/} + ${prev.id}" class="title" th:text="${prev.title}" th:unless="${prev == null}">휴일이짱</a></h4>
+                          <h5 class="prev-link"><a th:href="@{/market/sell/} + ${prev.id}" class="btn-link title" th:unless="${prev == null}">이전글</a></h5>
+                          <h4 class="prev-next-title"><a th:href="@{/market/sell/} + ${prev.id}" class="title" th:text="${prev.title}" th:unless="${prev == null}">휴일이짱</a></h4>
                         </div>
                       </div>
                       <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
                         <div class="next-post">
                           <h5 class="next-link"><a class="btn-link title">다음글</a></h5>
-                          <h4 class="next-prev-title"><a th:href="@{/market/buy/} + ${next.id}" class="title" th:text="${next.title}" th:unless="${next == null}">휴일굿</a></h4>
+                          <h4 class="next-prev-title"><a th:href="@{/market/sell/} + ${next.id}" class="title" th:text="${next.title}" th:unless="${next == null}">휴일굿</a></h4>
                         </div>
                       </div>
                     </div>
@@ -149,6 +160,182 @@
     </div>
   </div>
 <script th:inline="javascript">
+
+  function clickModify () {
+    let jwt = localStorage.getItem('jwt');
+    let marketId = getLastPath();
+    window.location.href = '/market/sell/modify/' + marketId+'?token='+jwt;
+  }
+
+  function clickRemove() {
+    let jwt = localStorage.getItem('jwt');
+    let marketId = getLastPath();
+
+    if (confirm('정말 삭제하시겠습니까?') == false) {
+      return false;
+    }
+
+    $.ajax({
+      type: 'POST',
+      url: '/market/sell/remove/'+marketId,
+      contentType: 'application/json',
+      headers: { 'Authorization': 'Bearer '+ jwt },
+      success: function(result) {
+        if (result === 'REMOVE_OK') {
+          alert('삭제 완료');
+          window.location.href = '/market/sell';
+        }
+      },
+      error: function(xhr, status, error) {
+        if (xhr.responseText === "NOT_YOUR_MARKET") {
+          alert("본인 글만 지울 수 있습니다");
+          window.location.href = '/market/sell';
+        }
+        if (xhr.responseText === "MEMBER_NOT_FOUND") {
+          alert("로그인 해주세요");
+          window.location.href = '/loginForm?redirectUrl=/market';
+        }
+        if (xhr.responseText === "NOT_FOUND") {
+          alert("이미 삭제 된 글입니다");
+          window.location.href = '/market/sell';
+        }
+
+      }
+    });
+  }
+
+  function getLastPath() {
+    var parts = window.location.href.split('/');
+    var lastSegment = parts.pop() || parts.pop(); // 마지막 게시글번호 이후 uri 만 남김
+    var letterNum = lastSegment.replace(/[^\d]+.*$/, ""); // 게시글 번호 이후 uri 다 삭제
+
+    return letterNum;
+  }
+
+  function removeCom(id) {
+    let jwt = localStorage.getItem('jwt');
+
+    if (confirm('정말 삭제하시겠습니까?') == false) {
+      return false;
+    }
+
+    let data = JSON.stringify({id: id});
+
+    $.ajax({
+      type: 'POST',
+      url: '/market/sell/comment/remove',
+      contentType: 'application/json',
+      data: data,
+      headers: { 'Authorization': 'Bearer '+ jwt },
+      dataType: 'json',
+      success: function(result) {
+        if (result.data === 'REMOVE_OK') {
+          alert('삭제 완료');
+          $('.commentDiv').load(location.href+' .commentDiv');
+        }
+      },
+      error: function(xhr, status, error) {
+        console.log('error - '+xhr.status+'. 메시지 : '+xhr.statusText)
+        if (xhr.responseText === 'MEMBER_NOT_FOUND') {
+          alert('로그인을 하세요');
+          window.location.href = '/loginForm';
+        } else if (xhr.responseText === 'NOT_YOUR_COMMENT') {
+          alert('본인 댓글이 아닙니다');
+        } else {
+          alert(error)
+        }
+      }
+    });
+
+  }
+
+  function replyBtnHtml(commentId) {
+    return  "                          <div class=\"col-lg-12 col-md-12 col-md-12 col-sm-12\">\n" +
+            "                            <div class=\"leave-comments\">\n" +
+            "                              <!-- leave comments -->\n" +
+            "                              <h1 class=\"reply-title  mb40\">댓글 작성</h1>\n" +
+            "                              <form class=\"reply-form\">\n" +
+            "                                <div class=\"row\">\n" +
+            "                                  <!-- Textarea -->\n" +
+            "                                  <div class=\"form-group\">\n" +
+            "                                    <div class=\"col-lg-12 col-md-12 col-sm-12 col-xs-12\">\n" +
+            "                                      <label class=\"control-label\" for=\"textarea\">내용 :</label>\n" +
+            "                                      <textarea class=\"form-control\" id=\"content"+commentId+"\" rows=\"6\" placeholder=\" \"></textarea>\n" +
+            "                                    </div>\n" +
+            "                                  </div>\n" +
+            "\n" +
+            "                                  <div class=\"col-lg-12 col-md-12 col-sm-12 col-xs-12\">\n" +
+            "                                    <!-- Button -->\n" +
+            "                                    <div class=\"form-group\">\n" +
+            "                                      <button type=\"button\" id=\"reWriteBtn"+commentId+"\" name=\"writeBtn\" class=\"btn btn-default\" onclick=\"replyWrite("+commentId+")\">등록</button>\n" +
+            "                                    </div>\n" +
+            "                                  </div>\n" +
+            "                                </div>\n" +
+            "                              </form>\n" +
+            "                            </div>\n" +
+            "                          </div>\n";
+
+  }
+
+  function replyBtnOn(commentId) {
+    let replyArea = $('.re'+commentId);
+
+    if (replyArea.children().length == 0) {
+      replyArea.html(replyBtnHtml(commentId));
+    } else {
+      replyArea.empty();
+    }
+  }
+
+
+
+
+  function replyWrite(commentId) {
+
+    let jwt = localStorage.getItem('jwt');
+    let content = '';
+    let commentNum = null;
+    if (commentId == -10) {
+      content = document.getElementById('content').value;
+    } else {
+      content = document.getElementById('content'+commentId).value;
+      commentNum = commentId;
+    }
+
+    // 글 번호와 엄마 댓글 번호
+    let boardNum = getLastPath();
+
+    if (content === '' || content === ' ') {
+      alert('내용을 입력하세요');
+      document.getElementById('content').focus();
+      return false;
+    }
+
+    let data = JSON.stringify({content: content, boardNum: boardNum, commentNum: commentNum});
+
+    $.ajax({
+      type: 'POST',
+      url: '/market/sell/comment/write',
+      contentType: 'application/json',
+      data: data,
+      headers: { 'Authorization': 'Bearer '+ jwt },
+      dataType: 'json',
+      success: function(result) {
+        alert('작성 완료');
+        $('.commentDiv').load(location.href+' .commentDiv');
+      },
+      error: function(xhr, status, error) {
+        if (xhr.responseText === 'MEMBER_NOT_FOUND') {
+          alert('로그인을 하세요');
+          window.location.href = '/loginForm?redirectUrl=/market/sell';
+        }
+        alert('error - '+xhr.status+'. 메시지 : '+xhr.statusText);
+        console.error(error);
+      }
+    });
+  }
+
+
 </script>
 </th:block>
 </html>
