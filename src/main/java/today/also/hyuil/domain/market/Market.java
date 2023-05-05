@@ -1,7 +1,7 @@
 package today.also.hyuil.domain.market;
 
 import lombok.Getter;
-import today.also.hyuil.domain.dto.market.buy.BuyWriteDto;
+import today.also.hyuil.domain.dto.market.MarketWriteDto;
 import today.also.hyuil.domain.member.Member;
 
 import javax.persistence.*;
@@ -36,25 +36,25 @@ public class Market {
     public Market() {
     }
 
-    public Market(Status status, BuyWriteDto buyWriteDto, Member member, Md md) {
-        this.title = buyWriteDto.getTitle();
-        this.content = buyWriteDto.getContent();
+    public Market(Status status, MarketWriteDto marketWriteDto, Member member, Md md) {
+        this.title = marketWriteDto.getTitle();
+        this.content = marketWriteDto.getContent();
         this.status = status;
         this.uploadDate = new Date();
         this.updateDate = new Date();
         this.md = md;
         this.member = member;
-        this.trade = buyWriteDto.getTrade();
+        this.trade = marketWriteDto.getTrade();
         this.view = 0L;
     }
-    public Market(Status status, BuyWriteDto buyWriteDto, Md md) {
-        this.title = buyWriteDto.getTitle();
-        this.content = buyWriteDto.getContent();
+    public Market(Status status, MarketWriteDto marketWriteDto, Md md) {
+        this.title = marketWriteDto.getTitle();
+        this.content = marketWriteDto.getContent();
         this.status = status;
         this.uploadDate = new Date();
         this.updateDate = new Date();
         this.md = md;
-        this.trade = buyWriteDto.getTrade();
+        this.trade = marketWriteDto.getTrade();
         this.view = 0L;
     }
 
@@ -62,12 +62,12 @@ public class Market {
         this.view++;
     }
 
-    public void changeToBuyWriteDto(BuyWriteDto buyWriteDto) {
-        this.title = buyWriteDto.getTitle();
-        this.content = buyWriteDto.getContent();
+    public void changeToBuyWriteDto(MarketWriteDto marketWriteDto) {
+        this.title = marketWriteDto.getTitle();
+        this.content = marketWriteDto.getContent();
         this.updateDate = new Date();
-        this.md.modifyMd(buyWriteDto.getPrice(), buyWriteDto.getQuantity(), buyWriteDto.getName());
-        this.trade = buyWriteDto.getTrade();
+        this.md.modifyMd(marketWriteDto.getPrice(), marketWriteDto.getQuantity(), marketWriteDto.getName());
+        this.trade = marketWriteDto.getTrade();
     }
 
     public void updateNewMarket(Market market) {

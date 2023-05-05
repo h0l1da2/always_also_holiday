@@ -37,14 +37,14 @@ import java.util.List;
 import java.util.Map;
 
 @Controller
-@RequestMapping("/market/buy")
-public class MarketBuyController {
+@RequestMapping("/market/sell")
+public class MarketSellController {
 
     private final WebService webService;
     private final MarketService marketService;
     private final MemberJoinService memberJoinService;
 
-    public MarketBuyController(WebService webService, MarketService marketService, MemberJoinService memberJoinService) {
+    public MarketSellController(WebService webService, MarketService marketService, MemberJoinService memberJoinService) {
         this.webService = webService;
         this.marketService = marketService;
         this.memberJoinService = memberJoinService;
@@ -63,16 +63,16 @@ public class MarketBuyController {
         // 삭제 여부 필터링
         List<BoardListDto> marketListDto =
                 marketList
-                .filter(market -> market.getMarketRemover() == null)
-                .map(market -> new BoardListDto(market))
-                .toList();
+                        .filter(market -> market.getMarketRemover() == null)
+                        .map(market -> new BoardListDto(market))
+                        .toList();
 
         // 페이지로 캐스팅
         Page<BoardListDto> page = webService.boardListToPage(pageable, marketListDto);
 
         model.addAttribute("marketList", page);
         model.addAttribute("nowPage", pageable.getPageNumber());
-        return "market/buy/buyList";
+        return "market/sell/sellList";
     }
 
     @GetMapping("/{id}")
@@ -127,14 +127,14 @@ public class MarketBuyController {
         }
 
 
-        return "market/buy/buyView";
+        return "market/sell/sellView";
     }
 
 
     @GetMapping("/write")
     public String write(Model model) {
-        model.addAttribute("buy", new MarketWriteDto());
-        return "/market/buy/buyWrite";
+        model.addAttribute("sell", new MarketWriteDto());
+        return "/market/sell/sellWrite";
     }
 
     @ResponseBody
@@ -191,19 +191,19 @@ public class MarketBuyController {
 
             // 글 작성자와 로그인 한 사용자가 다를 경우
             if (!market.getMember().getId().equals(memberId))
-                return "redirect:/loginForm?redirectUrl=/market/buy";
+                return "redirect:/loginForm?redirectUrl=/market/sell";
 
             model.addAttribute("market", new MarketViewDto(market));
 
         } catch (MemberNotFoundException e) {
             e.printStackTrace();
-            return "redirect:/loginForm?redirectUrl=/market/buy";
+            return "redirect:/loginForm?redirectUrl=/market/sell";
         } catch (ThisEntityIsNull e) {
             e.printStackTrace();
             return "exception/notFound";
         }
 
-        return "market/buy/buyModify";
+        return "market/sell/sellModify";
     }
 
     @ResponseBody
@@ -273,7 +273,7 @@ public class MarketBuyController {
 
     }
 
-        @ResponseBody
+    @ResponseBody
     @PostMapping("/comment/remove")
     public ResponseEntity<String> remove(@RequestBody CommentDto commentDto, HttpServletRequest request) {
         JsonObject jsonObject = new JsonObject();
