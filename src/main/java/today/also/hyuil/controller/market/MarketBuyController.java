@@ -50,16 +50,27 @@ public class MarketBuyController {
         this.memberJoinService = memberJoinService;
     }
 
-    // TODO 삭제 된 글 안 보이게 수정 필요
     @GetMapping
     public String main(@PageableDefault Pageable pageable, Model model) {
 
         Page<Market> marketList = marketService.listMain(pageable);
 
-        Page<BoardListDto> marketListDto =
-                marketList.map(market -> new BoardListDto(market));
+        /**
+         * 1. 서버에서 필터링하는 법
+         * 2. DB 에서 조건문을 준 후 가져오는 법
+         * 뭐가 더 유리할까?
+         */
+        // 삭제 여부 필터링
+        List<BoardListDto> marketListDto =
+                marketList
+                .filter(market -> market.getMarketRemover() == null)
+                .map(market -> new BoardListDto(market))
+                .toList();
 
-        model.addAttribute("marketList", marketListDto);
+        // 페이지로 캐스팅
+        Page<BoardListDto> page = webService.boardListToPage(pageable, marketListDto);
+
+        model.addAttribute("marketList", page);
         model.addAttribute("nowPage", pageable.getPageNumber());
         return "market/buy/buyList";
     }

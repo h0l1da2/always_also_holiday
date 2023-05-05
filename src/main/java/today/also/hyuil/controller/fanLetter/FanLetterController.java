@@ -54,10 +54,14 @@ public class FanLetterController {
     public String fanLetterList(@PageableDefault Pageable pageable, Model model) {
 
         Page<FanBoard> fanBoards = fanLetterService.listMain(pageable);
-        Page<BoardListDto> fanListDto =
-                fanBoards.map(fanBoard -> new BoardListDto(fanBoard));
+        List<BoardListDto> fanListDto =
+                fanBoards.filter(fanBoard -> fanBoard.getBoardRemover() == null)
+                        .map(fanBoard -> new BoardListDto(fanBoard))
+                        .toList();
 
-        model.addAttribute("fanLetterList", fanListDto);
+        Page<BoardListDto> page = webService.boardListToPage(pageable, fanListDto);
+
+        model.addAttribute("fanLetterList", page);
         model.addAttribute("nowPage", pageable.getPageNumber());
         return "fanLetter/boardList";
     }

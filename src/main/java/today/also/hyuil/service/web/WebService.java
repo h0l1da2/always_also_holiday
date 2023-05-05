@@ -2,15 +2,20 @@ package today.also.hyuil.service.web;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+import today.also.hyuil.domain.dto.fanLetter.BoardListDto;
 import today.also.hyuil.domain.dto.fanLetter.CommentWriteDto;
 import today.also.hyuil.domain.member.Member;
 import today.also.hyuil.exception.MemberNotFoundException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.util.List;
 
 @Service
 public class WebService {
@@ -59,6 +64,12 @@ public class WebService {
         String jsonResponse = gson.toJson(jsonObject);
         return ResponseEntity.badRequest()
                 .body(jsonResponse);
+    }
+
+    public Page<BoardListDto> boardListToPage(Pageable pageable, List dtoList) {
+        int start = (int) pageable.getOffset();
+        int end = Math.min((start + pageable.getPageSize()), dtoList.size());
+        return new PageImpl<>(dtoList.subList(start, end), pageable, dtoList.size());
     }
 
     public boolean commentWriteDtoNullCheck(CommentWriteDto commentWriteDto) {
