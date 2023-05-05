@@ -50,10 +50,12 @@ public class MarketBuyController {
         this.memberJoinService = memberJoinService;
     }
 
+    // TODO 삭제 된 글 안 보이게 수정 필요
     @GetMapping
     public String main(@PageableDefault Pageable pageable, Model model) {
 
         Page<Market> marketList = marketService.listMain(pageable);
+
         Page<BoardListDto> marketListDto =
                 marketList.map(market -> new BoardListDto(market));
 

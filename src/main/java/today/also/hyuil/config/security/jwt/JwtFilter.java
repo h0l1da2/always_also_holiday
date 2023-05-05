@@ -67,6 +67,7 @@ public class JwtFilter extends OncePerRequestFilter {
                 }
             }
         } catch (ExpiredJwtException e) {
+            // TODO 토큰이 만료 됐을 경우 자동 로그아웃 필요
             System.out.println("토큰이 만료됨 : 인증 실패");
             filterChain.doFilter(request, response);
             return;
