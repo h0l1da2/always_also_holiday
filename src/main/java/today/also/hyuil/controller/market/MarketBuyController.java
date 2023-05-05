@@ -147,7 +147,7 @@ public class MarketBuyController {
             Long id = webService.getIdInSession(request);
             Member member = memberJoinService.findMyAccount(id);
 
-            if (!buyDtoNullCheck(marketWriteDto)) {
+            if (!webService.marketWriteDtoNullCheck(marketWriteDto)) {
                 return ResponseEntity.badRequest()
                         .body("DTO_NULL");
             }
@@ -215,7 +215,7 @@ public class MarketBuyController {
             Long memberId = webService.getIdInSession(request);
 //            Long memberId = 8L;
 
-            if (!buyDtoNullCheck(marketWriteDto)) {
+            if (!webService.marketWriteDtoNullCheck(marketWriteDto)) {
                 System.out.println("글 내용이 없음");
                 return webService.badResponseEntity("NOT_CONTENT");
             }
@@ -354,29 +354,5 @@ public class MarketBuyController {
         return comment;
     }
 
-    private boolean buyDtoNullCheck(MarketWriteDto marketWriteDto) {
-        if (marketWriteDto == null) {
-            return false;
-        }
-        if (!StringUtils.hasText(marketWriteDto.getTitle())) {
-            return false;
-        }
-        if (!StringUtils.hasText(marketWriteDto.getName())) {
-            return false;
-        }
-        if (!StringUtils.hasText(marketWriteDto.getContent())) {
-            return false;
-        }
-        if (!StringUtils.hasText(marketWriteDto.getTrade().toString())) {
-            return false;
-        }
-        if (marketWriteDto.getPrice() == null) {
-            return false;
-        }
-        if (marketWriteDto.getQuantity() == null) {
-            return false;
-        }
-        return true;
-    }
 
 }

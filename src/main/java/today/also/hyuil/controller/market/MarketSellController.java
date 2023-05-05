@@ -2,23 +2,28 @@ package today.also.hyuil.controller.market;
 
 import com.google.gson.JsonObject;
 import javassist.NotFoundException;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import today.also.hyuil.domain.Who;
-import today.also.hyuil.domain.dto.fanLetter.BoardListDto;
-import today.also.hyuil.domain.dto.fanLetter.CommentDto;
-import today.also.hyuil.domain.dto.fanLetter.CommentWriteDto;
-import today.also.hyuil.domain.dto.fanLetter.PrevNextDto;
+import today.also.hyuil.domain.dto.fanLetter.*;
 import today.also.hyuil.domain.dto.market.MarketViewDto;
 import today.also.hyuil.domain.dto.market.MarketWriteDto;
+import today.also.hyuil.domain.fanLetter.FanBoard;
 import today.also.hyuil.domain.fanLetter.ReplyType;
+import today.also.hyuil.domain.file.FileInfo;
+import today.also.hyuil.domain.file.Files;
+import today.also.hyuil.domain.file.IsWhere;
 import today.also.hyuil.domain.market.Market;
 import today.also.hyuil.domain.market.MarketCom;
 import today.also.hyuil.domain.market.Md;
@@ -26,16 +31,19 @@ import today.also.hyuil.domain.market.Status;
 import today.also.hyuil.domain.member.Member;
 import today.also.hyuil.exception.MemberNotFoundException;
 import today.also.hyuil.exception.ThisEntityIsNull;
+import today.also.hyuil.exception.fanLetter.MimeTypeNotMatchException;
 import today.also.hyuil.service.market.inter.MarketService;
 import today.also.hyuil.service.member.inter.MemberJoinService;
 import today.also.hyuil.service.web.WebService;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.nio.file.AccessDeniedException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+@PropertySource("classpath:application.yml")
 @Controller
 @RequestMapping("/market/sell")
 public class MarketSellController {
@@ -43,6 +51,8 @@ public class MarketSellController {
     private final WebService webService;
     private final MarketService marketService;
     private final MemberJoinService memberJoinService;
+    @Value("${file.fan.market.path}")
+    private String filePath;
 
     public MarketSellController(WebService webService, MarketService marketService, MemberJoinService memberJoinService) {
         this.webService = webService;
@@ -50,6 +60,8 @@ public class MarketSellController {
         this.memberJoinService = memberJoinService;
     }
 
+    // TODO 마켓 판매 전체리스트 / 읽기 / 쓰기 / 수정 / 삭제 /
+    // TODO 댓글 읽기 / 쓰기 / 삭제
     @GetMapping
     public String main(@PageableDefault Pageable pageable, Model model) {
 
@@ -132,47 +144,54 @@ public class MarketSellController {
     }
 
     @ResponseBody
-    @PostMapping("/write")
-    public ResponseEntity<String> write(@RequestBody MarketWriteDto marketWriteDto, HttpServletRequest request, Model model) {
+    @PostMapping(value = "/write", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
+    public ResponseEntity<String> write(@RequestPart(value = "image", required = false) List<MultipartFile> files,
+                                        @RequestPart(value = "marketWriteDto") MarketWriteDto marketWriteDto,
+                                        HttpServletRequest request) {
 
-        System.out.println("buyWriteDto = " + marketWriteDto);
-        Market writeMarket = new Market();
+        Long marketId = null;
         try {
-            Long id = webService.getIdInSession(request);
-            Member member = memberJoinService.findMyAccount(id);
+            // 세션에서 memberId 가져오기
+//            Long id = webService.getIdInSession(request);
+            Long id = 8L;
 
-            if (!buyDtoNullCheck(marketWriteDto)) {
-                return ResponseEntity.badRequest()
-                        .body("DTO_NULL");
-            }
-
-            if (marketWriteDto.getPrice() < 100) {
-                return ResponseEntity.badRequest()
-                        .body("MINIMUM_PRICE");
-            }
-
-            if (marketWriteDto.getQuantity() < 1) {
-                return ResponseEntity.badRequest()
-                        .body("MINIMUM_QUANTITY");
+            if (!webService.marketWriteDtoNullCheck(marketWriteDto)) {
+                System.out.println("글 내용이 없음");
+                return new ResponseEntity<>("NOT_CONTENT", HttpStatus.BAD_REQUEST);
             }
 
             Md md = new Md(marketWriteDto);
-            Market market = new Market(Status.BUY, marketWriteDto, member, md);
+            Market market = new Market(Status.SELL, marketWriteDto, md);
 
-            writeMarket = marketService.writeBuy(market);
 
-        } catch (MemberNotFoundException e) {
+            // 이미지 파일이 존재할 경우
+            // 여기에서 뭔가 문제가 발생
+            List<FileInfo> fileInfoList = webService.getFileInfoList(files, filePath);
+
+            Market writSell = marketService.writeSell(id, market, fileInfoList);
+
+            if (writSell.getId() == null) {
+                System.out.println("작성 오류");
+                return webService.badResponseEntity("WRITE_ERROR");
+            }
+            marketId = writSell.getId();
+
+        } catch (MimeTypeNotMatchException e) {
             e.printStackTrace();
-            return ResponseEntity.badRequest()
-                    .body("MEMBER_NOT_LOGIN");
-        } catch (NumberFormatException e) {
+            System.out.println("이미지 파일 확장자 다름");
+            return webService.badResponseEntity("MIMETYPE_ERROR");
+//        } catch (MemberNotFoundException e) {
+//            e.printStackTrace();
+//            return webService.badResponseEntity("NOT_LOGIN");
+        } catch (IOException e) {
             e.printStackTrace();
-            return ResponseEntity.badRequest()
-                    .body("ONLY_NUMBER");
+            System.out.println("파일 업로드 에러");
+            return webService.badResponseEntity("FILE_UPLOAD_ERROR");
         }
 
-        return ResponseEntity.ok()
-                .body(writeMarket.getId().toString());
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("data", marketId);
+        return webService.okResponseEntity(jsonObject);
     }
 
     @GetMapping("/modify/{id}")

@@ -8,6 +8,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import today.also.hyuil.domain.Who;
+import today.also.hyuil.domain.file.FileInfo;
 import today.also.hyuil.domain.market.MarketComRemover;
 import today.also.hyuil.domain.market.Market;
 import today.also.hyuil.domain.market.MarketCom;
@@ -17,6 +18,7 @@ import today.also.hyuil.exception.ThisEntityIsNull;
 import today.also.hyuil.repository.market.MarketJpaRepository;
 import today.also.hyuil.repository.market.MarketRepository;
 import today.also.hyuil.repository.member.MemberRepository;
+import today.also.hyuil.service.file.inter.FileService;
 import today.also.hyuil.service.market.inter.MarketService;
 
 import java.nio.file.AccessDeniedException;
@@ -31,11 +33,13 @@ public class MarketServiceImpl implements MarketService {
     private final MarketRepository marketRepository;
     private final MarketJpaRepository marketJpaRepository;
     private final MemberRepository memberRepository;
+    private final FileService fileService;
 
-    public MarketServiceImpl(MarketRepository marketRepository, MarketJpaRepository marketJpaRepository, MemberRepository memberRepository) {
+    public MarketServiceImpl(MarketRepository marketRepository, MarketJpaRepository marketJpaRepository, MemberRepository memberRepository, FileService fileService) {
         this.marketRepository = marketRepository;
         this.marketJpaRepository = marketJpaRepository;
         this.memberRepository = memberRepository;
+        this.fileService = fileService;
     }
 
     @Override
@@ -126,6 +130,21 @@ public class MarketServiceImpl implements MarketService {
         MarketRemover remover = marketRepository.insertMarketRemover(marketRemover);
 
         marketRepository.updateMarketForRemove(marketId, remover);
+    }
+
+    @Override
+    public Market writeSell(Long memberId, Market market, List<FileInfo> fileInfoList) {
+        Member member = memberRepository.findById(memberId);
+
+        market.iAmSeller(member);
+        Market writeMarket = marketRepository.insertMarket(market);
+
+        for (FileInfo fileInfo : fileInfoList) {
+            fileInfo.marketFile(writeMarket);
+            fileService.saveFileInfo(fileInfo);
+        }
+
+        return writeMarket;
     }
 
 }

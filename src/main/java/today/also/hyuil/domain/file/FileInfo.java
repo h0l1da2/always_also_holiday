@@ -36,5 +36,10 @@ public class FileInfo {
 
     public void fanBoardFile(FanBoard fanBoard) {
         this.fanBoard = fanBoard;
+        this.isWhere = IsWhere.FAN_BOARD;
+    }
+    public void marketFile(Market market) {
+        this.market = market;
+        this.isWhere = IsWhere.MARKET;
     }
 }

@@ -4,6 +4,7 @@ import javassist.NotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import today.also.hyuil.domain.Who;
+import today.also.hyuil.domain.file.FileInfo;
 import today.also.hyuil.domain.market.Market;
 import today.also.hyuil.domain.market.MarketCom;
 import today.also.hyuil.domain.market.Md;
@@ -23,4 +24,5 @@ public interface MarketService {
     Page<Market> listMain(Pageable pageable);
     void modifyMarket(Long id, Market market);
     void removeMarket(Long marketId, Who who, Long memberId) throws NotFoundException, AccessDeniedException;
+    Market writeSell(Long memberId, Market market, List<FileInfo> fileInfoList);
 }

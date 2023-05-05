@@ -149,18 +149,7 @@ public class FanLetterController {
 
             // 이미지 파일이 존재할 경우
             // 여기에서 뭔가 문제가 발생
-            List<FileInfo> fileInfoList = new ArrayList<>();
-            if (isLetterHaveFiles(files)) {
-                for (MultipartFile multipartFile : files) {
-
-                    Files file = getFiles(multipartFile);
-
-                    FileInfo fileInfo = new FileInfo(file);
-                    fileInfo.whereFileIs(IsWhere.FAN_BOARD);
-
-                    fileInfoList.add(fileInfo);
-                }
-            }
+            List<FileInfo> fileInfoList = webService.getFileInfoList(files, filePath);
 
             FanBoard writeLetter = fanLetterService.writeLetter(id, fanBoard, fileInfoList);
 
@@ -245,19 +234,7 @@ public class FanLetterController {
             findLetter.modifyLetter(fanLetterWriteDto);
 
 
-            List<FileInfo> fileInfoList = new ArrayList<>();
-            if (isLetterHaveFiles(files)) {
-                for (MultipartFile multipartFile : files) {
-
-                    Files file = getFiles(multipartFile);
-
-                    FileInfo fileInfo = new FileInfo(file);
-                    fileInfo.whereFileIs(IsWhere.FAN_BOARD);
-
-                    fileInfoList.add(fileInfo);
-                }
-            }
-
+            List<FileInfo> fileInfoList = webService.getFileInfoList(files, filePath);
 
             Map<String, Object> boardMap = new HashMap<>();
 
@@ -324,44 +301,6 @@ public class FanLetterController {
         model.addAttribute("fanLetter", fanLetterWriteDto);
     }
 
-    private void saveFile(MultipartFile multipartFile, String mimeType, String fileUuid) throws IOException {
-        File fileIo = new File(filePath + fileUuid + mimeType);
-        multipartFile.transferTo(fileIo);
-    }
-
-    private Files getFiles(MultipartFile multipartFile) throws MimeTypeNotMatchException, IOException {
-        String fileUuid = UUID.randomUUID().toString();
-        // path type mimeType
-        String imgMimeType = setImgMimeType(multipartFile);
-        Files file = new Files(multipartFile);
-        file.fileUUID(fileUuid);
-
-        // 파일 저장 -> java.io.File (path/UUID.jpg)
-        saveFile(multipartFile, imgMimeType, fileUuid);
-
-        file.imgMimeType(imgMimeType);
-
-        file.filePath(filePath);
-        file.fileType(Type.IMAGE);
-        return file;
-    }
-
-    private String setImgMimeType(MultipartFile multipartFile) throws MimeTypeNotMatchException {
-        String imgMimeType = "";
-        if (multipartFile.getContentType().contains("image/jpeg")) {
-            imgMimeType = ".jpg";
-        } else if (multipartFile.getContentType().contains("image/png")) {
-            imgMimeType = ".png";
-        } else if (multipartFile.getContentType().contains("image/gif")) {
-            imgMimeType = ".gif";
-        } else {
-            // exception 만들기
-            System.out.println("올바른 확장자가 아닙니다");
-            throw new MimeTypeNotMatchException("올바른 확장자가 아닙니다");
-        }
-        return imgMimeType;
-    }
-
     private String pathSubstring(FileInfo fileInfo) {
         String filePath = fileInfo.getFile().getPath() + fileInfo.getFile().getUuid() + fileInfo.getFile().getMimeType();
         int startPath = "/Users/holiday/IdeaProjects/also_hyuil/src/main/resources".length();
@@ -382,11 +321,5 @@ public class FanLetterController {
         return true;
     }
 
-    private boolean isLetterHaveFiles(List<MultipartFile> files) {
-        if (files == null) {
-            return false;
-        }
-        return true;
-    }
 
 }

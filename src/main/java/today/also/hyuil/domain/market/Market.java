@@ -81,4 +81,8 @@ public class Market {
     public void itRemove(MarketRemover marketRemover) {
         this.marketRemover = marketRemover;
     }
+
+    public void iAmSeller(Member member) {
+        this.member = member;
+    }
 }

@@ -17,7 +17,7 @@
     <div class="container">
       <div class="row board-center" >
         <div class="table-center"><h1 class="title-name">판매글</h1></div>
-        <form th:object="${buy}">
+        <form th:object="${sell}">
           <!-- Textarea -->
           <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
             <!-- Text input-->
@@ -69,6 +69,23 @@
             <div class="form-group">
               <label class=" control-label" for="content">내용 :</label>
               <textarea class="form-control board-text" th:field="*{content}" rows="6" placeholder=" "></textarea>
+            </div>
+          </div>
+          <!-- 파일 -->
+          <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            <div class="form-group">
+              <input type="file" multiple="multiple" name="imagesInput" id="imagesInput" class=" control-label"/>
+            </div>
+          </div>
+          <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            <div class="form-group">
+              <h3>* (최대 5장) 업로드 된 이미지</h3>
+              <div id="preview">
+                <!--              <p id="${file.lastModified}">-->
+                <!--                ${file.name}-->
+                <!--                <button data-index='${file.lastModified}' class='btn btn-default file-remove-btn'>X</button>-->
+                <!--              </p>-->
+              </div>
             </div>
           </div>
           <!-- Button -->
@@ -128,45 +145,86 @@
           return false;
         }
 
+        let sellData = new FormData();
+
+        // input file 을 formData에 담는 로직
+        const fileInput = $('#imagesInput');
+        const files = fileInput[0].files;
+        for (let i = 0; i < files.length; i++) {
+          sellData.append('image', files[i]);
+        }
+
+        let data = {title: title, name: name, content: content, price: price, quantity: quantity, trade: trade};
+        sellData.append('marketWriteDto', new Blob([JSON.stringify(data)], {type: 'application/json'}));
+
+
         $.ajax({
           type: 'POST',
-          url: '/market/buy/write',
-          contentType: "application/json",
-          data: JSON.stringify({title: title, name: name, price: price, quantity: quantity, content: content, trade: trade}),
-          dataType: 'json',
+          url: '/market/sell/write',
+          processData: false,
+          contentType: false,
+          data: sellData,
           headers: { 'Authorization': 'Bearer '+ jwt },
-          success: function (result) {
-            alert("작성 완료");
-            window.location.href = '/market/buy/' + result;
+          dataType: 'json',
+          success: function(result) {
+            alert('작성 완료');
+            window.location.href = '/market/sell/'+result.data;
           },
           error: function(xhr, status, error) {
-            if (xhr.responseText === "DTO_NULL") {
-              alert("값이 제대로 가지 않음");
-            }
-            if (xhr.responseText === "MINIMUM_PRICE") {
-              alert("가격은 100원 이하는 불가능합니다");
-              document.getElementById('price').focus();
-            }
-            if (xhr.responseText === "MINIMUM_QUANTITY") {
-              alert("수량은 1개 이상 입력해주세요");
-              document.getElementById('quantity').focus();
-            }
-            if (xhr.responseText === "MEMBER_NOT_LOGIN") {
-              alert("로그인 해주세요");
-              window.location.href = '/loginForm?redirectUrl=/market';
-            }
-            if (xhr.responseText === "ONLY_NUMBER") {
-              alert("가격, 수량은 숫자만 입력해주세요");
-            }
-
-
+            alert('error - '+xhr.status+'. 메시지 : '+xhr.statusText)
             console.error(error);
           }
         });
 
-
       });
     })
+
+    const handler = {
+      init() {
+        const fileInput = document.querySelector('#imagesInput');
+        const preview = document.querySelector('#preview');
+        fileInput.addEventListener('change', () => {
+          console.dir(fileInput)
+          const files = Array.from(fileInput.files)
+          files.forEach(file => {
+            preview.innerHTML += `
+                        <p id="${file.lastModified}">
+                            ${file.name}
+                            <button data-index='${file.lastModified}' class='btn btn-default file-remove-btn'>X</button>
+                        </p>`;
+          });
+        });
+        // 하나가 업로드 될 때마다 초기화 (multiple)
+        // fileInput.value = '';
+      },
+
+      removeFile: () => {
+        document.addEventListener('click', (e) => {
+          if(e.target.className !== 'btn btn-default file-remove-btn') return;
+          const removeTargetId = e.target.dataset.index;
+          const removeTarget = document.getElementById(removeTargetId);
+          const files = document.querySelector('#imagesInput').files;
+          const dataTransfer = new DataTransfer();
+
+          // document.querySelector('#imagesInput').files =
+          //             Array.from(files).filter(file => file.lastModified !== removeTarget);
+
+
+          Array.from(files)
+                  .filter(file => file.lastModified != removeTargetId)
+                  .forEach(file => {
+                    dataTransfer.items.add(file);
+                  });
+
+          document.querySelector('#imagesInput').files = dataTransfer.files;
+
+          removeTarget.remove();
+        })
+      }
+    }
+
+    handler.init()
+    handler.removeFile()
   </script>
   </body>
 </th:block>
