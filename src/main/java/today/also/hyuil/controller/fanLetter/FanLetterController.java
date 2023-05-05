@@ -32,6 +32,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.AccessDeniedException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/fanLetter")
@@ -52,16 +53,10 @@ public class FanLetterController {
 
     @GetMapping
     public String fanLetterList(@PageableDefault Pageable pageable, Model model) {
-
         Page<FanBoard> fanBoards = fanLetterService.listMain(pageable);
-        List<BoardListDto> fanListDto =
-                fanBoards.filter(fanBoard -> fanBoard.getBoardRemover() == null)
-                        .map(fanBoard -> new BoardListDto(fanBoard))
-                        .toList();
-
-        Page<BoardListDto> page = webService.boardListToPage(pageable, fanListDto);
-
-        model.addAttribute("fanLetterList", page);
+        Page<BoardListDto> fanLetterList = fanBoards
+                .map(fanboard -> new BoardListDto(fanboard));
+        model.addAttribute("fanLetterList", fanLetterList);
         model.addAttribute("nowPage", pageable.getPageNumber());
         return "fanLetter/boardList";
     }

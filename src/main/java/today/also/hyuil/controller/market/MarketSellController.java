@@ -61,16 +61,10 @@ public class MarketSellController {
          * 뭐가 더 유리할까?
          */
         // 삭제 여부 필터링
-        List<BoardListDto> marketListDto =
-                marketList
-                        .filter(market -> market.getMarketRemover() == null)
-                        .map(market -> new BoardListDto(market))
-                        .toList();
+        Page<BoardListDto> marketListDto = marketList
+                        .map(market -> new BoardListDto(market));
 
-        // 페이지로 캐스팅
-        Page<BoardListDto> page = webService.boardListToPage(pageable, marketListDto);
-
-        model.addAttribute("marketList", page);
+        model.addAttribute("marketList", marketListDto);
         model.addAttribute("nowPage", pageable.getPageNumber());
         return "market/sell/sellList";
     }

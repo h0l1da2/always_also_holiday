@@ -68,7 +68,7 @@ public class MarketBuyController {
                 .toList();
 
         // 페이지로 캐스팅
-        Page<BoardListDto> page = webService.boardListToPage(pageable, marketListDto);
+        Page<BoardListDto> page = webService.listToPage(pageable, marketListDto);
 
         model.addAttribute("marketList", page);
         model.addAttribute("nowPage", pageable.getPageNumber());

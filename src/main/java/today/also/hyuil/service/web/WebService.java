@@ -66,9 +66,9 @@ public class WebService {
                 .body(jsonResponse);
     }
 
-    public Page<BoardListDto> boardListToPage(Pageable pageable, List dtoList) {
+    public Page<BoardListDto> listToPage(Pageable pageable, List dtoList) {
         int start = (int) pageable.getOffset();
-        int end = Math.min((start + pageable.getPageSize()), dtoList.size());
+        int end = Math.min((start + pageable.getPageSize()),  (int) pageable.getOffset() + dtoList.size());
         return new PageImpl<>(dtoList.subList(start, end), pageable, dtoList.size());
     }
 
