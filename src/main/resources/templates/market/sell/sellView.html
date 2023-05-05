@@ -84,8 +84,7 @@
                                 <div class="comment-content">
                                   <p th:text="${comment.content}"></p>
                                 </div>
-                                <!--                              <div class="reply" id="replyBtn" th:if="${session.memberId != null}"><a class="btn btn-default btn-sm">Reply</a></div>-->
-                                <div class="reply replyBtn" id="replyBtn"><a class="btn btn-default btn-sm" role="button" th:onclick="'replyBtnOn('+${comment.id}+')'">Reply</a></div>
+                                <div class="reply replyBtn" id="replyBtn" th:unless="${session.id == null}"><a class="btn btn-default btn-sm" role="button" th:onclick="'replyBtnOn('+${comment.id}+')'">Reply</a></div>
                                 <hr>
                               </div>
                             </div>
