@@ -27,7 +27,6 @@ import today.also.hyuil.exception.MemberNotFoundException;
 import today.also.hyuil.exception.ThisEntityIsNull;
 import today.also.hyuil.exception.fanLetter.MimeTypeNotMatchException;
 import today.also.hyuil.service.market.inter.MarketSellService;
-import today.also.hyuil.service.market.inter.MarketService;
 import today.also.hyuil.service.member.inter.MemberJoinService;
 import today.also.hyuil.service.web.WebService;
 
@@ -46,7 +45,7 @@ public class MarketSellController {
     private final WebService webService;
     private final MarketSellService marketService;
     private final MemberJoinService memberJoinService;
-    @Value("${file.fan.market.path}")
+    @Value("${file.fan.market.sell.path}")
     private String filePath;
 
     public MarketSellController(WebService webService, MarketSellService marketService, MemberJoinService memberJoinService) {
@@ -112,7 +111,6 @@ public class MarketSellController {
         if (nextMarket != null) {
             model.addAttribute("next", new PrevNextDto(nextMarket.getId(), nextMarket.getTitle()));
         }
-
 
         model.addAttribute("market", new MarketViewDto(market));
         model.addAttribute("filePath", filePaths);

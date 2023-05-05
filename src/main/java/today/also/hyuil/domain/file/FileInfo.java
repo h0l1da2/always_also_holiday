@@ -48,6 +48,6 @@ public class FileInfo {
     }
     public void marketSellFile(MarketSell marketSell) {
         this.marketSell = marketSell;
-        this.isWhere = IsWhere.MARKET;
+        this.isWhere = IsWhere.MARKET_SELL;
     }
 }

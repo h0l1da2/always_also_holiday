@@ -42,7 +42,7 @@ public class FileRepository {
     public List<FileInfo> selectInfoListForMarket(Long marketId) {
         return query.select(fileInfo)
                 .from(fileInfo)
-                .where(fileInfo.market.id.eq(marketId))
+                .where(fileInfo.marketSell.id.eq(marketId))
                 .leftJoin(fileInfo.file, files)
                 .fetchJoin()
                 .distinct()
