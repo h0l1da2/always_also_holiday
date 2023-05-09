@@ -18,11 +18,9 @@ import java.util.UUID;
 public class CustomDefaultOAuth2UserService extends DefaultOAuth2UserService {
 
     private final MemberJoinService memberJoinService;
-    private final SnsInfo snsInfo;
 
-    public CustomDefaultOAuth2UserService(MemberJoinService memberJoinService, SnsInfo snsInfo) {
+    public CustomDefaultOAuth2UserService(MemberJoinService memberJoinService) {
         this.memberJoinService = memberJoinService;
-        this.snsInfo = snsInfo;
     }
 
     @Override

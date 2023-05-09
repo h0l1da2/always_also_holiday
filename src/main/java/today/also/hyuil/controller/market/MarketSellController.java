@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -54,10 +55,16 @@ public class MarketSellController {
         this.memberJoinService = memberJoinService;
     }
 
-    // TODO 마켓 판매 전체리스트 / 읽기 / 쓰기 / 수정 / 삭제 /
+    // TODO 마켓 판매 전체리스트 / 읽기O / 쓰기O / 수정 / 삭제 /
     // TODO 댓글 읽기 / 쓰기 / 삭제
+    // TODO 뷰 페이지에 구매 버튼이 있고, 결제 페이지로 넘어갈 수 있게 구현 필요
+
+    /**
+     * 리스트 사이즈 = 6
+     * 해당 파일까지 보여줘야 함
+     */
     @GetMapping
-    public String main(@PageableDefault Pageable pageable, Model model) {
+    public String main(@PageableDefault(value = 6, size = 6, sort = "id", direction = Sort.Direction.DESC) Pageable pageable, Model model) {
 
         Page<MarketSell> marketList = marketService.listMain(pageable);
 

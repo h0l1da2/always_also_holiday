@@ -88,6 +88,9 @@ public class CustomOAuth2AuthorizationRequestResolver implements OAuth2Authoriza
             if (redirectUrl.startsWith("/market/buy")) {
                 redirectUrl = "/market/buy";
             }
+            if (redirectUrl.startsWith("/market/sell")) {
+                redirectUrl = "/market/sell";
+            }
             redirectUrl = BASE_URL + redirectUrl;
         }
         return redirectUrl;

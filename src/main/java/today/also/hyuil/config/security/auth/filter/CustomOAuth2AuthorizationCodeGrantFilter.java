@@ -35,7 +35,6 @@ import static org.springframework.http.MediaType.*;
 
 public class CustomOAuth2AuthorizationCodeGrantFilter extends OAuth2AuthorizationCodeGrantFilter {
 
-    private final String BASE_URL = "http://localhost:8080";
     private final ClientRegistrationRepository clientRegistrationRepository;
     private final CustomDefaultOAuth2UserService customDefaultOAuth2UserService;
     private final SnsInfo snsInfo;
