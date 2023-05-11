@@ -34,11 +34,4 @@ public class BoardListDto {
         this.uploadDate = market.getUploadDate();
         this.view = market.getView();
     }
-    public BoardListDto(MarketSell market) {
-        this.id = market.getId();
-        this.title = market.getTitle();
-        this.nickname = market.getMember().getNickname();
-        this.uploadDate = market.getUploadDate();
-        this.view = market.getView();
-    }
 }

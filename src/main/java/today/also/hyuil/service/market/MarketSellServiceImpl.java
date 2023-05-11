@@ -99,7 +99,7 @@ public class MarketSellServiceImpl implements MarketSellService {
     public Page<MarketSell> listMain(Pageable pageable) {
         // 현재페이지 / 페이지사이즈(10) / id 기준 오름차순
         Pageable pageRequest =
-                PageRequest.of(pageable.getPageNumber(), 10, Sort.Direction.DESC, "id");
+                PageRequest.of(pageable.getPageNumber(), 6, Sort.Direction.DESC, "id");
 
         return marketJpaRepository.findAll(pageRequest);
     }

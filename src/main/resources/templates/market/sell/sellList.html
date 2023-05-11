@@ -15,64 +15,20 @@
   <div class="container">
     <div class="row">
 
-      <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
-        <div class="price-block outline mb30">
-          <a th:href="service-detail.html"><div class="price-img">
+      <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12" th:each="sell : ${marketList}">
+        <div class="price-block outline mb30" th:value="${sell.id}">
+          <a th:href="@{/market/sell}+${sell.id}"><div class="price-img">
+<!--            <img th:src="@{${filePath}}" class="img-responsive" alt=""></div></a>-->
             <img th:src="@{/static/images/pricing-img-1.jpg}" class="img-responsive" alt=""></div></a>
             <div class="price-content pinside30">
-              <a th:href="service-detail.html">
-                <h2 class="price-title mb10">휴일이가 신던 신발 팝니다</h2>
+              <a th:href="@{/market/sell}+${sell.id}">
+                <h2 class="price-title mb10" th:text="${sell.title}">휴일이가 신던 신발 팝니다</h2>
               </a>
-          <p class="mb30">닉네임 | 날짜 | 조회수</p>
+          <p class="mb30" th:text="'닉네임 '+${sell.nickname}+' | 날짜 '+${sell.uploadDate}+' | 조회수'+${sell.view}">닉네임 | 날짜 | 조회수</p>
         </div>
       </div>
     </div>
-      
-    <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
-      <div class="price-block outline mb30">
-        <a th:href="service-detail.html"><div class="price-img"><img th:src="@{/static/images/pricing-img-1.jpg}" class="img-responsive" alt=""></div></a>
-        <div class="price-content pinside30">
-          <h2 class="price-title mb10">휴일이가 신던 신발 팝니다</h2>
-          <p class="mb30">닉네임 | 날짜 | 조회수</p>
-        </div>
-      </div>
-    </div>
-    <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
-      <div class="price-block outline mb30">
-        <a th:href="service-detail.html"><div class="price-img"><img th:src="@{/static/images/pricing-img-1.jpg}" class="img-responsive" alt=""></div></a>
-        <div class="price-content pinside30">
-          <h2 class="price-title mb10">휴일이가 신던 신발 팝니다</h2>
-          <p class="mb30">닉네임 | 날짜 | 조회수</p>
-        </div>
-      </div>
-    </div>
-    <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
-      <div class="price-block outline mb30">
-        <a th:href="service-detail.html"><div class="price-img"><img th:src="@{/static/images/pricing-img-1.jpg}" class="img-responsive" alt=""></div></a>
-        <div class="price-content pinside30">
-          <h2 class="price-title mb10">휴일이가 신던 신발 팝니다</h2>
-          <p class="mb30">닉네임 | 날짜 | 조회수</p>
-        </div>
-      </div>
-    </div>
-    <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
-      <div class="price-block outline mb30">
-        <a th:href="service-detail.html"><div class="price-img"><img th:src="@{/static/images/pricing-img-1.jpg}" class="img-responsive" alt=""></div></a>
-        <div class="price-content pinside30">
-          <h2 class="price-title mb10">휴일이가 신던 신발 팝니다</h2>
-          <p class="mb30">닉네임 | 날짜 | 조회수</p>
-        </div>
-      </div>
-    </div>
-    <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
-      <div class="price-block outline mb30">
-        <a th:href="service-detail.html"><div class="price-img"><img th:src="@{/static/images/pricing-img-1.jpg}" class="img-responsive" alt=""></div></a>
-        <div class="price-content pinside30">
-          <h2 class="price-title mb10">휴일이가 신던 신발 팝니다</h2>
-          <p class="mb30">닉네임 | 날짜 | 조회수</p>
-        </div>
-      </div>
-    </div>
+
   </div>
 </div>
 </div>

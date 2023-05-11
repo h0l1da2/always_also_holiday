@@ -20,6 +20,7 @@ import today.also.hyuil.domain.Who;
 import today.also.hyuil.domain.dto.fanLetter.*;
 import today.also.hyuil.domain.dto.market.MarketViewDto;
 import today.also.hyuil.domain.dto.market.MarketWriteDto;
+import today.also.hyuil.domain.dto.market.sell.SellListDto;
 import today.also.hyuil.domain.fanLetter.ReplyType;
 import today.also.hyuil.domain.file.FileInfo;
 import today.also.hyuil.domain.market.*;
@@ -64,7 +65,7 @@ public class MarketSellController {
      * 해당 파일까지 보여줘야 함
      */
     @GetMapping
-    public String main(@PageableDefault(value = 6, size = 6, sort = "id", direction = Sort.Direction.DESC) Pageable pageable, Model model) {
+    public String main(Pageable pageable, Model model) {
 
         Page<MarketSell> marketList = marketService.listMain(pageable);
 
@@ -74,8 +75,10 @@ public class MarketSellController {
          * 뭐가 더 유리할까?
          */
         // 삭제 여부 필터링
-        Page<BoardListDto> marketListDto = marketList
-                        .map(market -> new BoardListDto(market));
+        Page<SellListDto> marketListDto = marketList
+                        .map(market -> new SellListDto(market));
+
+        // 해당 페이지에 맞는 파일들도 가져와야함....어떻게 가져오지 ??ㅜㅜ
 
         model.addAttribute("marketList", marketListDto);
         model.addAttribute("nowPage", pageable.getPageNumber());
