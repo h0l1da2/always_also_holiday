@@ -1,6 +1,7 @@
 package today.also.hyuil.domain.dto.market.sell;
 
 import lombok.Data;
+import today.also.hyuil.domain.file.FileInfo;
 import today.also.hyuil.domain.market.MarketSell;
 
 import java.util.Date;
@@ -13,6 +14,7 @@ public class SellListDto {
     private String nickname;
     private Date uploadDate;
     private Long view;
+    private String filePath;
 
     public SellListDto() {
     }
@@ -23,5 +25,11 @@ public class SellListDto {
         this.nickname = marketSell.getMember().getNickname();
         this.uploadDate = marketSell.getUploadDate();
         this.view = marketSell.getView();
+    }
+
+    public void pathForList(FileInfo fileInfo) {
+        this.filePath = fileInfo.getFile().getPath() + fileInfo.getFile().getUuid() + fileInfo.getFile().getMimeType();
+        int startPath = "/Users/holiday/IdeaProjects/also_hyuil/src/main/resources".length();
+        this.filePath = filePath.substring(startPath);
     }
 }

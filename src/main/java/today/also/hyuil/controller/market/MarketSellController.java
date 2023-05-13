@@ -6,8 +6,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -28,6 +26,7 @@ import today.also.hyuil.domain.member.Member;
 import today.also.hyuil.exception.MemberNotFoundException;
 import today.also.hyuil.exception.ThisEntityIsNull;
 import today.also.hyuil.exception.fanLetter.MimeTypeNotMatchException;
+import today.also.hyuil.service.file.inter.FileService;
 import today.also.hyuil.service.market.inter.MarketSellService;
 import today.also.hyuil.service.member.inter.MemberJoinService;
 import today.also.hyuil.service.web.WebService;
@@ -47,13 +46,15 @@ public class MarketSellController {
     private final WebService webService;
     private final MarketSellService marketService;
     private final MemberJoinService memberJoinService;
+    private final FileService fileService;
     @Value("${file.fan.market.sell.path}")
     private String filePath;
 
-    public MarketSellController(WebService webService, MarketSellService marketService, MemberJoinService memberJoinService) {
+    public MarketSellController(WebService webService, MarketSellService marketService, MemberJoinService memberJoinService, FileService fileService) {
         this.webService = webService;
         this.marketService = marketService;
         this.memberJoinService = memberJoinService;
+        this.fileService = fileService;
     }
 
     // TODO 마켓 판매 전체리스트 / 읽기O / 쓰기O / 수정 / 삭제 /
@@ -68,17 +69,20 @@ public class MarketSellController {
     public String main(Pageable pageable, Model model) {
 
         Page<MarketSell> marketList = marketService.listMain(pageable);
+        Page<FileInfo> fileInfoList = fileService.fileInfoListForMarketSellList(pageable);
 
         /**
          * 1. 서버에서 필터링하는 법
          * 2. DB 에서 조건문을 준 후 가져오는 법
          * 뭐가 더 유리할까?
          */
-        // 삭제 여부 필터링
         Page<SellListDto> marketListDto = marketList
                         .map(market -> new SellListDto(market));
 
+        marketListDto.forEach(sellListDto -> sellListDto.pathForList(fileInfoList.iterator().next()));
+
         // 해당 페이지에 맞는 파일들도 가져와야함....어떻게 가져오지 ??ㅜㅜ
+
 
         model.addAttribute("marketList", marketListDto);
         model.addAttribute("nowPage", pageable.getPageNumber());
