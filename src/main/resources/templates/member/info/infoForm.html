@@ -16,9 +16,9 @@
     <div class="row">
       <div class="table-center">
         <div class="form-group">
-          <button id="singlebutton" name="singlebutton" class="btn btn-default info-btn-form">비밀번호 수정</button>
-          <button id="singlebutton" name="singlebutton" class="btn btn-default info-btn-form">이메일 수정</button>
-          <button id="singlebutton" name="singlebutton" class="btn btn-default info-btn-form">휴대폰 수정</button>
+          <button id="passBtn" name="singlebutton" class="btn btn-default info-btn-form">비밀번호 수정</button>
+          <button id="emailBtn" name="singlebutton" class="btn btn-default info-btn-form">이메일 수정</button>
+          <button id="phoneBtn" name="singlebutton" class="btn btn-default info-btn-form">휴대폰 수정</button>
         </div>
       </div>
 
@@ -28,21 +28,21 @@
             <!-- Textarea -->
             <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
               <!-- Text input-->
-              <div class="form-group join-input">
-                <label class=" control-label" for="name">아이디 : </label>
-                <input id="name" name="name" type="text" class="form-control" placeholder="5자 이상" required>
+              <div class="form-group join-input" th:object="${member}">
+                <label class=" control-label" for="memberId">아이디 : </label>
+                <input th:field="*{memberId}" type="text" class="form-control" placeholder="" disabled th:value="*{memberId}">
                 <label class=" control-label" for="name">이름 : </label>
-                <input id="name" name="name" type="text" class="form-control" placeholder="5자 이상" required>
+                <input th:field="*{name}" type="text" class="form-control" placeholder="" disabled th:value="*{name}">
                 <div class="form-group">
-                  <label class=" control-label" for="email">닉네임 :</label>
-                  <input id="email" name="email" type="password" class="form-control" placeholder="영문/숫자 포함 8자" required>
+                  <label class=" control-label" for="nickname">닉네임 :</label>
+                  <input th:field="*{nickname}" type="text" class="form-control" placeholder="" disabled th:value="*{nickname}">
                 </div>
                 <div class="form-group">
                   <label class=" control-label" for="email">이메일 :</label>
-                  <input id="email" name="email" type="password" class="form-control" placeholder="영문/숫자 포함 8자" required>
+                  <input th:field="*{email}" type="text" class="form-control" placeholder="" disabled th:value="*{email}">
                 </div>
                 <label class=" control-label" for="email">휴대폰 :</label>
-                <input id="email" name="email" type="password" class="form-control" placeholder="영문/숫자 포함 8자" required>
+                <input th:field="*{phone}" type="text" class="form-control" placeholder="" disabled th:value="*{phone}">
               </div>
             </div>
 

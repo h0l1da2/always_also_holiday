@@ -80,7 +80,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .mvcMatchers("/fanLetter/write", "/fanLetter/modify/**",
                         "/fanLetter/remove/**",
                         "/market/buy/write", "/market/buy/modify/**",
-                        "/market/buy/comment/write", "/market/buy/comment/remove/**")
+                        "/market/buy/comment/write", "/market/buy/comment/remove/**",
+                        "/market/sell/write")
                 .hasRole("USER")
                 .anyRequest()
                 .permitAll()
