@@ -14,7 +14,6 @@ import today.also.hyuil.exception.FileNumbersLimitExceededException;
 import today.also.hyuil.exception.MemberNotFoundException;
 import today.also.hyuil.repository.fanLetter.FanLetterJpaRepository;
 import today.also.hyuil.repository.fanLetter.FanLetterRepository;
-import today.also.hyuil.service.admin.inter.AdminService;
 import today.also.hyuil.service.fanLetter.inter.FanLetterService;
 import today.also.hyuil.service.file.inter.FileService;
 import today.also.hyuil.service.member.inter.MemberJoinService;
@@ -31,14 +30,13 @@ public class FanLetterServiceImpl implements FanLetterService {
     private final FanLetterRepository fanLetterRepository;
     private final FanLetterJpaRepository fanLetterJpaRepository;
     private final MemberJoinService memberJoinService;
-    private final AdminService adminService;
     private final FileService fileService;
 
-    public FanLetterServiceImpl(FanLetterRepository fanLetterRepository, FanLetterJpaRepository fanLetterJpaRepository, MemberJoinService memberJoinService, AdminService adminService, FileService fileService) {
+    // TODO 리포지토리 / 서비스 리팩토링
+    public FanLetterServiceImpl(FanLetterRepository fanLetterRepository, FanLetterJpaRepository fanLetterJpaRepository, MemberJoinService memberJoinService, FileService fileService) {
         this.fanLetterRepository = fanLetterRepository;
         this.fanLetterJpaRepository = fanLetterJpaRepository;
         this.memberJoinService = memberJoinService;
-        this.adminService = adminService;
         this.fileService = fileService;
     }
 

@@ -4,6 +4,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import today.also.hyuil.domain.member.Member;
+import today.also.hyuil.exception.NotValidException;
 import today.also.hyuil.repository.member.MemberRepository;
 import today.also.hyuil.service.member.inter.MemberJoinService;
 
@@ -57,8 +58,24 @@ public class MemberJoinServiceImpl implements MemberJoinService {
         return passwordEncoder.matches(password, findMember.getPassword());
     }
 
+    @Override
+    public void passwordChange(Long id, String password, String newPwd) throws NotValidException {
+        Member member = memberRepository.findById(id);
+
+        boolean valid = passwordValid(newPwd, member.getPassword());
+        if (valid) {
+            throw new NotValidException("패스워드가 다릅니다");
+        }
+
+        memberRepository.updatePassword(id, newPwd);
+    }
+
     private String getEncodedPassword(String password) {
         return passwordEncoder.encode(password);
+    }
+
+    private boolean passwordValid(String dbPwd, String clientPwd) {
+        return passwordEncoder.matches(dbPwd, clientPwd);
     }
 
 }

@@ -86,4 +86,11 @@ public class MemberRepository {
         em.close();
         return member;
     }
+
+    public void updatePassword(Long id, String newPwd) {
+        Member member = em.find(Member.class, id);
+        // 패스워드 변경 날짜도 함께 변경 됨
+        member.passwordChange(newPwd);
+        em.close();
+    }
 }

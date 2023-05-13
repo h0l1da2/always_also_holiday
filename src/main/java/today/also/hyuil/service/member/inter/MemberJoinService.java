@@ -1,6 +1,7 @@
 package today.also.hyuil.service.member.inter;
 
 import today.also.hyuil.domain.member.Member;
+import today.also.hyuil.exception.NotValidException;
 
 public interface MemberJoinService {
     Member joinMember(Member member);
@@ -10,5 +11,5 @@ public interface MemberJoinService {
     Member findMyAccountMemberId(String memberId);
     Member findMyAccount(Long id);
     boolean idPwdValid(String memberId, String password);
-
+    void passwordChange(Long id, String password, String newPwd) throws NotValidException;
 }

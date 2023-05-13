@@ -90,4 +90,9 @@ public class Member {
     public void encodePassword(String password) {
         this.password = password;
     }
+
+    public void passwordChange(String newPwd) {
+        this.password = newPwd;
+        this.pwdModifyDate = new Date();
+    }
 }
