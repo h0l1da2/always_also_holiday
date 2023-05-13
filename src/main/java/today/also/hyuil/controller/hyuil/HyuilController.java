@@ -19,4 +19,8 @@ public class HyuilController {
     public String music() {
         return "hyuil/music";
     }
+    @GetMapping("/drawing")
+    public String drawing() {
+        return "hyuil/drawing";
+    }
 }

@@ -66,9 +66,9 @@
               <ul class="listnone sidenav-outline">
                 <li><i class="fa fa-caret-right"></i> <a th:href="@{/intro}" class="active">소개</a></li>
                 <li><i class="fa fa-caret-right"></i> <a th:href="@{/friends}">친구 리뷰</a></li>
-                <li><i class="fa fa-caret-right"></i> <a href="service-detail.html">음악</a></li>
-                <li><i class="fa fa-caret-right"></i> <a href="service-detail.html">그림</a></li>
-                <li><i class="fa fa-caret-right"></i> <a href="service-detail.html">개발 ing</a></li>
+                <li><i class="fa fa-caret-right"></i> <a th:href="@{/music}">음악</a></li>
+                <li><i class="fa fa-caret-right"></i> <a th:href="@{/drawing}">그림</a></li>
+                <li><i class="fa fa-caret-right"></i> <a href="#"><div id="codingI">개발 ing</div></a></li>
               </ul>
             </div>
           </div>
@@ -77,6 +77,13 @@
     </div>
   </div>
 </div>
+<script th:inline="javascript">
+  $(document).ready(function() {
+    $('#codingI').click(function() {
+      alert('준비중입니다');
+    });
+  });
+</script>
 </body>
 </th:block>
 </html>

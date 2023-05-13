@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html">
 <th:block th:fragment="headerFragment(memberId)">
   <div class="header">
     <div class="container">
@@ -34,8 +34,8 @@
                   <li><a th:href="@{/intro}" title="Testimonial" class="animsition-link menu-title">소개</a></li>
                   <li><a th:href="@{/friends}" title="Testimonial" class="animsition-link menu-title">추천사</a></li>
                   <li><a th:href="@{/music}" title="Testimonial" class="animsition-link menu-title">음악</a></li>
-                  <li><a href="testimonial.html" title="Testimonial" class="animsition-link menu-title">그림</a></li>
-                  <li><a href="testimonial.html" title="Testimonial" class="animsition-link menu-title">개발ing</a></li>
+                  <li><a th:href="@{/drawing}" title="Testimonial" class="animsition-link menu-title">그림</a></li>
+                  <li><a href="#" title="Testimonial" class="animsition-link menu-title"><div id="coding">개발ing</div></a></li>
                 </ul>
               </li>
               <li><a th:href="@{/fanLetter}" title="Blog" class="animsition-link menu-title">팬레터</a></li>
@@ -46,18 +46,32 @@
 <!--                  <li><a href="testimonial.html" title="Testimonial" class="animsition-link menu-title">내역 확인</a></li>-->
                 </ul>
               </li>
-              <li><a href="contact.html" title="Contact Us" class="animsition-link menu-title">팬미팅 신청</a>
+              <li><a href="#" title="Contact Us" class="animsition-link menu-title"><div id="fanMeet">팬미팅 신청</div></a>
                 <ul>
-                  <li><a href="testimonial.html" title="Testimonial" class="animsition-link menu-title">신청하기</a></li>
+<!--                  <li><a href="#" title="Testimonial" class="animsition-link menu-title" id="fanMeetClick">신청하기</a></li>-->
 <!--                  <li><a href="testimonial.html" title="Testimonial" class="animsition-link menu-title">내역</a></li>-->
                 </ul>
               </li>
-              <li><a href="style-guide.html" title="Style Guide" class="animsition-link menu-title">온리팬즈</a></li>
+              <li><a href="#" title="Style Guide" class="animsition-link menu-title"><div id="onlyFans">온리팬즈</div></a></li>
             </ul>
           </div>
         </div>
       </div>
     </div>
   </div>
+  <script th:inline="javascript">
+    $( document ).ready( function() {
+      const onlyFans = document.getElementById('onlyFans');
+      const fanMeet = document.getElementById('fanMeet');
+      const coding = document.getElementById('coding');
+      onlyFans.addEventListener('click', click);
+      fanMeet.addEventListener('click', click);
+      coding.addEventListener('click', click);
+    })
+    function click() {
+      alert('준비중입니다');
+    }
+
+  </script>
 </th:block>
 </html>
