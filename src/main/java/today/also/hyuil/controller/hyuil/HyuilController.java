@@ -15,4 +15,8 @@ public class HyuilController {
     public String friends() {
         return "hyuil/review";
     }
+    @GetMapping("/music")
+    public String music() {
+        return "hyuil/music";
+    }
 }
