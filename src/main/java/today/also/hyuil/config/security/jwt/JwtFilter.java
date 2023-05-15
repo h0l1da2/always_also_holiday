@@ -2,6 +2,7 @@ package today.also.hyuil.config.security.jwt;
 
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.MalformedJwtException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -67,8 +68,11 @@ public class JwtFilter extends OncePerRequestFilter {
                 }
             }
         } catch (ExpiredJwtException e) {
-            // TODO 토큰이 만료 됐을 경우 자동 로그아웃 필요
             System.out.println("토큰이 만료됨 : 인증 실패");
+            filterChain.doFilter(request, response);
+            return;
+        } catch (MalformedJwtException e) {
+            System.out.println("토큰 값이 올바르지 않음");
             filterChain.doFilter(request, response);
             return;
         }

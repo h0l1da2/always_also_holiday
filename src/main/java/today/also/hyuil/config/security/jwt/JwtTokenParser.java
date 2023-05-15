@@ -64,7 +64,7 @@ public class JwtTokenParser {
         return authorities;
     }
 
-    public Claims getClaims(String token) {
+    public Claims getClaims(String token) throws MalformedJwtException {
         Claims claims = jwtParser.parseClaimsJws(token).getBody();
         return claims;
     }
@@ -153,7 +153,7 @@ public class JwtTokenParser {
                 .getBody();
     }
 
-    public String tokenInMemberId(String token) {
+    public String tokenInMemberId(String token) throws MalformedJwtException {
         Claims claims = getClaims(token);
         return String.valueOf(claims.get("memberId"));
     }

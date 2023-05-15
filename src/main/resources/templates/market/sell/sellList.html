@@ -14,6 +14,11 @@
 <div class="space-medium">
   <div class="container">
     <div class="row">
+      <div class="table-center">
+        <div class="form-group write-title">
+          <button id="writeBtn" name="writeBtn" class="btn btn-default info-btn-form">글쓰기</button>
+        </div>
+      </div>
 
       <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12" th:each="sell : ${marketList}">
         <div class="price-block outline mb30" th:value="${sell.id}">
@@ -44,6 +49,15 @@
 
 </div>
 </div>
+<script th:inline="javascript">
+
+  $( document ).ready( function() {
+    $('#writeBtn').click(function () {
+      let token = localStorage.getItem('jwt');
+      window.location.href='/market/sell/write?token='+token;
+    })
+  })
+</script>
 </body>
 </th:block>
 </html>
