@@ -27,6 +27,14 @@ repositories {
 	mavenCentral()
 }
 
+bootJar {
+	duplicatesStrategy = 'exclude'
+}
+
+jar {
+	enabled = false
+}
+
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-jdbc'
@@ -70,6 +78,7 @@ dependencies {
 		exclude group: "org.hamcrest", module: "hamcrest-core"
 	}
 
+	apply plugin: 'io.spring.dependency-management'
 }
 
 tasks.named('test') {
@@ -107,3 +116,5 @@ compileQuerydsl.doFirst {
 	if(file(querydslDir).exists() )
 		delete(file(querydslDir))
 }
+
+
