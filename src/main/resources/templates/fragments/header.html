@@ -15,7 +15,7 @@
             </div>
             <div class="col-lg-4 col-md-4 col-sm-3 col-xs-12">
               <div class="top-btn" th:unless="${session.id != null}"><a th:href="@{/loginForm}" class="btn btn-default menu-title">로그인</a> </div>
-              <div class="top-btn" th:unless="${session.id == null}"><a th:href="@{/loginForm}" class="btn btn-default menu-title" th:text="${session.nickname}"></a> </div>
+              <div class="top-btn" th:unless="${session.id == null}"><a th:href="@{/info}" class="btn btn-default menu-title" th:text="${session.nickname}"></a> </div>
             </div>
           </div>
         </div>
