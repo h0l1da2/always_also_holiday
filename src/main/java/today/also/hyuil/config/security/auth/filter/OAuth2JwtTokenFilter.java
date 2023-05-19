@@ -55,6 +55,10 @@ public class OAuth2JwtTokenFilter extends OncePerRequestFilter {
         TokenResponse tokenResponse =
                 (TokenResponse) request.getAttribute("tokenResponse");
         String sns = String.valueOf(request.getAttribute("sns"));
+
+        System.out.println("sns = " + sns);
+        System.out.println("tokenResponse = " + tokenResponse);
+
         String memberId = "";
         String token = "";
         String sub = "";
