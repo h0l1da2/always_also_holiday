@@ -1,6 +1,7 @@
 package today.also.hyuil.config.security.jwt;
 
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
@@ -112,10 +113,9 @@ public class JwtTokenParser {
         byte[] tokenBytes = Base64.getDecoder().decode(jwt[x]);
 
         String jsonString = new String(tokenBytes, StandardCharsets.UTF_8);
-        JsonObject headerJson = new JsonObject();
-        headerJson.addProperty(what, jsonString);
+        JsonObject headerJson = new JsonParser().parse(jsonString).getAsJsonObject();
 
-        return String.valueOf(headerJson.get(what));
+        return headerJson.get(what).getAsString();
     }
 
     public boolean isSignatureValid(PublicKey publicKey, String alg, String token) {
