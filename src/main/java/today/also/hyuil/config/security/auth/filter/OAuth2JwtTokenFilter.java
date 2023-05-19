@@ -1,7 +1,6 @@
 package today.also.hyuil.config.security.auth.filter;
 
 import io.jsonwebtoken.Claims;
-import org.springframework.boot.configurationprocessor.json.JSONException;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -98,11 +97,7 @@ public class OAuth2JwtTokenFilter extends OncePerRequestFilter {
                 String kty = "";
                 String alg = "";
 
-                try {
-                    kid = jwtTokenParser.getTokenSecret(token, "header", "kid");
-                } catch (JSONException jsonE) {
-                    jsonE.printStackTrace();
-                }
+                kid = jwtTokenParser.getTokenSecret(token, "header", "kid");
 
                 // kid First인지 Second인지 확인하고, 해당 객체 쓰기
                 if (sns.equals(Sns.KAKAO.name())) {

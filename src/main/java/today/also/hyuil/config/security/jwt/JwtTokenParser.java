@@ -1,10 +1,9 @@
 package today.also.hyuil.config.security.jwt;
 
+import com.google.gson.JsonObject;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.configurationprocessor.json.JSONException;
-import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -91,7 +90,7 @@ public class JwtTokenParser {
         }
     }
 
-    public String getTokenSecret(String token, String where, String what) throws JSONException {
+    public String getTokenSecret(String token, String where, String what) {
         String[] jwt = splitToken(token);
         int x = 0;
         if (where.equals("header")) {
@@ -113,7 +112,8 @@ public class JwtTokenParser {
         byte[] tokenBytes = Base64.getDecoder().decode(jwt[x]);
 
         String jsonString = new String(tokenBytes, StandardCharsets.UTF_8);
-        JSONObject headerJson = new JSONObject(jsonString);
+        JsonObject headerJson = new JsonObject();
+        headerJson.addProperty(what, jsonString);
 
         return String.valueOf(headerJson.get(what));
     }
