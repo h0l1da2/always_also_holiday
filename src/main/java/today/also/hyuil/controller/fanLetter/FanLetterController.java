@@ -1,5 +1,6 @@
 package today.also.hyuil.controller.fanLetter;
 
+import com.amazonaws.services.s3.AmazonS3;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.data.domain.Page;
@@ -17,9 +18,6 @@ import today.also.hyuil.domain.dto.fanLetter.*;
 import today.also.hyuil.domain.fanLetter.Comment;
 import today.also.hyuil.domain.fanLetter.FanBoard;
 import today.also.hyuil.domain.file.FileInfo;
-import today.also.hyuil.domain.file.Files;
-import today.also.hyuil.domain.file.IsWhere;
-import today.also.hyuil.domain.file.Type;
 import today.also.hyuil.exception.FileNumbersLimitExceededException;
 import today.also.hyuil.exception.MemberNotFoundException;
 import today.also.hyuil.exception.fanLetter.MimeTypeNotMatchException;
@@ -28,11 +26,9 @@ import today.also.hyuil.service.fanLetter.inter.FanLetterService;
 import today.also.hyuil.service.web.WebService;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.AccessDeniedException;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/fanLetter")
@@ -42,7 +38,6 @@ public class FanLetterController {
     private final WebService webService;
     private final FanLetterService fanLetterService;
     private final FanLetterCommentService fanLetterCommentService;
-
     @Value("${file.fan.letter.path}")
     private String filePath;
     public FanLetterController(WebService webService, FanLetterService fanLetterService, FanLetterCommentService fanLetterCommentService) {
@@ -146,7 +141,7 @@ public class FanLetterController {
 
             // 이미지 파일이 존재할 경우
             // 여기에서 뭔가 문제가 발생
-            List<FileInfo> fileInfoList = webService.getFileInfoList(files, filePath);
+            List<FileInfo> fileInfoList = webService.getFileInfoList("fanLetter_1/", files);
 
             FanBoard writeLetter = fanLetterService.writeLetter(id, fanBoard, fileInfoList);
 
@@ -231,7 +226,7 @@ public class FanLetterController {
             findLetter.modifyLetter(fanLetterWriteDto);
 
 
-            List<FileInfo> fileInfoList = webService.getFileInfoList(files, filePath);
+            List<FileInfo> fileInfoList = webService.getFileInfoList("fanLetter_1/",files);
 
             Map<String, Object> boardMap = new HashMap<>();
 
