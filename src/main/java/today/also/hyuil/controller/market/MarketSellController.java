@@ -173,7 +173,7 @@ public class MarketSellController {
 
             // 이미지 파일이 존재할 경우
             // 여기에서 뭔가 문제가 발생
-            List<FileInfo> fileInfoList = webService.getFileInfoList(files, filePath);
+            List<FileInfo> fileInfoList = webService.getFileInfoList("marketSell_1/",files);
 
             MarketSell writSell = marketService.writeSell(id, market, fileInfoList);
 

@@ -101,12 +101,8 @@
         headers: { 'Authorization': 'Bearer '+ jwt },
         dataType: 'text',
         success: function(result) {
-          alert('success');
-          if (result === 'WRITE_OK') {
-            window.location.href = '/fanLetter';
-          } else {
-            alert(result);
-          }
+          alert('작성 완료');
+          window.location.href = '/fanLetter';
         },
         error: function(xhr, status, error) {
           alert('error - '+xhr.status+'. 메시지 : '+xhr.statusText)
