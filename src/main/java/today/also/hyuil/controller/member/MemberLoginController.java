@@ -69,6 +69,10 @@ public class MemberLoginController {
             System.out.println("아이디가 없음");
             errorMapReturn(map);
             return map;
+        } catch (MemberNotFoundException e) {
+            e.printStackTrace();
+            errorMapReturn(map);
+            return map;
         }
         Member member = memberJoinService.findMyAccountMemberId(loginDto.getMemberId());
         Map<String, String> tokens = jwtTokenService.getTokens(

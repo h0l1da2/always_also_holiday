@@ -4,6 +4,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import today.also.hyuil.domain.member.Member;
+import today.also.hyuil.exception.MemberNotFoundException;
 import today.also.hyuil.exception.NotValidException;
 import today.also.hyuil.repository.member.MemberRepository;
 import today.also.hyuil.service.member.inter.MemberJoinService;
@@ -53,8 +54,11 @@ public class MemberJoinServiceImpl implements MemberJoinService {
     }
 
     @Override
-    public boolean idPwdValid(String memberId, String password) {
+    public boolean idPwdValid(String memberId, String password) throws MemberNotFoundException {
         Member findMember = memberRepository.findByMemberId(memberId);
+        if (findMember == null) {
+            throw new MemberNotFoundException();
+        }
         return passwordEncoder.matches(password, findMember.getPassword());
     }
 

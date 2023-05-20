@@ -50,7 +50,7 @@ public class CustomOAuth2AuthorizationCodeGrantFilter extends OAuth2Authorizatio
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         System.out.println("그랜트 필터 시작");
-        // http://localhost:8080/fanLetter?code={code}&state={state}
+        // https://alwaysalsoholiday.com/fanLetter?code={code}&state={state}
         String code = request.getParameter("code");
 
         if (!StringUtils.hasText(code)) {
@@ -66,6 +66,11 @@ public class CustomOAuth2AuthorizationCodeGrantFilter extends OAuth2Authorizatio
         if (session != null) {
             String originState = String.valueOf(session.getAttribute("state"));
             String state = request.getParameter("state");
+
+            if (originState == null | state == null) {
+                filterChain.doFilter(request, response);
+                return;
+            }
 
             if (state.equals(originState) && StringUtils.hasText(code)) {
                 System.out.println("어썬티케이션생성");
