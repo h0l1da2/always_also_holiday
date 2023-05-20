@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="layout/default_layout">
+<html lang="ko" xmlns:th="http://thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout/default_layout}">
 <th:block layout:fragment="content">
 <body>
 <div class="page-header page-caption">
@@ -46,14 +46,35 @@
         <div class="row">
           <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
             <div class="service-single-block mb30">
-              <div class="service-single-img"> <img src="@{/static/images/intro_profile.jpg}" class="img-responsive" alt=""></div>
+              <div class="service-single-img"> <img th:src="@{/static/images/intro_profile.jpg}" class="img-responsive" alt=""></div>
               <div class="service-single-content pinside30 outline">
-                <h1 class="section-title">휴일이</h1>
-                <p>내용내용</p>
+                <h1 class="section-title">강휴일 : KANGHYUIL</h1>
+                <p><b>95년 6월 10일 출생</b><br>
+                <b>MBTI :</b> INFP<br>
+                  <b>좋아하는 것 :</b> 맛있는 거 먹으면서 게임 방송 보기, T1 (벵기랑 페이커)<br>
+                  <b>싫어하는 것 :</b> 등산<br>
+                  <b>2023.03.23 ~ 현재 금연 중</b>
+                </p>
                 <!-- <img src="images/service-right-img.jpg" class="img-responsive alignright" alt=""> -->
                 <!-- <img src="images/service-left-img.jpg" class="img-responsive alignleft" alt=""> -->
-                <p>내용내용</p>
-                <p>내용내용내용</p>
+                <p><br>
+                휴일이를 사랑하는 사람들을 위한 공간에 오신 낯선 그대를 환영합니다.<br>
+                어렸을 때, 그러니까 학교를 다닐 적에는 수학 여행이나 현장 학습 같은 수업 외적인 이벤트들이 정말 싫었어요.<br>
+                친구가 없는 저는 항상 사람이 남는 조에 들어가야 했고 그 군중들 속에서 저를 달갑게 여기는 사람은 한명도 없었습니다. 제가 그래서 지금도 사람이 많은 곳을 좋아하지 않는 걸까요? 잘 모르겠네요<br>
+                어쨌든 얼렁뚱땅 고등학교 자퇴도 해보고 학교 대신 실용음악학원을 다니며 입시도 하고 사람들을 만나고 또 헤어지기도 하며… 저는 지금. 2023년을 기준으로 29살 어른이 되었답니다.</p>
+                <p>아니 그래서 본론이 뭐야?</p>
+                <p>
+                네! 저는 지금 무척 잘 살고 있습니다. 보통 어른이 되면 주변에 남을 사람만 남는다고 하잖아요? 저는 학창 시절보다 지금 친구가 더 많아요. 그냥 아는 사람 말고 친구가요.<br>
+                신기하게 그 시절 이어지지 않았던 인연들을 성인이 되어 알게 된 경우가 많았어요.<br>
+                그래서 아마 그대도 뒤늦게 휴일이의 매력에 빠진 제 n의 아해가 아닐까요? :)</p>
+
+                <p>
+                제 주변에는 좋은 사람들이 가득하고, 이 곳에 오신 당신도 분명 좋은 사람일 거예요. 저를 좋아해주시는 만큼 저도 그대들을 사랑하고 아끼고 있답니다.</p>
+
+                <p>
+                휴일이의 팬이 되어주셔서 감사합니다 ! 당신이 매일을 휴일처럼 느끼기를 진심으로 바랍니다.<br>
+                저도 그대 덕분에 힘든 오늘을 견딜 수 있으니까요 :)
+                </p>
               </div>
             </div>
           </div>

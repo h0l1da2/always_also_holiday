@@ -8,7 +8,7 @@
                     <div class="footer-widget bg-white pinside30 mb30">
                         <div class="logo mb30"> <a th:href="@{/static/images/logo.png}"><img th:src="@{/static/images/logo.png}" class="img-responsive" alt=""></a> </div>
                         <p class="mb30">내가 나를 사랑하고 싶어서 만든 사이트에 관심을 가져주셔서 감사합니다! 부디 행복하시고 휴일이도 많이 사랑해주시고 또 귀여워해주세요!</p>
-                        <div class="footer-social"><a href="#"><i class="fa fa-twitter"></i></a><a href="#"><i class="fa fa-facebook"></i></a><a href="#"><i class="fa fa-google-plus"></i></a></div>
+                        <div class="footer-social"><a href="https://github.com/h0l1da2"><i class="fa" th:text="Git"></i></a><a href="https://hyuil.tistory.com"><i class="fa" th:text="B"></i></a></div>
                     </div>
                 </div>
                 <div class="col-lg-offset-1 col-lg-3 col-md-offset-1 col-md-3 col-sm-6 col-xs-12">
@@ -19,7 +19,7 @@
                                 <div class="row">
                                     <div class="col-md-2"><i class="fa fa-phone"></i></div>
                                     <div class="col-md-10">
-                                        <h4 class="call-no"><a th:href="contact.html">010 8346 8610</a></h4>
+                                        <h4 class="call-no"><a href="#">010 8346 8610</a></h4>
                                     </div>
                                 </div>
                             </li>
@@ -27,7 +27,7 @@
                                 <div class="row">
                                     <div class="col-md-2"><i class="fa fa-envelope-o"></i></div>
                                     <div class="col-md-10">
-                                        <h4 class="mail-text"><a th:href="contact.html">holiday.k1@icloud.com</a></h4>
+                                        <h4 class="mail-text"><a href="#">holiday.k1@icloud.com</a></h4>
                                     </div>
                                 </div>
                             </li>
@@ -35,7 +35,7 @@
                                 <div class="row">
                                     <div class="col-md-2"><i class="fa fa-clock-o"></i></div>
                                     <div class="col-md-10">
-                                        <h4 class="time-text"><a th:href="contact.html">스케쥴은 개인 문의</a></h4>
+                                        <h4 class="time-text"><a href="#">스케쥴은 개인 문의</a></h4>
                                     </div>
                                 </div>
                             </li>
@@ -50,8 +50,8 @@
                             <li><i class="fa fa-caret-right"></i><a th:href="@{/intro}">소개</a></li>
                             <li><i class="fa fa-caret-right"></i><a th:href="@{/fanLetter}">팬레터</a></li>
                             <li><i class="fa fa-caret-right"></i><a th:href="@{/market/sell}">굿즈 장터</a></li>
-                            <li><i class="fa fa-caret-right"></i><a th:href="pricing.html">팬미팅 신청</a></li>
-                            <li><i class="fa fa-caret-right"></i><a th:href="contact.html">온리팬즈</a></li>
+                            <li><i class="fa fa-caret-right"></i><a id="fanMeetFoot">팬미팅 신청</a></li>
+                            <li><i class="fa fa-caret-right"></i><a id="onlyFansFoot">온리팬즈</a></li>
                         </ul>
                     </div>
                 </div>
@@ -65,5 +65,17 @@
             </div>
         </div>
     </div>
+    <script th:inline="javascript">
+        $( document ).ready( function() {
+            const onlyFans = document.getElementById('onlyFansFoot');
+            const fanMeet = document.getElementById('fanMeetFoot');
+            onlyFans.addEventListener('click', click);
+            fanMeet.addEventListener('click', click);
+        })
+        function click() {
+            alert('준비중입니다');
+        }
+
+    </script>
 </th:block>
 </html>

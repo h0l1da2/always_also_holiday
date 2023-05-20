@@ -16,7 +16,7 @@ import java.util.UUID;
 @Component
 public class CustomOAuth2AuthorizationRequestResolver implements OAuth2AuthorizationRequestResolver {
     private final String REQUEST_URL = "/oauth2/authorization/";
-    private final String BASE_URL = "http://localhost:8080";
+    private final String BASE_URL = "https://alwaysalsoholiday.com";
     private final SnsInfo snsInfo;
 
     public CustomOAuth2AuthorizationRequestResolver(SnsInfo snsInfo) {
