@@ -19,7 +19,8 @@ public class AwsConfig {
 
     @Value("${cloud.aws.credentials.secretKey}")
     private String secretKey;
-    private Regions region = Regions.AP_NORTHEAST_2;
+    @Value("${cloud.aws.s3.region}")
+    private Regions region;
     @Bean
     public AmazonS3Client amazonS3() {
         BasicAWSCredentials awsCredentials = new BasicAWSCredentials(accessKey, secretKey);

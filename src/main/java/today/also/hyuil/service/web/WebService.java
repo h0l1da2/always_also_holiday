@@ -158,7 +158,7 @@ public class WebService {
         file.fileUUID(fileUuid);
 
         // 아마존에 파일 저장
-        String filePath = saveFilesToAmazonS3(dir, multipartFile, fileUuid);
+        String filePath = saveFilesToAmazonS3(dir, multipartFile, fileUuid+imgMimeType);
 //        // 파일 저장 -> java.io.File (path/UUID.jpg)
 //        saveFile(multipartFile, imgMimeType, fileUuid, filePath);
 
@@ -177,10 +177,18 @@ public class WebService {
         List<String> filePaths = new ArrayList<>();
 
         for (FileInfo fileInfo : fileInfoList) {
-            String filePath = pathSubstring(fileInfo);
+//            String filePath = pathSubstring(fileInfo);
+            String filePath = awsPath(fileInfo);
+            System.out.println("filePath = " + filePath);
             filePaths.add(filePath);
         }
         return filePaths;
+    }
+
+    // TODO AWS 에서 이미지가 안 보임;;
+    private String awsPath(FileInfo fileInfo) {
+        String fileName = fileInfo.getFile().getUuid()+fileInfo.getFile().getMimeType();
+        return "https://"+bucket+".s3."+amazonS3.getRegion()+".amazonaws.com/"+fileName;
     }
 
     private String pathSubstring(FileInfo fileInfo) {
@@ -221,7 +229,6 @@ public class WebService {
         amazonS3.putObject(new PutObjectRequest(bucket, fileName, multipartFile.getInputStream(), objMeta)
                 .withCannedAcl(CannedAccessControlList.PublicRead));
 
-        System.out.println("amazonS3.getUrl(dir, fileName).toString() = " + amazonS3.getUrl(dir, fileName).toString());
         // 파일 주소 가져오기 path
         return amazonS3.getUrl(dir, fileName).toString();
 
