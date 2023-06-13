@@ -96,7 +96,7 @@ public class MemberJoinController {
         } catch (MessagingException e) {
             e.printStackTrace();
             jsonObject.addProperty("error", "SEND_ERROR");
-            webService.badResponseEntity(jsonObject);
+            webService.badResponseEntity("SEND_ERROR");
         }
         jsonObject.addProperty("body", "SEND_OK");
         return webService.okResponse(jsonObject);
