@@ -233,4 +233,11 @@ public class WebService {
         return amazonS3.getUrl(dir, fileName).toString();
 
     }
+
+    public ResponseEntity<String> okResponse(JsonObject jsonObject) {
+        Gson gson = new Gson();
+        String jsonResponse = gson.toJson(jsonObject);
+        return ResponseEntity.ok()
+                .body(jsonResponse);
+    }
 }
