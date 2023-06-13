@@ -3,10 +3,10 @@ package today.also.hyuil.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
@@ -16,7 +16,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import today.also.hyuil.config.security.CustomAccessDeniedHandler;
 import today.also.hyuil.config.security.CustomAuthenticationEntryPoint;
 import today.also.hyuil.config.security.CustomUserDetailsService;
-import today.also.hyuil.config.security.auth.*;
+import today.also.hyuil.config.security.auth.CustomDefaultOAuth2UserService;
+import today.also.hyuil.config.security.auth.CustomOAuth2SuccessHandler;
 import today.also.hyuil.config.security.auth.filter.CustomOAuth2AuthorizationCodeGrantFilter;
 import today.also.hyuil.config.security.auth.filter.CustomOAuth2AuthorizationRequestResolver;
 import today.also.hyuil.config.security.auth.filter.OAuth2JwtTokenFilter;
@@ -32,7 +33,7 @@ import today.also.hyuil.service.web.WebService;
 
 @EnableWebSecurity
 @Configuration
-public class SecurityConfig extends WebSecurityConfigurerAdapter {
+public class SecurityConfig {
 
     private final WebService webService;
     private final MemberJoinService memberJoinService;
@@ -59,13 +60,19 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         this.googleJwk = googleJwk;
     }
 
-    @Override
-    protected AuthenticationManager authenticationManager() throws Exception {
-        return super.authenticationManager();
+    @Bean
+    AuthenticationManager authenticationManager(
+            AuthenticationConfiguration authenticationConfiguration) throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
     }
 
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
+    @Bean
+    AuthenticationConfiguration authenticationConfiguration() {
+        return new AuthenticationConfiguration();
+    }
+
+    @Bean
+    protected void filterChain(HttpSecurity http) throws Exception {
         http
 
                 .csrf()
@@ -90,7 +97,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .addFilterBefore(new JwtFilter(userDetailsService(), jwtTokenParser, jwtTokenService), UsernamePasswordAuthenticationFilter.class)
                 .addFilterAfter(new JwtTokenSetFilter(), UsernamePasswordAuthenticationFilter.class)
                 // OAuth2
-                .addFilterBefore(new CustomOAuth2AuthorizationCodeGrantFilter(clientRegistrationRepository, oAuth2AuthorizedClientRepository, authenticationManager(), customDefaultOAuth2UserService, snsInfo), OAuth2LoginAuthenticationFilter.class)
+                .addFilterBefore(new CustomOAuth2AuthorizationCodeGrantFilter(clientRegistrationRepository, oAuth2AuthorizedClientRepository, authenticationManager(authenticationConfiguration()), customDefaultOAuth2UserService, snsInfo), OAuth2LoginAuthenticationFilter.class)
                 .addFilterAfter(new OAuth2JwtTokenFilter(webService, jwtTokenService, jwtTokenParser, memberJoinService, snsInfo, kakaoJwk, googleJwk), OAuth2LoginAuthenticationFilter.class)
                 .exceptionHandling()
                 .authenticationEntryPoint(new CustomAuthenticationEntryPoint()) // 인증이 실패했을 경우
@@ -117,9 +124,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     public UserDetailsService userDetailsService() {
         return new CustomUserDetailsService(memberJoinService);
     }
-    @Override
-    public void configure(WebSecurity web) throws Exception {
-        web
+    @Bean
+    public WebSecurityCustomizer configure() throws Exception {
+        return (web) -> web
                 .ignoring()
                 .mvcMatchers("/static/**", "/favicon.ico");
     }
