@@ -4,77 +4,100 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
-import org.thymeleaf.context.Context;
 import org.thymeleaf.spring5.SpringTemplateEngine;
+import org.thymeleaf.context.Context;
+import today.also.hyuil.domain.member.Mail;
 import today.also.hyuil.service.member.inter.MailService;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
-
 import java.util.Random;
 
-import static javax.mail.Message.RecipientType;
+import static javax.mail.Message.*;
 
 @Service
 @PropertySource("classpath:application.yml")
 public class MailServiceImpl implements MailService {
 
     private final JavaMailSender mailSender;
-    private final SpringTemplateEngine templateEngine; //타임리프를 사용하기 위한 객체
+    private final SpringTemplateEngine templateEngine;
+
     private MimeMessage message;
     @Value("${mail.id}")
     private String fromEmail;
-
     private String title;
-    private String randomCode;
-    private String randomPwd;
+    private String template;
+
+    private String randomCode = "";
     private final String charset = "UTF-8";
     private final String html = "html";
 
-    public MailServiceImpl(JavaMailSender mailSender, SpringTemplateEngine templateEngine) {
-        this.mailSender = mailSender;
+    public MailServiceImpl(JavaMailSender javaMailSender, SpringTemplateEngine templateEngine) {
+        this.mailSender = javaMailSender;
         this.templateEngine = templateEngine;
     }
 
     @Override
-    public String joinCodeSend(String toEmail) {
-        createCode();
-        title = "오늘도 휴일 * 가입 코드";
+    public String mailSend(Mail mail, String userEmail) throws MessagingException {
+        String result = "";
+        if (mail.equals(Mail.JOIN)) {
+            randomCode = createCode();
+            result = randomCode;
+        }
+        MimeMessage template = setTemplate(mail, userEmail, randomCode);
+        sendMail(template);
+        return result;
+    }
 
-        try {
-            message = mailSender.createMimeMessage();
-            message.addRecipients(RecipientType.TO, toEmail);
-            message.setSubject(title);
-            message.setFrom(fromEmail);
-            message.setText(contextJoin(randomCode), charset, html);
-            mailSender.send(message);
+    @Override
+    public String createCode() {
+        String values = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        int codeLength = 5;
 
-        } catch (MessagingException e) {
-            return "전송 오류";
+        Random random = new Random();
+        StringBuilder builder = new StringBuilder();
+
+        /**
+         * values 길이 안에서 랜덤한 숫자를 가져오고
+         * 랜덤 숫자를 values 의 인덱스로 가져와서 builder 로 String 에 추가함.
+         */
+        for (int i = 0; i < codeLength; i++) {
+            int randomIndex = random.nextInt(values.length());
+            builder.append(values.charAt(randomIndex));
+        }
+        return builder.toString();
+    }
+    @Override
+    public MimeMessage setTemplate(Mail type, String userEmail, String randomCode) throws MessagingException {
+
+        String key = "";
+        String value = "";
+
+        if (type.equals(Mail.JOIN)) {
+            title = "오늘도 휴일 * 가입 코드 전송";
+            template = "email/joinMailForm";
+            // randomCode , template , key=randomCode , value = code
+            key = "randomCode";
+            value = randomCode;
         }
 
-        return randomCode;
+        message = mailSender.createMimeMessage();
+        message.addRecipients(RecipientType.TO, userEmail);
+        message.setSubject(title);
+        message.setFrom(fromEmail);
+        message.setText(getContext(key, value, template), charset, html);
+        return message;
     }
 
     @Override
-    public MimeMessage joinMailForm(String toEmail) {
-        return null;
+    public String getContext(String key, String value, String template) {
+        Context context = setContext(key, value);
+        return templateEngine.process(template, context);
     }
 
     @Override
-    public String contextJoin(String code) {
-        Context context = setContext("code", code);
-        return templateEngine.process("email/joinMailForm", context);
-    }
-
-    public void createCode() {
-        int min = 1000;
-        int max = 9999;
-        StringBuffer buffer = new StringBuffer();
-        Random random = new Random();
-        int code = random.nextInt(max-min)+min;
-
-        randomCode = buffer.append(code).toString();
+    public void sendMail(MimeMessage message) {
+        mailSender.send(message);
     }
 
     private Context setContext(String key, String value) {

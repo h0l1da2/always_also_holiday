@@ -1,16 +1,18 @@
 package today.also.hyuil.controller.member;
 
+import com.google.gson.JsonObject;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import today.also.hyuil.domain.dto.member.DoubleCheckDto;
 import today.also.hyuil.domain.dto.member.MemberJoinDto;
-import today.also.hyuil.domain.member.Address;
-import today.also.hyuil.domain.member.Member;
-import today.also.hyuil.domain.member.Name;
-import today.also.hyuil.domain.member.Role;
+import today.also.hyuil.domain.member.*;
 import today.also.hyuil.service.member.inter.MailService;
 import today.also.hyuil.service.member.inter.MemberJoinService;
+import today.also.hyuil.service.web.WebService;
+
+import javax.mail.MessagingException;
 
 @Controller
 @RequestMapping("/join")
@@ -19,10 +21,12 @@ public class MemberJoinController {
     private String randomCode;
     private final MemberJoinService memberJoinService;
     private final MailService mailService;
+    private final WebService webService;
 
-    public MemberJoinController(MemberJoinService memberJoinService, MailService mailService) {
+    public MemberJoinController(MemberJoinService memberJoinService, MailService mailService, WebService webService) {
         this.memberJoinService = memberJoinService;
         this.mailService = mailService;
+        this.webService = webService;
     }
 
     @GetMapping
@@ -85,14 +89,17 @@ public class MemberJoinController {
 
     @ResponseBody
     @PostMapping("/emailSend")
-    public String emailCodeSend(@RequestBody DoubleCheckDto doubleCheckDto) {
-        if (stringNullCheck(
-                doubleCheckDto.getEmail())) {
-            return "확인 불가";
+    public ResponseEntity<String> emailSend(@RequestParam String email) {
+        JsonObject jsonObject = new JsonObject();
+        try {
+            randomCode = mailService.mailSend(Mail.JOIN, email);
+        } catch (MessagingException e) {
+            e.printStackTrace();
+            jsonObject.addProperty("error", "SEND_ERROR");
+            webService.badResponseEntity(jsonObject);
         }
-
-        randomCode = mailService.joinCodeSend(doubleCheckDto.getEmail());
-        return randomCode;
+        jsonObject.addProperty("body", "SEND_OK");
+        return webService.okResponse(jsonObject);
     }
 
     @ResponseBody
