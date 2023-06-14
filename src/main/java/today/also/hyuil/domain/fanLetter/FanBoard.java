@@ -1,10 +1,10 @@
 package today.also.hyuil.domain.fanLetter;
 
+import jakarta.persistence.*;
 import lombok.Getter;
 import today.also.hyuil.domain.dto.fanLetter.FanLetterWriteDto;
 import today.also.hyuil.domain.member.Member;
 
-import javax.persistence.*;
 import java.util.Date;
 
 @Getter

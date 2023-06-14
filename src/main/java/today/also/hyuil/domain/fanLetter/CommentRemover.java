@@ -1,17 +1,18 @@
 package today.also.hyuil.domain.fanLetter;
 
+import jakarta.persistence.*;
 import lombok.Getter;
 import today.also.hyuil.domain.member.Admin;
 import today.also.hyuil.domain.member.Member;
 
-import javax.persistence.*;
 import java.util.Date;
 
 @Entity
 @Getter
 public class CommentRemover {
 
-    @Id @GeneratedValue
+    @Id
+    @GeneratedValue
     private Long id;
     private Date removeDate;
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)

@@ -1,6 +1,6 @@
 package today.also.hyuil.service.market.inter;
 
-import javassist.NotFoundException;
+import com.amazonaws.services.kms.model.NotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import today.also.hyuil.domain.Who;

@@ -12,7 +12,7 @@ import today.also.hyuil.service.member.inter.MailService;
 import today.also.hyuil.service.member.inter.MemberJoinService;
 import today.also.hyuil.service.web.WebService;
 
-import javax.mail.MessagingException;
+import jakarta.mail.MessagingException;
 
 @Controller
 @RequestMapping("/join")

@@ -1,17 +1,17 @@
 package today.also.hyuil.domain.file;
 
+import jakarta.persistence.*;
 import lombok.Getter;
 import today.also.hyuil.domain.fanLetter.FanBoard;
 import today.also.hyuil.domain.market.Market;
 import today.also.hyuil.domain.market.MarketSell;
 
-import javax.persistence.*;
-
 @Entity
 @Getter
 public class FileInfo {
 
-    @Id @GeneratedValue
+    @Id
+    @GeneratedValue
     private Long id;
     @Enumerated(EnumType.STRING)
     private IsWhere isWhere;

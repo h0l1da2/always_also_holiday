@@ -1,6 +1,6 @@
 package today.also.hyuil.service.fanLetter.inter;
 
-import javassist.NotFoundException;
+import com.amazonaws.services.kms.model.NotFoundException;
 import today.also.hyuil.domain.fanLetter.Comment;
 
 import java.nio.file.AccessDeniedException;

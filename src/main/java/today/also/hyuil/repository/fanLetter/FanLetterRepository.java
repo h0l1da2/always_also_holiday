@@ -11,7 +11,7 @@ import today.also.hyuil.domain.dto.fanLetter.BoardListDto;
 import today.also.hyuil.domain.fanLetter.BoardRemover;
 import today.also.hyuil.domain.fanLetter.FanBoard;
 
-import javax.persistence.EntityManager;
+import jakarta.persistence.EntityManager;
 import java.util.List;
 
 import static today.also.hyuil.domain.fanLetter.QFanBoard.fanBoard;

@@ -6,7 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import today.also.hyuil.domain.member.Admin;
 import today.also.hyuil.domain.member.QAdmin;
 
-import javax.persistence.EntityManager;
+import jakarta.persistence.EntityManager;
 
 import static today.also.hyuil.domain.member.QAdmin.admin;
 

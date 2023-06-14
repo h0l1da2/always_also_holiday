@@ -5,7 +5,7 @@ import today.also.hyuil.domain.Who;
 import today.also.hyuil.domain.member.Admin;
 import today.also.hyuil.domain.member.Member;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.Date;
 
 @Entity

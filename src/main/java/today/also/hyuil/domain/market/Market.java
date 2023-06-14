@@ -4,7 +4,7 @@ import lombok.Getter;
 import today.also.hyuil.domain.dto.market.MarketWriteDto;
 import today.also.hyuil.domain.member.Member;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.Date;
 
 @Entity

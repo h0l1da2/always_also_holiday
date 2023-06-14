@@ -3,7 +3,7 @@ package today.also.hyuil.domain.member;
 import lombok.Getter;
 import today.also.hyuil.domain.dto.member.MemberJoinDto;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 @Entity
 @Getter

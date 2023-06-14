@@ -1,7 +1,8 @@
 package today.also.hyuil.controller.market;
 
+import com.amazonaws.services.kms.model.NotFoundException;
 import com.google.gson.JsonObject;
-import javassist.NotFoundException;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.data.domain.Page;
@@ -15,13 +16,18 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import today.also.hyuil.domain.Who;
-import today.also.hyuil.domain.dto.fanLetter.*;
+import today.also.hyuil.domain.dto.fanLetter.CommentDto;
+import today.also.hyuil.domain.dto.fanLetter.CommentWriteDto;
+import today.also.hyuil.domain.dto.fanLetter.PrevNextDto;
 import today.also.hyuil.domain.dto.market.MarketViewDto;
 import today.also.hyuil.domain.dto.market.MarketWriteDto;
 import today.also.hyuil.domain.dto.market.sell.SellListDto;
 import today.also.hyuil.domain.fanLetter.ReplyType;
 import today.also.hyuil.domain.file.FileInfo;
-import today.also.hyuil.domain.market.*;
+import today.also.hyuil.domain.market.MarketSell;
+import today.also.hyuil.domain.market.MarketSellCom;
+import today.also.hyuil.domain.market.Md;
+import today.also.hyuil.domain.market.Status;
 import today.also.hyuil.domain.member.Member;
 import today.also.hyuil.exception.MemberNotFoundException;
 import today.also.hyuil.exception.ThisEntityIsNull;
@@ -31,7 +37,6 @@ import today.also.hyuil.service.market.inter.MarketSellService;
 import today.also.hyuil.service.member.inter.MemberJoinService;
 import today.also.hyuil.service.web.WebService;
 
-import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.nio.file.AccessDeniedException;
 import java.util.ArrayList;

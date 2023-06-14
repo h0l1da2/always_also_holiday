@@ -1,16 +1,16 @@
 package today.also.hyuil.domain.file;
 
+import jakarta.persistence.*;
 import lombok.Getter;
 import org.springframework.web.multipart.MultipartFile;
-
-import javax.persistence.*;
 
 @Entity
 @Getter
 @Table(name = "file")
 public class Files {
 
-    @Id @GeneratedValue
+    @Id
+    @GeneratedValue
     private Long id;
     private String name;
     private String uuid;

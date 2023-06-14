@@ -3,9 +3,9 @@ package today.also.hyuil.domain.market;
 import lombok.Getter;
 import today.also.hyuil.domain.dto.market.MarketWriteDto;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
 
 @Entity
 @Getter

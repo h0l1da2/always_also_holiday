@@ -2,9 +2,9 @@ package today.also.hyuil.service.member.inter;
 
 import today.also.hyuil.domain.member.Mail;
 
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.internet.MimeMessage;
+import jakarta.mail.Message;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
 
 public interface MailService {
     /**

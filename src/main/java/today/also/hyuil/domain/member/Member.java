@@ -5,8 +5,8 @@ import lombok.Getter;
 import today.also.hyuil.domain.dto.member.LoginDto;
 import today.also.hyuil.domain.dto.member.MemberJoinDto;
 
-import javax.persistence.*;
-import javax.validation.constraints.Email;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
 import java.util.Date;
 
 @Entity

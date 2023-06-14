@@ -5,7 +5,7 @@ import today.also.hyuil.domain.dto.fanLetter.CommentWriteDto;
 import today.also.hyuil.domain.fanLetter.ReplyType;
 import today.also.hyuil.domain.member.Member;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.Date;
 
 @Entity

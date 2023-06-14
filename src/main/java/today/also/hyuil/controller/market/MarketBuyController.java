@@ -1,7 +1,8 @@
 package today.also.hyuil.controller.market;
 
+import com.amazonaws.services.kms.model.NotFoundException;
 import com.google.gson.JsonObject;
-import javassist.NotFoundException;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -29,7 +30,6 @@ import today.also.hyuil.service.market.inter.MarketService;
 import today.also.hyuil.service.member.inter.MemberJoinService;
 import today.also.hyuil.service.web.WebService;
 
-import javax.servlet.http.HttpServletRequest;
 import java.nio.file.AccessDeniedException;
 import java.util.ArrayList;
 import java.util.List;

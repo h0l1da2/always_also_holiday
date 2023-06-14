@@ -1,8 +1,8 @@
 package today.also.hyuil.controller.fanLetter;
 
-import com.google.gson.Gson;
+import com.amazonaws.services.kms.model.NotFoundException;
 import com.google.gson.JsonObject;
-import javassist.NotFoundException;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -19,7 +19,6 @@ import today.also.hyuil.service.fanLetter.inter.FanLetterService;
 import today.also.hyuil.service.member.inter.MemberJoinService;
 import today.also.hyuil.service.web.WebService;
 
-import javax.servlet.http.HttpServletRequest;
 import java.nio.file.AccessDeniedException;
 import java.util.ArrayList;
 import java.util.List;

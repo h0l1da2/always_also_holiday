@@ -6,7 +6,7 @@ import lombok.ToString;
 import today.also.hyuil.domain.member.Name;
 import today.also.hyuil.domain.member.Sns;
 
-import javax.validation.constraints.Email;
+import jakarta.validation.constraints.Email;
 
 @Getter
 @Setter

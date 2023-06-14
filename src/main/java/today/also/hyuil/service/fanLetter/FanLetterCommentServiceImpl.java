@@ -1,6 +1,6 @@
 package today.also.hyuil.service.fanLetter;
 
-import javassist.NotFoundException;
+import com.amazonaws.services.kms.model.NotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import today.also.hyuil.domain.fanLetter.Comment;

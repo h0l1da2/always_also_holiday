@@ -7,9 +7,9 @@ import today.also.hyuil.config.security.jwt.JwtTokenService;
 import today.also.hyuil.domain.member.Member;
 import today.also.hyuil.service.member.inter.MemberJoinService;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Map;
 

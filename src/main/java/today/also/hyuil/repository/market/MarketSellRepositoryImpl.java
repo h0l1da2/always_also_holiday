@@ -6,7 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import today.also.hyuil.domain.market.*;
 import today.also.hyuil.repository.market.inter.MarketSellRepository;
 
-import javax.persistence.EntityManager;
+import jakarta.persistence.EntityManager;
 import java.util.List;
 
 import static today.also.hyuil.domain.market.QMarketSellCom.*;

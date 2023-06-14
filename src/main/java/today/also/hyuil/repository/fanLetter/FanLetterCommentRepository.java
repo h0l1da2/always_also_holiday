@@ -1,17 +1,15 @@
 package today.also.hyuil.repository.fanLetter;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import jakarta.persistence.EntityManager;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import today.also.hyuil.domain.fanLetter.Comment;
 import today.also.hyuil.domain.fanLetter.CommentRemover;
-import today.also.hyuil.domain.fanLetter.QComment;
-import today.also.hyuil.domain.member.QMember;
 
-import javax.persistence.EntityManager;
 import java.util.List;
 
-import static today.also.hyuil.domain.fanLetter.QComment.*;
+import static today.also.hyuil.domain.fanLetter.QComment.comment;
 import static today.also.hyuil.domain.member.QMember.member;
 
 @Transactional

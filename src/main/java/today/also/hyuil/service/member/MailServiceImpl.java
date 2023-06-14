@@ -1,19 +1,19 @@
 package today.also.hyuil.service.member;
 
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
-import org.thymeleaf.spring5.SpringTemplateEngine;
 import org.thymeleaf.context.Context;
+import org.thymeleaf.spring6.SpringTemplateEngine;
 import today.also.hyuil.domain.member.Mail;
 import today.also.hyuil.service.member.inter.MailService;
 
-import javax.mail.MessagingException;
-import javax.mail.internet.MimeMessage;
 import java.util.Random;
 
-import static javax.mail.Message.*;
+import static jakarta.mail.Message.RecipientType;
 
 @Service
 @PropertySource("classpath:application.yml")

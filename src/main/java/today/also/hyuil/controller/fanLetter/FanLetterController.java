@@ -25,7 +25,7 @@ import today.also.hyuil.service.fanLetter.inter.FanLetterCommentService;
 import today.also.hyuil.service.fanLetter.inter.FanLetterService;
 import today.also.hyuil.service.web.WebService;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.nio.file.AccessDeniedException;
 import java.util.*;
