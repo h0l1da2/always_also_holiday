@@ -8,10 +8,10 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.client.web.OAuth2AuthorizedClientRepository;
 import org.springframework.security.oauth2.client.web.OAuth2LoginAuthenticationFilter;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import today.also.hyuil.config.security.CustomAccessDeniedHandler;
 import today.also.hyuil.config.security.CustomAuthenticationEntryPoint;
@@ -39,6 +39,7 @@ public class SecurityConfig {
     private final MemberJoinService memberJoinService;
     private final JwtTokenParser jwtTokenParser;
     private final JwtTokenService jwtTokenService;
+    private final CustomUserDetailsService customUserDetailsService;
     private final CustomDefaultOAuth2UserService customDefaultOAuth2UserService;
     private final CustomOAuth2AuthorizationRequestResolver customOAuth2AuthorizationRequestResolver;
     private final ClientRegistrationRepository clientRegistrationRepository;
@@ -46,11 +47,12 @@ public class SecurityConfig {
     private final SnsInfo snsInfo;
     private final KakaoJwk kakaoJwk;
     private final GoogleJwk googleJwk;
-    public SecurityConfig(WebService webService, MemberJoinService memberJoinService, JwtTokenParser jwtTokenParser, JwtTokenService jwtTokenService, CustomDefaultOAuth2UserService customDefaultOAuth2UserService, CustomOAuth2AuthorizationRequestResolver customOAuth2AuthorizationRequestResolver, ClientRegistrationRepository clientRegistrationRepository, OAuth2AuthorizedClientRepository oAuth2AuthorizedClientRepository, SnsInfo snsInfo, KakaoJwk kakaoJwk, GoogleJwk googleJwk) {
+    public SecurityConfig(WebService webService, MemberJoinService memberJoinService, JwtTokenParser jwtTokenParser, JwtTokenService jwtTokenService, CustomUserDetailsService customUserDetailsService, CustomDefaultOAuth2UserService customDefaultOAuth2UserService, CustomOAuth2AuthorizationRequestResolver customOAuth2AuthorizationRequestResolver, ClientRegistrationRepository clientRegistrationRepository, OAuth2AuthorizedClientRepository oAuth2AuthorizedClientRepository, SnsInfo snsInfo, KakaoJwk kakaoJwk, GoogleJwk googleJwk) {
         this.webService = webService;
         this.memberJoinService = memberJoinService;
         this.jwtTokenParser = jwtTokenParser;
         this.jwtTokenService = jwtTokenService;
+        this.customUserDetailsService = customUserDetailsService;
         this.customDefaultOAuth2UserService = customDefaultOAuth2UserService;
         this.customOAuth2AuthorizationRequestResolver = customOAuth2AuthorizationRequestResolver;
         this.clientRegistrationRepository = clientRegistrationRepository;
@@ -61,74 +63,53 @@ public class SecurityConfig {
     }
 
     @Bean
-    AuthenticationManager authenticationManager(
+    public AuthenticationManager authenticationManager(
             AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
     }
 
     @Bean
-    AuthenticationConfiguration authenticationConfiguration() {
+    public AuthenticationConfiguration authenticationConfiguration() {
         return new AuthenticationConfiguration();
     }
 
     @Bean
-    protected void filterChain(HttpSecurity http) throws Exception {
-        http
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        return http
+                .csrf(csrf -> csrf.disable())
 
-                .csrf()
-                .disable()
-
-                .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-
-                .and()
-                .authorizeRequests()
-                //, "/fanLetter/remove/**"
-                .mvcMatchers("/fanLetter/write", "/fanLetter/modify/**",
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(request -> request.requestMatchers(
+                        "/fanLetter/write", "/fanLetter/modify/**",
                         "/fanLetter/remove/**",
                         "/market/buy/write", "/market/buy/modify/**",
                         "/market/buy/comment/write", "/market/buy/comment/remove/**",
-                        "/market/sell/write")
-                .hasRole("USER")
-                .anyRequest()
-                .permitAll()
+                        "/market/sell/write"
+                ).hasRole("USER")
+                        .anyRequest().permitAll())
 
-                .and()
-                .addFilterBefore(new JwtFilter(userDetailsService(), jwtTokenParser, jwtTokenService), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new JwtFilter(customUserDetailsService, jwtTokenParser, jwtTokenService), UsernamePasswordAuthenticationFilter.class)
                 .addFilterAfter(new JwtTokenSetFilter(), UsernamePasswordAuthenticationFilter.class)
                 // OAuth2
                 .addFilterBefore(new CustomOAuth2AuthorizationCodeGrantFilter(clientRegistrationRepository, oAuth2AuthorizedClientRepository, authenticationManager(authenticationConfiguration()), customDefaultOAuth2UserService, snsInfo), OAuth2LoginAuthenticationFilter.class)
                 .addFilterAfter(new OAuth2JwtTokenFilter(webService, jwtTokenService, jwtTokenParser, memberJoinService, snsInfo, kakaoJwk, googleJwk), OAuth2LoginAuthenticationFilter.class)
-                .exceptionHandling()
-                .authenticationEntryPoint(new CustomAuthenticationEntryPoint()) // 인증이 실패했을 경우
-                .accessDeniedHandler(new CustomAccessDeniedHandler()) // 권한이 없을 경우
+                .exceptionHandling(exception -> exception.authenticationEntryPoint(new CustomAuthenticationEntryPoint())
+                        .accessDeniedHandler(new CustomAccessDeniedHandler()))
 
-                .and()
-                .oauth2Login()
-                .loginPage("/loginForm")
-                .authorizationEndpoint()
-                .authorizationRequestResolver(customOAuth2AuthorizationRequestResolver)
-                .and()
-                .userInfoEndpoint()
-                .userService(customDefaultOAuth2UserService) // 로그인
-                .and()
-                .successHandler(new CustomOAuth2SuccessHandler(jwtTokenService, memberJoinService))
+                .oauth2Login(oauth -> oauth.loginPage("/loginForm")
+                        .authorizationEndpoint(end -> end.authorizationRequestResolver(customOAuth2AuthorizationRequestResolver))
+                        .userInfoEndpoint(userInfo -> userInfo.userService(customDefaultOAuth2UserService))
+                        .successHandler(new CustomOAuth2SuccessHandler(jwtTokenService, memberJoinService)))
 
-                .and()
-                .logout()
-                .logoutSuccessUrl("/")
-                .permitAll()
-        ;
+                .logout(logout -> logout.logoutSuccessUrl("/").permitAll())
+                .build();
     }
-    @Bean
-    public UserDetailsService userDetailsService() {
-        return new CustomUserDetailsService(memberJoinService);
-    }
+
     @Bean
     public WebSecurityCustomizer configure() throws Exception {
         return (web) -> web
                 .ignoring()
-                .mvcMatchers("/static/**", "/favicon.ico");
+                .requestMatchers("/static/**", "/favicon.ico");
     }
 
 
