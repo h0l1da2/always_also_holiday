@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
 
+// TODO JWT 관련 코드들 리팩토링 필요
 public class JwtFilter extends OncePerRequestFilter {
 
     private final UserDetailsService userDetailsService;

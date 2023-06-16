@@ -70,6 +70,7 @@ public class MemberJoinController {
         return "가입 가능";
     }
 
+    // TODO 폰 양식 체크도 서버에서 한번 더
     @ResponseBody
     @PostMapping("/phoneCheck")
     public String phoneCheck(@RequestBody DoubleCheckDto doubleCheckDto) {
@@ -87,6 +88,7 @@ public class MemberJoinController {
         return "가입 가능";
     }
 
+    // TODO 이메일 양식 체크도 서버에서 한번 더
     @ResponseBody
     @PostMapping("/emailSend")
     public ResponseEntity<String> emailSend(@RequestParam String email) {

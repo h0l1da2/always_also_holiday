@@ -12,6 +12,7 @@ import java.util.List;
 import static today.also.hyuil.domain.market.QMarketCom.marketCom;
 import static today.also.hyuil.domain.member.QMember.member;
 
+// TODO 서비스에 붙여봐 ?
 @Transactional
 @Repository
 public class MarketRepositoryImpl implements MarketRepository {

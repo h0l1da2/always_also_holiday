@@ -112,6 +112,7 @@ public class CustomOAuth2AuthorizationCodeGrantFilter extends OAuth2Authorizatio
                 removeSessionAttr(session, originState);
 
                 // authentication 생성 후, SpringContext에 저장하는 작업
+                // TODO 해당 작업 OAuth2JwtTokenFilter 로 옮겨보기
                 ClientRegistration clientRegistration =
                         clientRegistrationRepository.findByRegistrationId(sns.toLowerCase());
                 OAuth2AccessToken oAuth2AccessToken = getOAuth2AccessToken(tokenResponse);
