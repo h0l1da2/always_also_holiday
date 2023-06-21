@@ -1,0 +1,9 @@
+### Fanletter write
+POST http://localhost:8080/fanLetter/comment/write
+Content-Type: application/json
+
+{
+  "boardNum": null,
+  "commentNum": null,
+  "content": ""
+}
