@@ -3,6 +3,7 @@ package today.also.hyuil.controller.fanLetter;
 import com.amazonaws.services.kms.model.NotFoundException;
 import com.google.gson.JsonObject;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -57,8 +58,7 @@ public class FanLetterCommentController {
     }
 
     @PostMapping("/write")
-    public ResponseEntity<String> write(@RequestBody CommentWriteDto commentWriteDto, HttpServletRequest request) {
-
+    public ResponseEntity<String> write(@RequestBody @Valid CommentWriteDto commentWriteDto, HttpServletRequest request) {
         System.out.println("fanCommentWriteDto = " + commentWriteDto);
         /**
          * 해당 글 번호, 부모 댓글 번호, 본인 아이디, 내용...
@@ -122,7 +122,6 @@ public class FanLetterCommentController {
         return ResponseEntity.ok()
                 .body("REMOVE_OK");
     }
-
 
     private Comment getComment(CommentWriteDto commentWriteDto, Member member, FanBoard fanBoard) {
         Comment comment = new Comment();
