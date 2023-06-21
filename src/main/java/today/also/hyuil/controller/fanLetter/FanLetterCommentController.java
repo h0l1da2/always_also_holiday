@@ -34,6 +34,7 @@ public class FanLetterCommentController {
     private final FanLetterCommentService fanLetterCommentService;
     private final MemberJoinService memberJoinService;
 
+    // TODO RequiredArgConstructor , Slf4j 추가 (상관없음)
     public FanLetterCommentController(WebService webService, FanLetterService fanLetterService, FanLetterCommentService fanLetterCommentService, MemberJoinService memberJoinService) {
         this.webService = webService;
         this.fanLetterService = fanLetterService;
@@ -95,6 +96,7 @@ public class FanLetterCommentController {
         return webService.okResponseEntity(jsonObject);
     }
 
+    // TODO Http 메서드 변경 필요 (요청에 맞는 메서드로)
     @PostMapping("/remove")
     public ResponseEntity<String> remove(@RequestBody CommentDto commentDto, @AuthenticationPrincipal CustomUserDetails userDetails) {
         try {
@@ -123,6 +125,7 @@ public class FanLetterCommentController {
                 .body("REMOVE_OK");
     }
 
+    // TODO Validation 이용하고 널체크 삭제
     private Comment getComment(CommentWriteDto commentWriteDto, Member member, FanBoard fanBoard) {
         Comment comment = new Comment();
         if (commentWriteDto.getCommentNum() == null) {
