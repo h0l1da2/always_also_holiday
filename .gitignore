@@ -43,3 +43,4 @@ out/
 /gradle/wrapper/
 /build.gradle
 /settings.gradle
+/src/main/generated/
