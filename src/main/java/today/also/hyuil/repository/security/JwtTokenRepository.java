@@ -1,11 +1,11 @@
 package today.also.hyuil.repository.security;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import jakarta.persistence.EntityManager;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import today.also.hyuil.domain.security.Token;
 
-import jakarta.persistence.EntityManager;
 import java.util.Optional;
 
 import static today.also.hyuil.domain.security.QToken.token1;
