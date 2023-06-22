@@ -20,6 +20,7 @@ import today.also.hyuil.domain.dto.fanLetter.*;
 import today.also.hyuil.domain.fanLetter.Comment;
 import today.also.hyuil.domain.fanLetter.FanBoard;
 import today.also.hyuil.domain.file.FileInfo;
+import today.also.hyuil.domain.member.Name;
 import today.also.hyuil.exception.FileNumbersLimitExceededException;
 import today.also.hyuil.exception.MemberNotFoundException;
 import today.also.hyuil.exception.fanLetter.MimeTypeNotMatchException;
@@ -136,7 +137,7 @@ public class FanLetterController {
             FanBoard fanBoard = new FanBoard(fanLetterWriteDto);
 
             // 이미지 파일이 존재할 경우
-            List<FileInfo> fileInfoList = fileService.getFileInfoList("fanLetter_1/", files);
+            List<FileInfo> fileInfoList = fileService.getFileInfoList("fanLetter", files);
 
             FanBoard writeLetter = fanLetterService.writeLetter(id, fanBoard, fileInfoList);
 
@@ -191,24 +192,19 @@ public class FanLetterController {
                                          @RequestPart(value = "fanLetterWriteDto") FanLetterWriteDto fanLetterWriteDto) {
         try {
             Long id = webService.getIdInSession(request);
-//            String memberId = "aaaa1";
-
-            if (!writeDtoNullCheck(fanLetterWriteDto)) {
-                System.out.println("글 내용이 없음");
-                return new ResponseEntity<>("NOT_CONTENT", HttpStatus.BAD_REQUEST);
-            }
+//            Long id = 1L;
 
             Map<String, Object> map = fanLetterService.readLetter(num);
 
             FanBoard findLetter = (FanBoard) map.get("fanLetter");
 
             if (findLetter == null) {
-                System.out.println("해당 글은 존재하지 않음");
+                log.info("해당 글은 존재하지 않음");
                 return new ResponseEntity<>("NOT_FOUND", HttpStatus.NOT_FOUND);
             }
 
             if (!id.equals(findLetter.getId())) {
-                System.out.println("본인이 쓴 글이 아님");
+                log.info("본인 글이 아님");
                 return new ResponseEntity<>("NOT_WRITER", HttpStatus.BAD_REQUEST);
             }
 
@@ -216,7 +212,7 @@ public class FanLetterController {
             findLetter.modifyLetter(fanLetterWriteDto);
 
 
-            List<FileInfo> fileInfoList = fileService.getFileInfoList("fanLetter_1/",files);
+            List<FileInfo> fileInfoList = fileService.getFileInfoList("fanLetter",files);
 
             Map<String, Object> boardMap = new HashMap<>();
 
@@ -246,9 +242,9 @@ public class FanLetterController {
     public ResponseEntity<String> deleteLetter(@PathVariable Long num, HttpServletRequest request) {
         try {
             Long id = webService.getIdInSession(request);
-//            String memberId = "aaaa1";
+//            Long id = 1L;
 
-            fanLetterService.removeLetter(num, "MEMBER", id);
+            fanLetterService.removeLetter(num, Name.ROLE_USER, id);
 
         } catch (MemberNotFoundException e) {
             e.printStackTrace();

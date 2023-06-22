@@ -1,5 +1,7 @@
 package today.also.hyuil.service.fanLetter;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -10,6 +12,7 @@ import today.also.hyuil.domain.fanLetter.BoardRemover;
 import today.also.hyuil.domain.fanLetter.FanBoard;
 import today.also.hyuil.domain.file.FileInfo;
 import today.also.hyuil.domain.member.Member;
+import today.also.hyuil.domain.member.Name;
 import today.also.hyuil.exception.FileNumbersLimitExceededException;
 import today.also.hyuil.exception.MemberNotFoundException;
 import today.also.hyuil.repository.fanLetter.FanLetterJpaRepository;
@@ -25,6 +28,8 @@ import java.util.Map;
 
 @Transactional
 @Service
+@Slf4j
+@RequiredArgsConstructor
 public class FanLetterServiceImpl implements FanLetterService {
 
     private final FanLetterRepository fanLetterRepository;
@@ -33,12 +38,6 @@ public class FanLetterServiceImpl implements FanLetterService {
     private final FileService fileService;
 
     // TODO 리포지토리 / 서비스 리팩토링
-    public FanLetterServiceImpl(FanLetterRepository fanLetterRepository, FanLetterJpaRepository fanLetterJpaRepository, MemberJoinService memberJoinService, FileService fileService) {
-        this.fanLetterRepository = fanLetterRepository;
-        this.fanLetterJpaRepository = fanLetterJpaRepository;
-        this.memberJoinService = memberJoinService;
-        this.fileService = fileService;
-    }
 
     @Override
     public FanBoard writeLetter(Long id, FanBoard fanBoard, List<FileInfo> fileInfoList) throws MemberNotFoundException {
@@ -123,21 +122,21 @@ public class FanLetterServiceImpl implements FanLetterService {
     }
 
     @Override
-    public void removeLetter(Long num, String who, Long id) throws MemberNotFoundException, AccessDeniedException {
+    public void removeLetter(Long num, Name who, Long id) throws MemberNotFoundException, AccessDeniedException {
 
         Map<String, Object> map = readLetter(num);
         FanBoard fanBoard = (FanBoard) map.get("fanLetter");
 
         BoardRemover boardRemover = new BoardRemover();
 
-        if (who.equals("MEMBER")) {
+        if (who.equals(Name.ROLE_USER)) {
             Member member = memberJoinService.findMyAccount(id);
 
             if (member == null) {
                 throw new MemberNotFoundException("해당 멤버 아이디를 찾을 수 없어요");
             }
             if (!fanBoard.getMember().getId().equals(id)) {
-                System.out.println("본인 글이 아닙니다");
+                log.info("본인 글이 아닙니다.");
                 throw new AccessDeniedException("본인 글이 아닙니다");
             }
             boardRemover.memberRemove(member);

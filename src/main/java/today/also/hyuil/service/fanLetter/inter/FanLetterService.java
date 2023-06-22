@@ -4,6 +4,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import today.also.hyuil.domain.fanLetter.FanBoard;
 import today.also.hyuil.domain.file.FileInfo;
+import today.also.hyuil.domain.member.Name;
 import today.also.hyuil.exception.FileNumbersLimitExceededException;
 import today.also.hyuil.exception.MemberNotFoundException;
 
@@ -17,7 +18,7 @@ public interface FanLetterService {
     Map<String, Object> findLetter(Long id, Long fanLetterNum) throws MemberNotFoundException;
     Map<String, Object> readLetter(Long num);
     void modifyLetter(Map<String, Object> map) throws FileNumbersLimitExceededException;
-    void removeLetter(Long num, String who, Long id) throws MemberNotFoundException, AccessDeniedException;
+    void removeLetter(Long num, Name who, Long id) throws MemberNotFoundException, AccessDeniedException;
     Page<FanBoard> listMain(Pageable pageable);
     Map<String, FanBoard> prevNextLetter(Long id);
 }
