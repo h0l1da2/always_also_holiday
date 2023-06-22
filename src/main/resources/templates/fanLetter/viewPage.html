@@ -157,20 +157,14 @@
       return false;
     }
 
-    let data = JSON.stringify({id: id});
-
     $.ajax({
       type: 'POST',
-      url: '/fanLetter/comment/remove',
+      url: '/fanLetter/comment/remove?id='+id,
       contentType: 'application/json',
-      data: data,
       headers: { 'Authorization': 'Bearer '+ jwt },
-      dataType: 'json',
       success: function(result) {
-        if (result.data === 'REMOVE_OK') {
-          alert('삭제 완료');
-          $('.commentDiv').load(location.href+' .commentDiv');
-        }
+        alert('삭제 완료');
+        $('.commentDiv').load(location.href+' .commentDiv');
       },
       error: function(xhr, status, error) {
         console.log('error - '+xhr.status+'. 메시지 : '+xhr.statusText)

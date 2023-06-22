@@ -10,5 +10,5 @@ public interface FanLetterCommentService {
 
     Comment writeComment(Comment comment);
     List<Comment> readComment(Long num);
-    void removeComment(Long commentId, String memberId) throws NotFoundException, AccessDeniedException;
+    void removeComment(Long commentId, Long memberId) throws NotFoundException, AccessDeniedException;
 }

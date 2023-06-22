@@ -32,14 +32,14 @@ public class FanLetterCommentServiceImpl implements FanLetterCommentService {
     }
 
     @Override
-    public void removeComment(Long commentId, String memberId) throws NotFoundException, AccessDeniedException {
+    public void removeComment(Long commentId, Long memberId) throws NotFoundException, AccessDeniedException {
         Comment comment = commentRepository.selectComment(commentId);
 
         if (comment == null) {
             throw new NotFoundException("해당 댓글을 찾을 수 없습니다");
         }
 
-        if (!comment.getMember().getMemberId().equals(memberId)) {
+        if (!comment.getMember().getId().equals(memberId)) {
             throw new AccessDeniedException("댓글을 쓴 본인만 삭제가 가능합니다");
         }
 

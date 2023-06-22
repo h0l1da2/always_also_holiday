@@ -7,9 +7,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import today.also.hyuil.config.security.CustomUserDetails;
 import today.also.hyuil.domain.dto.fanLetter.CommentDto;
 import today.also.hyuil.domain.dto.fanLetter.CommentWriteDto;
 import today.also.hyuil.domain.fanLetter.Comment;
@@ -88,16 +86,12 @@ public class FanLetterCommentController {
         return webService.okResponseEntity(jsonObject);
     }
 
-    // TODO Http 메서드 변경 필요 (요청에 맞는 메서드로)
-    @PostMapping("/remove")
-    public ResponseEntity<String> remove(@RequestBody CommentDto commentDto, @AuthenticationPrincipal CustomUserDetails userDetails) {
+    @DeleteMapping("/remove")
+    public ResponseEntity<String> remove(@RequestParam Long id, HttpServletRequest request) {
         try {
-            if (userDetails == null) {
-                return ResponseEntity.badRequest()
-                        .body("MEMBER_NOT_FOUND");
-            }
-            fanLetterCommentService.removeComment(commentDto.getId(), userDetails.getUsername());
-//            fanLetterCommentService.removeComment(commentDto.getId(), "aaaa1");
+            Long memberId = webService.getIdInSession(request);
+            fanLetterCommentService.removeComment(id, memberId);
+//            fanLetterCommentService.removeComment(commentDto.getId(), 1L);
         } catch (NotFoundException e) {
             e.printStackTrace();
             return ResponseEntity.badRequest()
@@ -107,9 +101,13 @@ public class FanLetterCommentController {
             return ResponseEntity.badRequest()
                     .body("NOT_YOUR_COMMENT");
         } catch (NumberFormatException e) {
-            System.out.println("타입 변환 에러(코멘트 파라미터가 숫자 타입이 아님)");
+            log.info("타입 변환 에러(코멘트 파라미터가 숫자 타입이 아님)");
             return ResponseEntity.badRequest()
                     .body("BAD_COMMENT_ID");
+        } catch (MemberNotFoundException e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest()
+                    .body("MEMBER_NOT_FOUND");
         }
 
 
@@ -117,7 +115,6 @@ public class FanLetterCommentController {
                 .body("REMOVE_OK");
     }
 
-    // TODO Validation 이용하고 널체크 삭제
     private Comment getComment(CommentWriteDto commentWriteDto, Member member, FanBoard fanBoard) {
         Comment comment = new Comment();
         if (commentWriteDto.getCommentNum() == null) {
