@@ -1,5 +1,6 @@
 package today.also.hyuil.controller.fanLetter;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,12 +25,15 @@ import today.also.hyuil.exception.MemberNotFoundException;
 import today.also.hyuil.exception.fanLetter.MimeTypeNotMatchException;
 import today.also.hyuil.service.fanLetter.inter.FanLetterCommentService;
 import today.also.hyuil.service.fanLetter.inter.FanLetterService;
+import today.also.hyuil.service.file.inter.FileService;
 import today.also.hyuil.service.web.WebService;
 
-import jakarta.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.nio.file.AccessDeniedException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/fanLetter")
@@ -41,6 +45,7 @@ public class FanLetterController {
     private final WebService webService;
     private final FanLetterService fanLetterService;
     private final FanLetterCommentService fanLetterCommentService;
+    private final FileService fileService;
     @Value("${file.fan.letter.path}")
     private String filePath;
 
@@ -62,7 +67,7 @@ public class FanLetterController {
         FanBoard fanBoard = (FanBoard) map.get("fanLetter");
         List<FileInfo> fileInfoList = (List<FileInfo>) map.get("fileInfoList");
 
-        List<String> filePaths = webService.getFilePaths(fileInfoList);
+        List<String> filePaths = fileService.getFilePaths(fileInfoList);
 
         // 댓글
         List<Comment> commentList = fanLetterCommentService.readComment(num);
@@ -122,43 +127,35 @@ public class FanLetterController {
     public ResponseEntity<String> write(@RequestPart(value = "image", required = false) List<MultipartFile> files,
                                         @RequestPart(value = "fanLetterWriteDto") FanLetterWriteDto fanLetterWriteDto,
                                 HttpServletRequest request) {
-//      webPath 값을 지정하면 해당경로까지의 realPath를 추출하는 코드
-//        String folderPath = request.getSession().getServletContext().getRealPath(filePath);
 
         try {
             // 세션에서 memberId 가져오기
             Long id = webService.getIdInSession(request);
-//            String memberId = "aaaa1";
-
-            if (!writeDtoNullCheck(fanLetterWriteDto)) {
-                System.out.println("글 내용이 없음");
-                return new ResponseEntity<>("NOT_CONTENT", HttpStatus.BAD_REQUEST);
-            }
+//            Long id = 1L;
 
             FanBoard fanBoard = new FanBoard(fanLetterWriteDto);
 
             // 이미지 파일이 존재할 경우
-            // 여기에서 뭔가 문제가 발생
-            List<FileInfo> fileInfoList = webService.getFileInfoList("fanLetter_1/", files);
+            List<FileInfo> fileInfoList = fileService.getFileInfoList("fanLetter_1/", files);
 
             FanBoard writeLetter = fanLetterService.writeLetter(id, fanBoard, fileInfoList);
 
             if (writeLetter.getId() == null) {
-                System.out.println("작성 오류");
+                log.info("작성 오류");
                 return new ResponseEntity<>("WRITE_ERROR", HttpStatus.INTERNAL_SERVER_ERROR);
             }
 
         } catch (MimeTypeNotMatchException e) {
             e.printStackTrace();
-            System.out.println("이미지 파일 확장자 다름");
+            log.info("이미지 파일 확장자 다름");
             return new ResponseEntity<>("MIMETYPE_ERROR", HttpStatus.BAD_REQUEST);
         } catch (MemberNotFoundException me) {
             me.printStackTrace();
-            System.out.println("로그인이 안 됨");
+            log.info("로그인이 안 됨");
             return new ResponseEntity<>("NOT_LOGIN", HttpStatus.BAD_REQUEST);
         } catch (IOException e) {
             e.printStackTrace();
-            System.out.println("파일 업로드 에러");
+            log.error("파일 업로드 에러");
             e.printStackTrace();
             return new ResponseEntity<>("FILE_UPLOAD_ERROR", HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -224,7 +221,7 @@ public class FanLetterController {
             findLetter.modifyLetter(fanLetterWriteDto);
 
 
-            List<FileInfo> fileInfoList = webService.getFileInfoList("fanLetter_1/",files);
+            List<FileInfo> fileInfoList = fileService.getFileInfoList("fanLetter_1/",files);
 
             Map<String, Object> boardMap = new HashMap<>();
 

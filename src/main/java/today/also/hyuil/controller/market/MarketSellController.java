@@ -102,7 +102,7 @@ public class MarketSellController {
         MarketSell market = (MarketSell) map.get("market");
         List<FileInfo> fileInfoList = (List<FileInfo>) map.get("fileInfoList");
 
-        List<String> filePaths = webService.getFilePaths(fileInfoList);
+        List<String> filePaths = fileService.getFilePaths(fileInfoList);
 
         // 댓글 - Buy와 중복 코드인데... 어떡하지? 고민..
         List<MarketSellCom> commentList = marketService.readComments(id);
@@ -178,7 +178,7 @@ public class MarketSellController {
 
             // 이미지 파일이 존재할 경우
             // 여기에서 뭔가 문제가 발생
-            List<FileInfo> fileInfoList = webService.getFileInfoList("marketSell_1/",files);
+            List<FileInfo> fileInfoList = fileService.getFileInfoList("marketSell_1/",files);
 
             MarketSell writSell = marketService.writeSell(id, market, fileInfoList);
 
