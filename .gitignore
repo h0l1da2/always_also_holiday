@@ -44,3 +44,4 @@ out/
 /build.gradle
 /settings.gradle
 /src/main/generated/
+/src/main/META-INF/
