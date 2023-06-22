@@ -16,7 +16,6 @@ public interface FileService {
     List<FileInfo> fileInfoListForMarket(Long marketId);
     Page<FileInfo> fileInfoListForMarketSellList(Pageable pageable);
     List<String> getFilePaths(List<FileInfo> fileInfoList);
-    String saveFilesToAmazonS3(String dir, MultipartFile multipartFile, String fileName) throws IOException;
     List<FileInfo> getFileInfoList(String dir, List<MultipartFile> files) throws IOException, MimeTypeNotMatchException;
 
 }

@@ -40,6 +40,9 @@ public class FileServiceImpl implements FileService {
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
 
+    private String fanLetterDir = "fanLetter_1/";
+    private String marketSellDir = "marketSell_1/";
+
     @Override
     public FileInfo saveFileInfo(FileInfo fileInfo) {
         return fileRepository.insertFileInfo(fileInfo);
@@ -68,15 +71,16 @@ public class FileServiceImpl implements FileService {
         List<String> filePaths = new ArrayList<>();
 
         for (FileInfo fileInfo : fileInfoList) {
+            // AWS
             String filePath = awsPath(fileInfo);
-            System.out.println("filePath = " + filePath);
+            // Local
+//            String filePath = localPath(fileInfo);
             filePaths.add(filePath);
         }
         return filePaths;
     }
 
-    @Override
-    public String saveFilesToAmazonS3(String dir, MultipartFile multipartFile, String fileName) throws IOException {
+    private String saveFilesToAmazonS3(String dir, MultipartFile multipartFile, String fileName) throws IOException {
         // 파일 사이즈 알려주기
         ObjectMetadata objMeta = new ObjectMetadata();
         objMeta.setContentLength(multipartFile.getInputStream().available());
@@ -90,7 +94,10 @@ public class FileServiceImpl implements FileService {
 
     }
 
-    public List<FileInfo> getFileInfoList(String dir, List<MultipartFile> files) throws IOException, MimeTypeNotMatchException {
+    public List<FileInfo> getFileInfoList(String where, List<MultipartFile> files) throws IOException, MimeTypeNotMatchException {
+
+        String dir = getDir(where);
+
         List<FileInfo> fileInfoList = new ArrayList<>();
         if (isHaveFiles(files)) {
             for (MultipartFile multipartFile : files) {
@@ -119,7 +126,16 @@ public class FileServiceImpl implements FileService {
         return "https://"+bucket+".s3."+amazonS3.getRegion()+".amazonaws.com/"+fileName;
     }
 
-
+    private String getDir(String where) {
+        String dir = "";
+        if (where.equals("fanLetter")) {
+            dir = fanLetterDir;
+        }
+        if (where.equals("marketSell")) {
+            dir = marketSellDir;
+        }
+        return dir;
+    }
 
     private Files getFiles(String dir, MultipartFile multipartFile) throws MimeTypeNotMatchException, IOException {
         String fileUuid = UUID.randomUUID().toString();
@@ -131,7 +147,7 @@ public class FileServiceImpl implements FileService {
         // 아마존에 파일 저장
         String filePath = saveFilesToAmazonS3(dir, multipartFile, fileUuid+imgMimeType);
 //        // 파일 저장 -> java.io.File (path/UUID.jpg)
-//        saveFile(multipartFile, imgMimeType, fileUuid, filePath);
+//        saveFile(multipartFile, imgMimeType, fileUuid, dir);
 
         file.imgMimeType(imgMimeType);
 
@@ -162,7 +178,7 @@ public class FileServiceImpl implements FileService {
         multipartFile.transferTo(fileIo);
     }
 
-    private String pathSubstring(FileInfo fileInfo) {
+    private String localPath(FileInfo fileInfo) {
         String filePath = fileInfo.getFile().getPath() + fileInfo.getFile().getUuid() + fileInfo.getFile().getMimeType();
         int startPath = "/Users/holiday/IdeaProjects/also_hyuil/src/main/resources".length();
         filePath = filePath.substring(startPath);

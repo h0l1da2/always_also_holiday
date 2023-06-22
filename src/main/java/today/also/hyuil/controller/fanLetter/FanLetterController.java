@@ -167,12 +167,7 @@ public class FanLetterController {
     public String modify(@PathVariable Long num, Model model, HttpServletRequest request) {
         try {
             Long id = webService.getIdInSession(request);
-//            String memberId = "aaaa1";
-            /**
-             * 1. 본인 글인지 검증
-             * 2. 본인 글이 맞다면 내용 보여줌
-             * 3. 사진은...? 일단 글만 보여주는 걸로 -> 사진도
-             */
+//            Long id = 1L;
 
             Map<String, Object> map = fanLetterService.findLetter(id, num);
             modelInFanBoard(model, map);
