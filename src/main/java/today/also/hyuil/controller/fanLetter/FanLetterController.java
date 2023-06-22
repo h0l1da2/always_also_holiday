@@ -1,6 +1,7 @@
 package today.also.hyuil.controller.fanLetter;
 
-import com.amazonaws.services.s3.AmazonS3;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.data.domain.Page;
@@ -33,6 +34,8 @@ import java.util.*;
 @Controller
 @RequestMapping("/fanLetter")
 @PropertySource("classpath:application.yml")
+@RequiredArgsConstructor
+@Slf4j
 public class FanLetterController {
 
     private final WebService webService;
@@ -40,11 +43,6 @@ public class FanLetterController {
     private final FanLetterCommentService fanLetterCommentService;
     @Value("${file.fan.letter.path}")
     private String filePath;
-    public FanLetterController(WebService webService, FanLetterService fanLetterService, FanLetterCommentService fanLetterCommentService) {
-        this.webService = webService;
-        this.fanLetterService = fanLetterService;
-        this.fanLetterCommentService = fanLetterCommentService;
-    }
 
     @GetMapping
     public String fanLetterList(@PageableDefault Pageable pageable, Model model) {
@@ -100,12 +98,12 @@ public class FanLetterController {
 
         // 본인 글인지 확인
         try {
-            String nickname = webService.getNicknameInSession(request);
-            if (nickname.equals(fanBoard.getMember().getNickname())) {
-                model.addAttribute("nickname", nickname);
+            Long memberId = webService.getIdInSession(request);
+            if (memberId.equals(fanBoard.getMember().getId())) {
+                model.addAttribute("writer", memberId);
             }
         } catch (MemberNotFoundException e) {
-            System.out.println("로그인이 안 되어 있음");
+            log.info("로그인이 안 되어있음");
         }
 
         return "/fanLetter/viewPage";
