@@ -4,6 +4,8 @@ import com.amazonaws.services.kms.model.NotFoundException;
 import com.google.gson.JsonObject;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -27,20 +29,14 @@ import java.util.Map;
 
 @RequestMapping("/fanLetter/comment")
 @RestController
+@Slf4j
+@RequiredArgsConstructor
 public class FanLetterCommentController {
 
     private final WebService webService;
     private final FanLetterService fanLetterService;
     private final FanLetterCommentService fanLetterCommentService;
     private final MemberJoinService memberJoinService;
-
-    // TODO RequiredArgConstructor , Slf4j 추가 (상관없음)
-    public FanLetterCommentController(WebService webService, FanLetterService fanLetterService, FanLetterCommentService fanLetterCommentService, MemberJoinService memberJoinService) {
-        this.webService = webService;
-        this.fanLetterService = fanLetterService;
-        this.fanLetterCommentService = fanLetterCommentService;
-        this.memberJoinService = memberJoinService;
-    }
 
     // TODO 댓글 비동기로 직접 넣도록 수정
 
@@ -60,7 +56,6 @@ public class FanLetterCommentController {
 
     @PostMapping("/write")
     public ResponseEntity<String> write(@RequestBody @Valid CommentWriteDto commentWriteDto, HttpServletRequest request) {
-        System.out.println("fanCommentWriteDto = " + commentWriteDto);
         /**
          * 해당 글 번호, 부모 댓글 번호, 본인 아이디, 내용...
          */
@@ -68,16 +63,13 @@ public class FanLetterCommentController {
 
         try {
 
-            if (!webService.commentWriteDtoNullCheck(commentWriteDto)) {
-                System.out.println("comment NULL 들어옴");
-                return webService.badResponseEntity("COMMENT_NULL");
-            }
             Long id = webService.getIdInSession(request);
-//            String memberId = "aaaa1";
+//            Long id = 1L;
 
             Member member = memberJoinService.findMyAccount(id);
 
             if (member == null) {
+                log.info("멤버가 없습니다. 로그인 안 되어 있음.");
                 return webService.badResponseEntity("MEMBER_NOT_FOUND");
             }
 

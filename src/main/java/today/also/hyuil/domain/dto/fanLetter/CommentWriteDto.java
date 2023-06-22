@@ -10,6 +10,7 @@ public class CommentWriteDto {
     @NotNull
     private Long boardNum;
     // 부모 댓글 번호
+    @NotNull
     private Long commentNum;
     @NotBlank
     private String content;
