@@ -1,5 +1,8 @@
 package today.also.hyuil.controller.member;
 
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -17,17 +20,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Controller
+@RequiredArgsConstructor
+@Slf4j
 public class MemberLoginController {
 
     private final WebService webService;
     private final MemberJoinService memberJoinService;
     private final JwtTokenService jwtTokenService;
-
-    public MemberLoginController(WebService webService, MemberJoinService memberJoinService, JwtTokenService jwtTokenService) {
-        this.webService = webService;
-        this.memberJoinService = memberJoinService;
-        this.jwtTokenService = jwtTokenService;
-    }
 
     @GetMapping("/loginForm")
     public String loginForm(@RequestParam(name = "error", required = false) String error, Model model) {
@@ -51,12 +50,8 @@ public class MemberLoginController {
 
     @ResponseBody
     @PostMapping("/login")
-    public Map loginToken(@RequestBody LoginDto loginDto, HttpServletRequest request) {
+    public Map loginToken(@RequestBody @Valid LoginDto loginDto, HttpServletRequest request) {
         Map map = new HashMap();
-
-        if (loginDtoNullCheck(loginDto)) {
-            errorMapReturn(map);
-        }
 
         try {
             boolean idPwdValid = memberJoinService.idPwdValid(loginDto.getMemberId(), loginDto.getPassword());
@@ -96,23 +91,5 @@ public class MemberLoginController {
     private void errorMapReturn(Map map) {
         map.put("error", "error");
     }
-
-    private boolean loginDtoNullCheck(LoginDto loginDto) {
-        if (loginDto == null) {
-            return true;
-        }
-        if (loginDto.getMemberId().equals("")) {
-            return true;
-        }
-        if (loginDto.getPassword().equals("")) {
-            return true;
-        }
-        if (loginDto.getMemberId().contains(" ")) {
-            return true;
-        }
-        if (loginDto.getPassword().contains(" ")) {
-            return true;
-        }
-        return false;
-    }
+    
 }
