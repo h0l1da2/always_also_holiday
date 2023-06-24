@@ -1,5 +1,7 @@
 package today.also.hyuil.config.security.jwt;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
@@ -18,18 +20,16 @@ import java.util.Map;
  *  - 토큰을 검증
  */
 @Service
+@Slf4j
+@RequiredArgsConstructor
 public class JwtTokenService {
 
     private final JwtTokenProvider jwtTokenProvider;
     private final JwtTokenRepository jwtTokenRepository;
 
-    public JwtTokenService(JwtTokenProvider jwtTokenProvider, JwtTokenRepository jwtTokenRepository) {
-        this.jwtTokenProvider = jwtTokenProvider;
-        this.jwtTokenRepository = jwtTokenRepository;
-    }
-
     public Map<String, String> getTokens(String memberId, Name role) {
-        System.out.println("여기까진 가나");
+        log.info("토큰 생성 = {}", memberId);
+
         String refreshToken = jwtTokenProvider.createRefreshToken();
         String accessToken = jwtTokenProvider.createAccessToken(
                 memberId, getAuthorities(String.valueOf(role)));
@@ -41,7 +41,7 @@ public class JwtTokenService {
     }
 
     public Map<String, String> getReCreateTokens(String token) {
-
+        log.info("토큰 재생성");
         String refreshT = jwtTokenProvider.createRefreshToken();
         String accessT = jwtTokenProvider.reCreateJwtToken(token);
 
