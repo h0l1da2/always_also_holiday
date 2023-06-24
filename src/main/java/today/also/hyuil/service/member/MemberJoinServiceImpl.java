@@ -2,7 +2,6 @@ package today.also.hyuil.service.member;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import today.also.hyuil.domain.member.Member;
 import today.also.hyuil.exception.MemberNotFoundException;
 import today.also.hyuil.exception.NotValidException;
@@ -10,7 +9,6 @@ import today.also.hyuil.repository.member.MemberRepository;
 import today.also.hyuil.service.member.inter.MemberJoinService;
 
 // TODO 트랜잭션 삭제하고 필요할 때만 붙이기 (모든 서비스)
-@Transactional
 @Service
 public class MemberJoinServiceImpl implements MemberJoinService {
 

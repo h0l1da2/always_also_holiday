@@ -1,9 +1,12 @@
 package today.also.hyuil.controller.member;
 
+import com.google.gson.JsonObject;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -14,9 +17,6 @@ import today.also.hyuil.exception.MemberNotFoundException;
 import today.also.hyuil.service.member.inter.MemberJoinService;
 import today.also.hyuil.service.web.WebService;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
-import java.util.HashMap;
 import java.util.Map;
 
 @Controller
@@ -50,24 +50,19 @@ public class MemberLoginController {
 
     @ResponseBody
     @PostMapping("/login")
-    public Map loginToken(@RequestBody @Valid LoginDto loginDto, HttpServletRequest request) {
-        Map map = new HashMap();
+    public ResponseEntity<String> loginToken(@RequestBody @Valid LoginDto loginDto, HttpServletRequest request) {
+        JsonObject jsonObject = new JsonObject();
 
         try {
             boolean idPwdValid = memberJoinService.idPwdValid(loginDto.getMemberId(), loginDto.getPassword());
-            // idPwd 틀리면 오류폼
+
             if (!idPwdValid) {
-                errorMapReturn(map);
-                return map;
+                return webService.badResponseEntity("NOT_VALID");
             }
-        } catch (UsernameNotFoundException e) {
-            System.out.println("아이디가 없음");
-            errorMapReturn(map);
-            return map;
+
         } catch (MemberNotFoundException e) {
             e.printStackTrace();
-            errorMapReturn(map);
-            return map;
+            return webService.badResponseEntity("MEMBER_NOT_FOUND");
         }
         Member member = memberJoinService.findMyAccountMemberId(loginDto.getMemberId());
         Map<String, String> tokens = jwtTokenService.getTokens(
@@ -78,18 +73,12 @@ public class MemberLoginController {
         // 각 토큰 저장
         jwtTokenService.saveRefreshToken(member.getMemberId(), refreshToken);
 
-        /**
-         * 자동로그인기능 쿠키생성(나중에)
-         */
-        map.put("JWT", accessToken);
+        // TODO 자동로그인 기능 쿠키 생성 나중에 추가
+        jsonObject.addProperty("JWT", accessToken);
 
         webService.sessionSetMember(member, request);
 
-        return map;
-    }
-
-    private void errorMapReturn(Map map) {
-        map.put("error", "error");
+        return webService.okResponseEntity(jsonObject);
     }
     
 }

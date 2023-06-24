@@ -138,24 +138,19 @@
         data: JSON.stringify({memberId:memberId, password:password}),
         dataType: 'json',
         success: function(result) {
-          if (result.error) {
-            if(redirectUrl) {
-              window.location.href='/loginForm?error='+result.error+"&redirectUrl="+redirectUrl;
-            } else {
-              window.location.href='/loginForm?error='+result.error;
-            }
-          } else {
-            localStorage.setItem('jwt', result.JWT);
-            if (redirectUrl) {
-              window.location.href = redirectUrl+"?token="+result.JWT;
-            } else {
-              window.location.href = "/";
-            }
+          let data = JSON.parse(result);
+          let jwt = data.JWT;
 
+          localStorage.setItem('jwt', jwt);
+          if (redirectUrl) {
+            window.location.href = redirectUrl+"?token="+jwt;
+          } else {
+            window.location.href = "/";
           }
+
         },
-        error: function(error) {
-          console.error(error);
+        function(xhr, status, error) {
+          window.location.href='/loginForm?error=error&redirectUrl='+redirectUrl;
         }
       });
 

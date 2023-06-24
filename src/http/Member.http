@@ -1,0 +1,8 @@
+### Member Login
+POST http://localhost:8080/login
+Content-Type: application/json
+
+{
+  "memberId": "aaaa1",
+  "password": "1111"
+}
