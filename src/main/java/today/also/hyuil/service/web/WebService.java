@@ -54,6 +54,26 @@ public class WebService {
         return true;
     }
 
+    public boolean validMemberId(String memberId) {
+        String pattern = "^[a-zA-Z0-9]{5,20}$";
+        return Pattern.matches(pattern, memberId);
+    }
+
+    public boolean validPhoneNumber(String phoneNumber) {
+        String pattern = "^010-[0-9]{4}-[0-9]{4}$";
+        return Pattern.matches(pattern, phoneNumber);
+    }
+
+    public boolean validEmail(String email) {
+        String pattern = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$";
+        return Pattern.matches(pattern, email);
+    }
+
+    public boolean validNickname(String nickname) {
+        String pattern = "^[가-힣a-zA-Z0-9]{3,}$";
+        return Pattern.matches(pattern, nickname);
+    }
+
     public Long getIdInSession(HttpServletRequest request) throws MemberNotFoundException {
         HttpSession session = request.getSession();
         Long id = null;

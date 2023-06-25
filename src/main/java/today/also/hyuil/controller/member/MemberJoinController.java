@@ -2,6 +2,7 @@ package today.also.hyuil.controller.member;
 
 import com.google.gson.JsonObject;
 import jakarta.mail.MessagingException;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.simple.JSONObject;
@@ -15,8 +16,6 @@ import today.also.hyuil.domain.member.*;
 import today.also.hyuil.service.member.inter.MailService;
 import today.also.hyuil.service.member.inter.MemberJoinService;
 import today.also.hyuil.service.web.WebService;
-
-import java.util.regex.Pattern;
 
 @Controller
 @RequestMapping("/join")
@@ -46,6 +45,9 @@ public class MemberJoinController {
             if (!nullCheck) {
                 return webService.badResponseEntity("NULL");
             }
+            if (!webService.validMemberId(memberId)) {
+                return webService.badResponseEntity("BAD_FORM");
+            }
 
             Member member = memberJoinService.idDoubleCheck(resultId);
 
@@ -71,6 +73,10 @@ public class MemberJoinController {
                 return webService.badResponseEntity("NULL");
             }
 
+            if (!webService.validNickname(nickname)) {
+                return webService.badResponseEntity("BAD_FORM");
+            }
+
             Member member = memberJoinService.nicknameCheck(resultNick);
             if (memberNullCheck(member)) {
                 return webService.badResponseEntity("DUPL_NICK");
@@ -94,7 +100,7 @@ public class MemberJoinController {
                 return webService.badResponseEntity("NULL");
             }
 
-            if (!validPhoneNumber(resultPhone)) {
+            if (!webService.validPhoneNumber(resultPhone)) {
                 webService.badResponseEntity("FORM_FAIL");
             }
 
@@ -120,7 +126,7 @@ public class MemberJoinController {
             }
 
             String resultEmail = jsonToString(email, "email");
-            if (!validEmail(resultEmail)) {
+            if (!webService.validEmail(resultEmail)) {
                 return webService.badResponseEntity("FORM_FAIL");
             }
 
@@ -157,15 +163,34 @@ public class MemberJoinController {
         return okBodyResponse();
     }
 
+    @ResponseBody
     @PostMapping("/complete")
-    public String joinMember(@ModelAttribute MemberJoinDto memberJoinDto) {
+    public ResponseEntity<String> joinMember(@RequestBody @Valid MemberJoinDto memberJoinDto) {
+
+        if (!webService.validMemberId(memberJoinDto.getMemberId())) {
+            return webService.badResponseEntity("BAD_ID");
+        }
+        if (!webService.validNickname(memberJoinDto.getNickname())) {
+            return webService.badResponseEntity("BAD_NICK");
+        }
+        if (!webService.validPwd(memberJoinDto.getPassword())) {
+            return webService.badResponseEntity("BAD_PWD");
+        }
+        if (!webService.validEmail(memberJoinDto.getEmail())) {
+            return webService.badResponseEntity("BAD_EMAIL");
+        }
+        if (!webService.validPhoneNumber(memberJoinDto.getPhone())) {
+            return webService.badResponseEntity("BAD_PHONE");
+        }
+
         memberJoinDto.setRoleName(Name.ROLE_USER);
+        memberJoinDto.setSns(Sns.NONE);
         Member member =
                 new Member(memberJoinDto,
                 new Address(memberJoinDto),
                         new Role(memberJoinDto));
         memberJoinService.joinMember(member);
-        return "member/joinComplete";
+        return okBodyResponse();
     }
 
     private boolean memberNullCheck(Member member) {
@@ -175,20 +200,10 @@ public class MemberJoinController {
         return false;
     }
 
-    public boolean validPhoneNumber(String phoneNumber) {
-        String pattern = "^010-[0-9]{4}-[0-9]{4}$";
-        return Pattern.matches(pattern, phoneNumber);
-    }
-
     private String jsonToString(String str, String key) throws ParseException {
         JSONObject jsonObject = webService.jsonParsing(str);
         String resultPhone = String.valueOf(jsonObject.get(key));
         return resultPhone;
-    }
-
-    public boolean validEmail(String email) {
-        String pattern = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$";
-        return Pattern.matches(pattern, email);
     }
 
     private ResponseEntity<String> okBodyResponse() {
