@@ -12,5 +12,5 @@ public interface MemberJoinService {
     Member findMyAccountMemberId(String memberId);
     Member findMyAccount(Long id);
     boolean idPwdValid(String memberId, String password) throws MemberNotFoundException;
-    void passwordChange(Long id, String password, String newPwd) throws NotValidException;
+    void passwordChange(Long id, String password, String newPwd) throws NotValidException, MemberNotFoundException;
 }

@@ -1,6 +1,10 @@
 package today.also.hyuil.controller.member;
 
 import com.google.gson.JsonObject;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -13,19 +17,14 @@ import today.also.hyuil.exception.NotValidException;
 import today.also.hyuil.service.member.inter.MemberJoinService;
 import today.also.hyuil.service.web.WebService;
 
-import jakarta.servlet.http.HttpServletRequest;
-
 @Controller
 @RequestMapping("/info")
+@RequiredArgsConstructor
+@Slf4j
 public class MemberInfoController {
 
     private final WebService webService;
     private final MemberJoinService memberJoinService;
-
-    public MemberInfoController(WebService webService, MemberJoinService memberJoinService) {
-        this.webService = webService;
-        this.memberJoinService = memberJoinService;
-    }
 
     @GetMapping
     public String info() {
@@ -53,14 +52,15 @@ public class MemberInfoController {
         return "member/info/passwordForm";
     }
 
-    // TODO 패스워드 변경 구현
     @ResponseBody
-    @PostMapping("/password")
-    public ResponseEntity<String> modifyPwd(@RequestBody PwdDto pwdDto, HttpServletRequest request) {
-        JsonObject jsonObject = new JsonObject();
+    @PutMapping("/password")
+    public ResponseEntity<String> modifyPwd(@RequestBody @Valid PwdDto pwdDto, HttpServletRequest request) {
         try {
             Long id = webService.getIdInSession(request);
-            Member member = memberJoinService.findMyAccount(id);
+
+            if (!webService.validPwd(pwdDto.getNewPwd())) {
+                return webService.badResponseEntity("BAD_FORM");
+            }
 
             memberJoinService.passwordChange(id, pwdDto.getPassword(), pwdDto.getNewPwd());
 
@@ -72,7 +72,14 @@ public class MemberInfoController {
             return webService.badResponseEntity("NOT_VALID");
         }
 
-        jsonObject.addProperty("data", "MODIFY_OK");
+        return okResponseEntity();
+    }
+
+
+
+    private ResponseEntity<String> okResponseEntity() {
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("BODY", "OK");
         return webService.okResponseEntity(jsonObject);
     }
 }

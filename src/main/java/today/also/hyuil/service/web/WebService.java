@@ -20,6 +20,7 @@ import today.also.hyuil.domain.member.Member;
 import today.also.hyuil.exception.MemberNotFoundException;
 
 import java.util.List;
+import java.util.regex.Pattern;
 
 @Service
 public class WebService {
@@ -33,6 +34,11 @@ public class WebService {
     public JSONObject jsonParsing(String json) throws ParseException {
         JSONParser jsonParser = new JSONParser();
         return (JSONObject) jsonParser.parse(json);
+    }
+
+    public boolean validPwd(String password) {
+        String pattern = "^(?=.*[a-zA-Z])(?=.*\\d).{6,}$";
+        return Pattern.matches(pattern, password);
     }
 
     public boolean stringNullCheck(String request) {
