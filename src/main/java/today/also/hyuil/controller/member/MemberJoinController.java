@@ -65,19 +65,31 @@ public class MemberJoinController {
 
     @ResponseBody
     @PostMapping("/nicknameCheck")
-    public String nicknameCheck(@RequestBody DoubleCheckDto doubleCheckDto) {
-        if (stringNullCheck(
-                doubleCheckDto.getNickname())) {
-            return "확인 불가";
+    public ResponseEntity<String> nicknameCheck(@RequestBody String nickname) {
+
+        try {
+            JSONObject jsonObject = webService.jsonParsing(nickname);
+
+            String resultNick = String.valueOf(jsonObject.get("nickname"));
+
+            if (!webService.stringNullCheck(resultNick)) {
+                return webService.badResponseEntity("NULL");
+            }
+
+            Member member = memberJoinService.nicknameCheck(resultNick);
+            if (memberNullCheck(member)) {
+                return webService.badResponseEntity("DUPL_NICK");
+            }
+
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return webService.badResponseEntity("BAD_JSON");
         }
 
-        Member member = memberJoinService.nicknameCheck(
-                doubleCheckDto.getNickname()
-        );
-        if (memberNullCheck(member)) {
-            return "중복";
-        }
-        return "가입 가능";
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("BODY", "OK");
+
+        return webService.okResponseEntity(jsonObject);
     }
 
     // TODO 폰 양식 체크도 서버에서 한번 더
