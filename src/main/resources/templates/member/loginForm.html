@@ -138,8 +138,8 @@
         data: JSON.stringify({memberId:memberId, password:password}),
         dataType: 'json',
         success: function(result) {
-          let data = JSON.parse(result);
-          let jwt = data.JWT;
+          let response = JSON.parse(result);
+          let jwt = response.JWT;
 
           localStorage.setItem('jwt', jwt);
           if (redirectUrl) {
@@ -149,7 +149,7 @@
           }
 
         },
-        function(xhr, status, error) {
+        error: function(xhr, status, error) {
           window.location.href='/loginForm?error=error&redirectUrl='+redirectUrl;
         }
       });

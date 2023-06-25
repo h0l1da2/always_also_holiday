@@ -193,6 +193,11 @@ public class MemberJoinController {
         return okBodyResponse();
     }
 
+    @GetMapping("/complete")
+    public String complete() {
+        return "member/joinComplete";
+    }
+
     private boolean memberNullCheck(Member member) {
         if (member != null) {
             return true;

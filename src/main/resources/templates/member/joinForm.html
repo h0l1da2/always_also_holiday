@@ -112,24 +112,15 @@
       return true;
     }
   }
-  function checkMemberId(str){
-    let regMemberId = /[ㄱ-ㅎ|ㅏ-ㅣ|가-힣]/;
-    let reg = /[`~!@#$%^&*()_|+\-=?;:'",.<>\{\}\[\]\\\/ ]/gim;
-    let regNum = /^.{5,20}$/
-    if(regMemberId.test(str) || reg.test(str) || !regNum.test(str)) {
-      return false;
-    }else {
-      return true;
-    }
+
+  function checkMemberId(memberId) {
+    const pattern = /^[a-zA-Z0-9]{5,20}$/;
+    return pattern.test(memberId);
   }
-  function checkNickname(str){
-    let regNickname = /[ㄱ-ㅎ|ㅏ-ㅣ]/;
-    let reg = /[`~!@#$%^&*()_|+\-=?;:'",.<>\{\}\[\]\\\/ ]/gim;
-    if(reg.test(str) | regNickname.test(str)) {
-      return false;
-    }else {
-      return true;
-    }
+
+  function checkNick(nickname) {
+    const pattern = /^[가-힣a-zA-Z0-9]{3,}$/;
+    return pattern.test(nickname);
   }
   function checkPhone(str){
     let reg = /^(01[016789]{1})-?[0-9]{3,4}-?[0-9]{4}$/;
@@ -159,10 +150,16 @@
   }
 
   function formCheck(form) {
-    let name = document.getElementById("name").value;
-    let address = document.getElementById("address").value;
-    let detail = document.getElementById("detail").value;
+    let memberId = document.getElementById("memberId").value;
     let password = document.getElementById("password").value;
+    let name = document.getElementById("name").value;
+    let nickname = document.getElementById("nickname").value;
+    let email = document.getElementById("email").value;
+    let phone = document.getElementById("phone").value;
+    let address = document.getElementById("address").value;
+    let extraAddress = document.getElementById("extraAddress").value;
+    let postcode = document.getElementById("postcode").value;
+    let detail = document.getElementById("detail").value;
     if (idCheck == 0) {
       alert('ID 중복확인은 필수입니다');
       return false;
@@ -180,7 +177,8 @@
       return false;
     }
     if ($('#difPwd').css('display') == 'block' |
-            $('#pwdForm').css('display') == 'block') {
+            $('#pwdForm').css('display') == 'block' |
+            !checkPassword(password)) {
       alert('비밀번호를 제대로 확인해주세요');
       document.getElementById('password').focus();
       return false;
@@ -190,16 +188,64 @@
       document.getElementById('name').focus();
       return false;
     }
-    if (address == '' | detail == '') {
+    if (address == '' | detail == '' | extraAddress == '' | postcode == '') {
       alert('주소를 입력해주세요');
       document.getElementById('detail').focus();
       return false;
     }
-    if (!checkPassword(password)) {
-      alert('비밀번호 양식을 맞춰주세요');
-      document.getElementById('password').focus();
-      return false;
+    if (!checkNick(nickname)) {
+      alert('닉네임 형식을 확인해주세요');
+      document.getElementById('nickname').focus();
     }
+    if (!checkEmail(email)) {
+      alert('이메일 형식을 확인해주세요');
+      document.getElementById('email').focus();
+    }
+    if (!checkPhone(phone)) {
+      alert('휴대폰 형식을 확인해주세요');
+      document.getElementById('phone').focus();
+    }
+
+    $.ajax({
+      type: 'POST',
+      url: '/join/codeCheck',
+      contentType: "application/json",
+      data: JSON.stringify({memberId:memberId}),
+      dataType: 'text',
+      success: function (result) {
+        location.href = '/join/complete';
+      },
+      error: function(xhr, status, error) {
+        let response = JSON.parse(xhr.responseText);
+        let data = response.data;
+
+        if (data === 'BAD_ID') {
+          alert('아이디를 확인하세요');
+          document.getElementById('memberId').focus();
+        }
+        if (data === 'BAD_NICK') {
+          alert('닉네임을 확인하세요');
+          document.getElementById('nickname').focus();
+
+        }
+        if (data === 'BAD_PWD') {
+          alert('비밀번호를 확인하세요');
+          document.getElementById('password').focus();
+
+        }
+        if (data === 'BAD_EMAIL') {
+          alert('이메일을 확인하세요');
+          document.getElementById('email').focus();
+
+        }
+        if (data === 'BAD_PHONE') {
+          alert('휴대폰을 확인하세요');
+          document.getElementById('phone').focus();
+
+        }
+      }}
+    );
+
   }
 
   let idCheck = 0;
@@ -279,7 +325,7 @@
     })
     $('#nickCheckBtn').click(function () {
       let nickname = document.getElementById("nickname").value;
-      if (nickname == "" | nickname == " " | !checkNickname(nickname)) {
+      if (nickname == "" | nickname == " " | !checkNick(nickname)) {
         $('#wrongNick').css('display', 'block');
         return false;
       }
