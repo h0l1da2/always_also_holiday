@@ -1,20 +1,20 @@
 package today.also.hyuil.config;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import today.also.hyuil.repository.member.MemberJpaRepository;
 import today.also.hyuil.repository.member.MemberRepository;
 import today.also.hyuil.service.member.MemberJoinServiceImpl;
 import today.also.hyuil.service.member.inter.MemberJoinService;
 
 @Configuration
+@RequiredArgsConstructor
 public class AppConfig {
 
     private final MemberRepository memberRepository;
-
-    public AppConfig(MemberRepository memberRepository) {
-        this.memberRepository = memberRepository;
-    }
+    private final MemberJpaRepository memberJpaRepository;
 
     // TODO 시큐리티 컨피그에 옮기면?
     @Bean
@@ -24,7 +24,7 @@ public class AppConfig {
 
     @Bean
     public MemberJoinService memberJoinService() {
-        return new MemberJoinServiceImpl(memberRepository, bCryptPasswordEncoder());
+        return new MemberJoinServiceImpl(memberRepository, memberJpaRepository,bCryptPasswordEncoder());
     }
 
 
