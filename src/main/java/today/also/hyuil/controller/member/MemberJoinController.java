@@ -115,17 +115,29 @@ public class MemberJoinController {
     // TODO 이메일 양식 체크도 서버에서 한번 더
     @ResponseBody
     @PostMapping("/emailSend")
-    public ResponseEntity<String> emailSend(@RequestParam String email) {
-        JsonObject jsonObject = new JsonObject();
+    public ResponseEntity<String> emailSend(@RequestBody String email) {
         try {
-            randomCode = mailService.mailSend(Mail.JOIN, email);
+
+            if (!webService.stringNullCheck(email)) {
+                return webService.badResponseEntity("NULL");
+            }
+
+            String resultEmail = jsonToString(email, "email");
+            if (!validEmail(resultEmail)) {
+                return webService.badResponseEntity("FORM_FAIL");
+            }
+            
+            randomCode = mailService.mailSend(Mail.JOIN, resultEmail);
+
         } catch (MessagingException e) {
             e.printStackTrace();
-            jsonObject.addProperty("error", "SEND_ERROR");
-            webService.badResponseEntity("SEND_ERROR");
+            return webService.badResponseEntity("SEND_ERROR");
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return webService.badResponseEntity("BAD_JSON");
         }
-        jsonObject.addProperty("body", "SEND_OK");
-        return webService.okResponse(jsonObject);
+
+        return okBodyResponse();
     }
 
     @ResponseBody
@@ -177,18 +189,21 @@ public class MemberJoinController {
         return Pattern.matches(pattern, phoneNumber);
     }
 
+    private String jsonToString(String str, String key) throws ParseException {
+        JSONObject jsonObject = webService.jsonParsing(str);
+        String resultPhone = String.valueOf(jsonObject.get(key));
+        return resultPhone;
+    }
 
+    public boolean validEmail(String email) {
+        String pattern = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$";
+        return Pattern.matches(pattern, email);
+    }
 
     private ResponseEntity<String> okBodyResponse() {
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("BODY", "OK");
 
         return webService.okResponseEntity(jsonObject);
-    }
-
-    private String jsonToString(String phone, String phone1) throws ParseException {
-        JSONObject jsonObject = webService.jsonParsing(phone);
-        String resultPhone = String.valueOf(jsonObject.get(phone1));
-        return resultPhone;
     }
 }
