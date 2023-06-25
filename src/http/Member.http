@@ -6,3 +6,10 @@ Content-Type: application/json
   "memberId": "aaaa1",
   "password": "1111"
 }
+### Member idCheck
+POST http://localhost:8080/join/idCheck
+Content-Type: application/json
+
+{
+  "memberId": " "
+}
