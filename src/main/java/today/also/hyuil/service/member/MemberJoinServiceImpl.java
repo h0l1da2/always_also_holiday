@@ -1,45 +1,46 @@
 package today.also.hyuil.service.member;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import today.also.hyuil.domain.member.Member;
 import today.also.hyuil.exception.MemberNotFoundException;
 import today.also.hyuil.exception.NotValidException;
+import today.also.hyuil.repository.member.MemberJpaRepository;
 import today.also.hyuil.repository.member.MemberRepository;
 import today.also.hyuil.service.member.inter.MemberJoinService;
 
 // TODO 트랜잭션 삭제하고 필요할 때만 붙이기 (모든 서비스)
 @Service
+@RequiredArgsConstructor
+@Slf4j
 public class MemberJoinServiceImpl implements MemberJoinService {
 
     private final MemberRepository memberRepository;
+    private final MemberJpaRepository memberJpaRepository;
     private final BCryptPasswordEncoder passwordEncoder;
-
-    public MemberJoinServiceImpl(MemberRepository memberRepository, BCryptPasswordEncoder passwordEncoder) {
-        this.memberRepository = memberRepository;
-        this.passwordEncoder = passwordEncoder;
-    }
 
     @Override
     public Member joinMember(Member member) {
         String encodedPassword = getEncodedPassword(member.getPassword());
         member.encodePassword(encodedPassword);
-        return memberRepository.insertMember(member);
+        return memberJpaRepository.saveMember(member);
     }
 
     @Override
     public Member idDoubleCheck(String memberId) {
-        return memberRepository.findByMemberId(memberId);
+        return memberJpaRepository.findByMemberId(memberId).orElse(null);
     }
 
     @Override
     public Member nicknameCheck(String nickname) {
-        return memberRepository.findByNickname(nickname);
+        return memberJpaRepository.findByNickname(nickname).orElse(null);
     }
 
     @Override
     public Member phoneCheck(String phone) {
-        return memberRepository.findByPhone(phone);
+        return memberJpaRepository.findByPhone(phone).orElse(null);
     }
 
     @Override
@@ -54,7 +55,7 @@ public class MemberJoinServiceImpl implements MemberJoinService {
 
     @Override
     public boolean idPwdValid(String memberId, String password) throws MemberNotFoundException {
-        Member findMember = memberRepository.findByMemberId(memberId);
+        Member findMember = memberJpaRepository.findByMemberId(memberId).orElse(null);
         if (findMember == null) {
             throw new MemberNotFoundException();
         }
@@ -62,15 +63,17 @@ public class MemberJoinServiceImpl implements MemberJoinService {
     }
 
     @Override
-    public void passwordChange(Long id, String password, String newPwd) throws NotValidException {
-        Member member = memberRepository.findById(id);
+    public void passwordChange(Long id, String password, String newPwd) throws NotValidException, MemberNotFoundException {
+        Member member = memberJpaRepository.findById(id).orElse(null);
+        if (member == null) {
+            throw new MemberNotFoundException();
+        }
 
-        boolean valid = passwordValid(newPwd, member.getPassword());
+        boolean valid = passwordValid(password, member.getPassword());
         if (valid) {
             throw new NotValidException("패스워드가 다릅니다");
         }
-
-        memberRepository.updatePassword(id, newPwd);
+        memberJpaRepository.updateByPassword(id, newPwd);
     }
 
     private String getEncodedPassword(String password) {
