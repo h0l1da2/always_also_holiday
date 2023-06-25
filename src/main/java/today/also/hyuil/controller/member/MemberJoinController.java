@@ -10,7 +10,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import today.also.hyuil.domain.dto.member.DoubleCheckDto;
 import today.also.hyuil.domain.dto.member.MemberJoinDto;
 import today.also.hyuil.domain.member.*;
 import today.also.hyuil.service.member.inter.MailService;
@@ -111,8 +110,6 @@ public class MemberJoinController {
         return okBodyResponse();
     }
 
-
-    // TODO 이메일 양식 체크도 서버에서 한번 더
     @ResponseBody
     @PostMapping("/emailSend")
     public ResponseEntity<String> emailSend(@RequestBody String email) {
@@ -126,7 +123,7 @@ public class MemberJoinController {
             if (!validEmail(resultEmail)) {
                 return webService.badResponseEntity("FORM_FAIL");
             }
-            
+
             randomCode = mailService.mailSend(Mail.JOIN, resultEmail);
 
         } catch (MessagingException e) {
@@ -142,17 +139,24 @@ public class MemberJoinController {
 
     @ResponseBody
     @PostMapping("/codeCheck")
-    public String codeCheck(@RequestBody DoubleCheckDto doubleCheckDto) {
-        String code = doubleCheckDto.getCode();
-        if (stringNullCheck(code)) {
-            return "확인 불가";
-        }
+    public ResponseEntity<String> codeCheck(@RequestBody String code) {
+        try {
+            String resultCode = jsonToString(code, "code");
+            if (!webService.stringNullCheck(resultCode)) {
+                return webService.badResponseEntity("NULL");
+            }
 
-        if (code.equals(randomCode)) {
-            return "코드 일치";
+            if (!resultCode.equals(randomCode)) {
+                return webService.badResponseEntity("NOT_VALID");
+            }
+
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return webService.badResponseEntity("BAD_JSON");
         }
-        return "코드 불일치";
+        return okBodyResponse();
     }
+
     @PostMapping("/complete")
     public String joinMember(@ModelAttribute MemberJoinDto memberJoinDto) {
         memberJoinDto.setRoleName(Name.ROLE_USER);
@@ -162,19 +166,6 @@ public class MemberJoinController {
                         new Role(memberJoinDto));
         memberJoinService.joinMember(member);
         return "member/joinComplete";
-    }
-
-    private boolean stringNullCheck(String str) {
-        if (str == null) {
-            return true;
-        }
-        if (str.equals("")) {
-            return true;
-        }
-        if (str.contains(" ")) {
-            return true;
-        }
-        return false;
     }
 
     private boolean memberNullCheck(Member member) {
