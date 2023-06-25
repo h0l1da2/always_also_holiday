@@ -17,6 +17,8 @@ import today.also.hyuil.service.member.inter.MailService;
 import today.also.hyuil.service.member.inter.MemberJoinService;
 import today.also.hyuil.service.web.WebService;
 
+import java.util.regex.Pattern;
+
 @Controller
 @RequestMapping("/join")
 @RequiredArgsConstructor
@@ -39,8 +41,7 @@ public class MemberJoinController {
     public ResponseEntity<String> idDoubleCheck(@RequestBody String memberId) {
         try {
             // memberId 제이슨 풀기
-            JSONObject jsonObject = webService.jsonParsing(memberId);
-            String resultId = String.valueOf(jsonObject.get("memberId"));
+            String resultId = jsonToString(memberId, "memberId");
 
             boolean nullCheck = webService.stringNullCheck(resultId);
             if (!nullCheck) {
@@ -57,10 +58,7 @@ public class MemberJoinController {
             e.printStackTrace();
             return webService.badResponseEntity("BAD_JSON");
         }
-        JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("BODY", "OK");
-
-        return webService.okResponseEntity(jsonObject);
+        return okBodyResponse();
     }
 
     @ResponseBody
@@ -68,9 +66,7 @@ public class MemberJoinController {
     public ResponseEntity<String> nicknameCheck(@RequestBody String nickname) {
 
         try {
-            JSONObject jsonObject = webService.jsonParsing(nickname);
-
-            String resultNick = String.valueOf(jsonObject.get("nickname"));
+            String resultNick = jsonToString(nickname, "nickname");
 
             if (!webService.stringNullCheck(resultNick)) {
                 return webService.badResponseEntity("NULL");
@@ -86,29 +82,35 @@ public class MemberJoinController {
             return webService.badResponseEntity("BAD_JSON");
         }
 
-        JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("BODY", "OK");
-
-        return webService.okResponseEntity(jsonObject);
+        return okBodyResponse();
     }
 
-    // TODO 폰 양식 체크도 서버에서 한번 더
     @ResponseBody
     @PostMapping("/phoneCheck")
-    public String phoneCheck(@RequestBody DoubleCheckDto doubleCheckDto) {
-        if (stringNullCheck(
-                doubleCheckDto.getPhone())) {
-            return "확인 불가";
-        }
+    public ResponseEntity<String> phoneCheck(@RequestBody String phone) {
+        try {
+            String resultPhone = jsonToString(phone, "phone");
 
-        Member member = memberJoinService.phoneCheck(
-                doubleCheckDto.getPhone()
-        );
-        if (memberNullCheck(member)) {
-            return "중복";
+            if (!webService.stringNullCheck(phone)) {
+                return webService.badResponseEntity("NULL");
+            }
+
+            if (!validPhoneNumber(resultPhone)) {
+                webService.badResponseEntity("FORM_FAIL");
+            }
+
+            Member member = memberJoinService.phoneCheck(resultPhone);
+            if (memberNullCheck(member)) {
+                return webService.badResponseEntity("DUPL_PHONE");
+            }
+
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return webService.badResponseEntity("BAD_JSON");
         }
-        return "가입 가능";
+        return okBodyResponse();
     }
+
 
     // TODO 이메일 양식 체크도 서버에서 한번 더
     @ResponseBody
@@ -139,7 +141,6 @@ public class MemberJoinController {
         }
         return "코드 불일치";
     }
-
     @PostMapping("/complete")
     public String joinMember(@ModelAttribute MemberJoinDto memberJoinDto) {
         memberJoinDto.setRoleName(Name.ROLE_USER);
@@ -171,4 +172,23 @@ public class MemberJoinController {
         return false;
     }
 
+    public boolean validPhoneNumber(String phoneNumber) {
+        String pattern = "^010-[0-9]{4}-[0-9]{4}$";
+        return Pattern.matches(pattern, phoneNumber);
+    }
+
+
+
+    private ResponseEntity<String> okBodyResponse() {
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("BODY", "OK");
+
+        return webService.okResponseEntity(jsonObject);
+    }
+
+    private String jsonToString(String phone, String phone1) throws ParseException {
+        JSONObject jsonObject = webService.jsonParsing(phone);
+        String resultPhone = String.valueOf(jsonObject.get(phone1));
+        return resultPhone;
+    }
 }
