@@ -1,6 +1,11 @@
 package today.also.hyuil.controller.member;
 
 import com.google.gson.JsonObject;
+import jakarta.mail.MessagingException;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.ParseException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -12,22 +17,16 @@ import today.also.hyuil.service.member.inter.MailService;
 import today.also.hyuil.service.member.inter.MemberJoinService;
 import today.also.hyuil.service.web.WebService;
 
-import jakarta.mail.MessagingException;
-
 @Controller
 @RequestMapping("/join")
+@RequiredArgsConstructor
+@Slf4j
 public class MemberJoinController {
 
     private String randomCode;
     private final MemberJoinService memberJoinService;
     private final MailService mailService;
     private final WebService webService;
-
-    public MemberJoinController(MemberJoinService memberJoinService, MailService mailService, WebService webService) {
-        this.memberJoinService = memberJoinService;
-        this.mailService = mailService;
-        this.webService = webService;
-    }
 
     @GetMapping
     public String joinForm(Model model) {
@@ -37,20 +36,31 @@ public class MemberJoinController {
 
     @ResponseBody
     @PostMapping("/idCheck")
-    public String idDoubleCheck(@RequestBody DoubleCheckDto doubleCheckDto) {
-        if (stringNullCheck(
-                doubleCheckDto.getMemberId())) {
-            return "확인 불가";
-        }
+    public ResponseEntity<String> idDoubleCheck(@RequestBody String memberId) {
+        try {
+            // memberId 제이슨 풀기
+            JSONObject jsonObject = webService.jsonParsing(memberId);
+            String resultId = String.valueOf(jsonObject.get("memberId"));
 
-        Member member = memberJoinService.idDoubleCheck(
-                doubleCheckDto.getMemberId()
-        );
+            boolean nullCheck = webService.stringNullCheck(resultId);
+            if (!nullCheck) {
+                return webService.badResponseEntity("NULL");
+            }
 
-        if (memberNullCheck(member)) {
-            return "중복";
+            Member member = memberJoinService.idDoubleCheck(resultId);
+
+            if (memberNullCheck(member)) {
+                return webService.badResponseEntity("DUPL_ID");
+            }
+
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return webService.badResponseEntity("BAD_JSON");
         }
-        return "가입 가능";
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("BODY", "OK");
+
+        return webService.okResponseEntity(jsonObject);
     }
 
     @ResponseBody

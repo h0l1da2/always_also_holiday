@@ -4,6 +4,9 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -25,6 +28,24 @@ public class WebService {
         HttpSession session = request.getSession();
         session.setAttribute("id", member.getId());
         session.setAttribute("nickname", member.getNickname());
+    }
+
+    public JSONObject jsonParsing(String json) throws ParseException {
+        JSONParser jsonParser = new JSONParser();
+        return (JSONObject) jsonParser.parse(json);
+    }
+
+    public boolean stringNullCheck(String request) {
+        if (request == null) {
+            return false;
+        }
+        if (request.equals("")) {
+            return false;
+        }
+        if (request.contains(" ")) {
+            return false;
+        }
+        return true;
     }
 
     public Long getIdInSession(HttpServletRequest request) throws MemberNotFoundException {
