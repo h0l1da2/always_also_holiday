@@ -70,7 +70,7 @@ public class MemberJoinServiceImpl implements MemberJoinService {
         }
 
         boolean valid = passwordValid(password, member.getPassword());
-        if (valid) {
+        if (!valid) {
             throw new NotValidException("패스워드가 다릅니다");
         }
         member.passwordChange(newPwd);

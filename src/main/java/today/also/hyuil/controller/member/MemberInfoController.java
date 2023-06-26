@@ -57,6 +57,7 @@ public class MemberInfoController {
     public ResponseEntity<String> modifyPwd(@RequestBody @Valid PwdDto pwdDto, HttpServletRequest request) {
         try {
             Long id = webService.getIdInSession(request);
+//            Long id = 1L;
 
             if (!webService.validPwd(pwdDto.getNewPwd())) {
                 return webService.badResponseEntity("BAD_FORM");
