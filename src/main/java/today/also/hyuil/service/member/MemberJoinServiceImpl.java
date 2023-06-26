@@ -25,7 +25,7 @@ public class MemberJoinServiceImpl implements MemberJoinService {
     public Member joinMember(Member member) {
         String encodedPassword = getEncodedPassword(member.getPassword());
         member.encodePassword(encodedPassword);
-        return memberJpaRepository.saveMember(member);
+        return memberJpaRepository.save(member);
     }
 
     @Override
@@ -73,7 +73,8 @@ public class MemberJoinServiceImpl implements MemberJoinService {
         if (valid) {
             throw new NotValidException("패스워드가 다릅니다");
         }
-        memberJpaRepository.updateByPassword(id, newPwd);
+        member.passwordChange(newPwd);
+        memberJpaRepository.save(member);
     }
 
     private String getEncodedPassword(String password) {
