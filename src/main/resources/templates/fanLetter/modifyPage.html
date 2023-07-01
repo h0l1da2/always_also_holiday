@@ -103,7 +103,7 @@
       fanLetterData.append('fanLetterWriteDto', new Blob([JSON.stringify(data)], {type: 'application/json'}));
 
       $.ajax({
-        type: 'POST',
+        type: 'PATCH',
         url: '/fanLetter/modify/'+num,
         processData: false,
         contentType: false,
