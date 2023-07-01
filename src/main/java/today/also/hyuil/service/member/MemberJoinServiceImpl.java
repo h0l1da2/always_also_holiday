@@ -55,10 +55,7 @@ public class MemberJoinServiceImpl implements MemberJoinService {
 
     @Override
     public boolean idPwdValid(String memberId, String password) throws MemberNotFoundException {
-        Member findMember = memberJpaRepository.findByMemberId(memberId).orElse(null);
-        if (findMember == null) {
-            throw new MemberNotFoundException();
-        }
+        Member findMember = memberJpaRepository.findByMemberId(memberId).orElseThrow(MemberNotFoundException::new);
         return passwordEncoder.matches(password, findMember.getPassword());
     }
 
