@@ -1,5 +1,6 @@
 package today.also.hyuil.config.security.auth.filter;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestResolver;
 import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
 import org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames;
@@ -14,9 +15,10 @@ import java.util.Map;
 import java.util.UUID;
 
 @Component
+@Slf4j
 public class CustomOAuth2AuthorizationRequestResolver implements OAuth2AuthorizationRequestResolver {
     private final String REQUEST_URL = "/oauth2/authorization/";
-    private final String BASE_URL = "https://alwaysalsoholiday.com";
+    private final String BASE_URL = "http://localhost:8080/";
     private final SnsInfo snsInfo;
 
     public CustomOAuth2AuthorizationRequestResolver(SnsInfo snsInfo) {
@@ -35,7 +37,7 @@ public class CustomOAuth2AuthorizationRequestResolver implements OAuth2Authoriza
 
     @Override
     public OAuth2AuthorizationRequest resolve(HttpServletRequest request, String clientRegistrationId) {
-        System.out.println("리졸버 시작");
+        log.info("리졸버 시작");
         String sns = clientRegistrationId.toUpperCase();
         String state = UUID.randomUUID().toString();
 

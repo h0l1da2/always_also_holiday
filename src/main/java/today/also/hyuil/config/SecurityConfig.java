@@ -1,5 +1,6 @@
 package today.also.hyuil.config;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -33,6 +34,7 @@ import today.also.hyuil.service.web.WebService;
 
 @EnableWebSecurity
 @Configuration
+@RequiredArgsConstructor
 public class SecurityConfig {
 
     private final WebService webService;
@@ -47,20 +49,6 @@ public class SecurityConfig {
     private final SnsInfo snsInfo;
     private final KakaoJwk kakaoJwk;
     private final GoogleJwk googleJwk;
-    public SecurityConfig(WebService webService, MemberJoinService memberJoinService, JwtTokenParser jwtTokenParser, JwtTokenService jwtTokenService, CustomUserDetailsService customUserDetailsService, CustomDefaultOAuth2UserService customDefaultOAuth2UserService, CustomOAuth2AuthorizationRequestResolver customOAuth2AuthorizationRequestResolver, ClientRegistrationRepository clientRegistrationRepository, OAuth2AuthorizedClientRepository oAuth2AuthorizedClientRepository, SnsInfo snsInfo, KakaoJwk kakaoJwk, GoogleJwk googleJwk) {
-        this.webService = webService;
-        this.memberJoinService = memberJoinService;
-        this.jwtTokenParser = jwtTokenParser;
-        this.jwtTokenService = jwtTokenService;
-        this.customUserDetailsService = customUserDetailsService;
-        this.customDefaultOAuth2UserService = customDefaultOAuth2UserService;
-        this.customOAuth2AuthorizationRequestResolver = customOAuth2AuthorizationRequestResolver;
-        this.clientRegistrationRepository = clientRegistrationRepository;
-        this.oAuth2AuthorizedClientRepository = oAuth2AuthorizedClientRepository;
-        this.snsInfo = snsInfo;
-        this.kakaoJwk = kakaoJwk;
-        this.googleJwk = googleJwk;
-    }
 
     @Bean
     public AuthenticationManager authenticationManager(
@@ -91,8 +79,8 @@ public class SecurityConfig {
                 .addFilterBefore(new JwtFilter(customUserDetailsService, jwtTokenParser, jwtTokenService), UsernamePasswordAuthenticationFilter.class)
                 .addFilterAfter(new JwtTokenSetFilter(), UsernamePasswordAuthenticationFilter.class)
                 // OAuth2
-                .addFilterBefore(new CustomOAuth2AuthorizationCodeGrantFilter(clientRegistrationRepository, oAuth2AuthorizedClientRepository, authenticationManager(authenticationConfiguration()), customDefaultOAuth2UserService, snsInfo), OAuth2LoginAuthenticationFilter.class)
-                .addFilterAfter(new OAuth2JwtTokenFilter(webService, jwtTokenService, jwtTokenParser, memberJoinService, snsInfo, kakaoJwk, googleJwk), OAuth2LoginAuthenticationFilter.class)
+                .addFilterBefore(new CustomOAuth2AuthorizationCodeGrantFilter(clientRegistrationRepository, oAuth2AuthorizedClientRepository, authenticationManager(authenticationConfiguration()), snsInfo), OAuth2LoginAuthenticationFilter.class)
+                .addFilterAfter(new OAuth2JwtTokenFilter(webService, jwtTokenService, jwtTokenParser, memberJoinService, snsInfo, clientRegistrationRepository, customDefaultOAuth2UserService,kakaoJwk, googleJwk), OAuth2LoginAuthenticationFilter.class)
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(new CustomAuthenticationEntryPoint())
                         .accessDeniedHandler(new CustomAccessDeniedHandler()))
 
