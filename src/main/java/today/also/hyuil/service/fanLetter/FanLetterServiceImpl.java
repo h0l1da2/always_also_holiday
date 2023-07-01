@@ -13,6 +13,7 @@ import today.also.hyuil.domain.fanLetter.FanBoard;
 import today.also.hyuil.domain.file.FileInfo;
 import today.also.hyuil.domain.member.Member;
 import today.also.hyuil.domain.member.Name;
+import today.also.hyuil.exception.BoardNotFoundException;
 import today.also.hyuil.exception.FileNumbersLimitExceededException;
 import today.also.hyuil.exception.MemberNotFoundException;
 import today.also.hyuil.repository.fanLetter.FanLetterJpaRepository;
@@ -47,7 +48,7 @@ public class FanLetterServiceImpl implements FanLetterService {
         }
         fanBoard.writeMember(findMember);
 
-        FanBoard insertFanBoard = fanLetterRepository.insertFanBoard(fanBoard);
+        FanBoard insertFanBoard = fanLetterJpaRepository.save(fanBoard);
         for (FileInfo fileInfo : fileInfoList) {
             fileInfo.fanBoardFile(insertFanBoard);
             fileService.saveFileInfo(fileInfo);
@@ -57,8 +58,12 @@ public class FanLetterServiceImpl implements FanLetterService {
     }
 
     @Override
-    public Map<String, Object> findLetter(Long id, Long fanLetterNum) throws MemberNotFoundException {
-        FanBoard fanBoard = fanLetterRepository.selectFanBoard(fanLetterNum);
+    public Map<String, Object> findLetter(Long id, Long fanLetterNum) throws MemberNotFoundException, BoardNotFoundException {
+        FanBoard fanBoard = fanLetterJpaRepository.findById(fanLetterNum).orElse(null);
+
+        if (fanBoard == null) {
+            throw new BoardNotFoundException("게시글을 찾을 수 없습니다");
+        }
         String writer = fanBoard.getMember().getMemberId();
 
         if (!writer.equals(id)) {
@@ -180,4 +185,25 @@ public class FanLetterServiceImpl implements FanLetterService {
 
         return map;
     }
+
+    @Override
+    public Map<String, Object> getLetter(Long num) throws BoardNotFoundException {
+        FanBoard fanBoard = fanLetterJpaRepository.findById(num).orElse(null);
+
+        if (fanBoard == null) {
+            throw new BoardNotFoundException("게시글을 찾을 수 없습니다");
+        }
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("fanLetter", fanBoard);
+
+        List<FileInfo> fileInfoList = fileService.fileInfoListForFanBoard(num);
+
+        if (fileInfoList.size() != 0) {
+            map.put("fileInfoList", fileInfoList);
+        }
+
+        return map;
+    }
+
 }
