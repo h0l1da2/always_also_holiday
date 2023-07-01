@@ -6,7 +6,8 @@
 <h2>주소</h2>
 오늘도 휴일 (http://alwaysalsoholiday.com)<br>
 <br>
-*혹시 해당 주소가 접속 불가일 경우,<br>티스토리(https://hyuil.tistory.com/199) 에서 페이지를 확인해주세요!
+*현재 해당 주소 접속 불가로,<br>티스토리(https://hyuil.tistory.com/199) 에서 페이지를 확인해주세요!<br>
+- aws 용량 초과로 돈이 나가서 중지시켜놨습니다..<br>
 
 <h2>작업자</h2>
 강휴일 1인 개발
