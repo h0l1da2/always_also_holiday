@@ -10,4 +10,13 @@ public class PwdDto {
     private String password;
     @NotBlank
     private String newPwd;
+
+    public PwdDto() {
+
+    }
+
+    public PwdDto(String password, String newPw) {
+        this.password = password;
+        this.newPwd = newPw;
+    }
 }
