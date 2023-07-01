@@ -37,6 +37,29 @@ class MemberInfoControllerTest {
     @Autowired
     private MemberJoinService memberJoinService;
 
+    private final String password = "password!123";
+
+    @Test
+    @DisplayName("password 변경 시 성공")
+    void modifyPwd_success() throws Exception {
+        // given
+        Member member = getMember();
+        member = memberJoinService.joinMember(member);
+
+        MockHttpSession session = new MockHttpSession();
+        session.setAttribute("id", member.getId());
+
+        PwdDto pwdDto = new PwdDto(password, "newPwd!1234");
+        // expected
+        mockMvc.perform(
+                put("/info/password")
+                        .session(session)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(pwdDto))
+        ).andExpect(status().is2xxSuccessful())
+         .andExpect(jsonPath("$.data").value("OK"))
+         .andDo(print());
+    }
     @Test
     @DisplayName("password 변경 시 짧으면 BadRequest")
     void modifyPwd() throws Exception {
@@ -47,7 +70,7 @@ class MemberInfoControllerTest {
         MockHttpSession session = new MockHttpSession();
         session.setAttribute("id", member.getId());
 
-        PwdDto pwdDto = new PwdDto("password!123", "newPw");
+        PwdDto pwdDto = new PwdDto(password, "newPw");
         // expected
         mockMvc.perform(
                 put("/info/password")

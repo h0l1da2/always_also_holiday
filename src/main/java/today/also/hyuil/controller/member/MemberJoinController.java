@@ -213,7 +213,7 @@ public class MemberJoinController {
 
     private ResponseEntity<String> okBodyResponse() {
         JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("BODY", "OK");
+        jsonObject.addProperty("data", "OK");
 
         return webService.okResponseEntity(jsonObject);
     }

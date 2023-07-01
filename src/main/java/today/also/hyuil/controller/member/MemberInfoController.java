@@ -80,7 +80,7 @@ public class MemberInfoController {
 
     private ResponseEntity<String> okResponseEntity() {
         JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("BODY", "OK");
+        jsonObject.addProperty("data", "OK");
         return webService.okResponseEntity(jsonObject);
     }
 }
