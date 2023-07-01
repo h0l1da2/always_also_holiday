@@ -13,3 +13,29 @@ Content-Type: application/json
 {
   "memberId": " "
 }
+### Member join
+POST http://localhost:8080/join/complete
+Content-Type: application/json
+
+{
+  "memberId": "aaaa1",
+  "password": "Password1",
+  "nickname": "nickname",
+  "name": "휴일이",
+  "email": "aaaa1@aaaa.com",
+  "phone": "010-0000-2222",
+  "address": "경기도 부천시 지봉로",
+  "extraAddress": "지봉로 124",
+  "postcode": "16754",
+  "detail": "ㅇㅇㅇㅇ"
+}
+
+
+### Password update
+PUT http://localhost:8080/info/password
+Content-Type: application/json
+
+{
+  "password": "Password1",
+  "newPwd": "newPassword1"
+}
