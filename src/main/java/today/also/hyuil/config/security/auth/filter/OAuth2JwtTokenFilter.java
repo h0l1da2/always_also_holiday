@@ -1,14 +1,25 @@
 package today.also.hyuil.config.security.auth.filter;
 
 import io.jsonwebtoken.Claims;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.client.registration.ClientRegistration;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
+import org.springframework.security.oauth2.core.OAuth2AccessToken;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.filter.OncePerRequestFilter;
+import today.also.hyuil.config.security.auth.CustomDefaultOAuth2UserService;
 import today.also.hyuil.config.security.auth.jwk.GoogleJwk;
 import today.also.hyuil.config.security.auth.jwk.KakaoJwk;
 import today.also.hyuil.config.security.auth.tokenresponse.NaverProfileApiResponse;
@@ -27,8 +38,11 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.security.PublicKey;
+import java.time.Instant;
 import java.util.Map;
 
+@Slf4j
+@RequiredArgsConstructor
 public class OAuth2JwtTokenFilter extends OncePerRequestFilter {
 
     private final WebService webService;
@@ -36,28 +50,18 @@ public class OAuth2JwtTokenFilter extends OncePerRequestFilter {
     private final JwtTokenParser jwtTokenParser;
     private final MemberJoinService memberJoinService;
     private final SnsInfo snsInfo;
+    private final ClientRegistrationRepository clientRegistrationRepository;
+    private final CustomDefaultOAuth2UserService customDefaultOAuth2UserService;
 
     private final KakaoJwk kakaoJwk;
     private final GoogleJwk googleJwk;
-    public OAuth2JwtTokenFilter(WebService webService, JwtTokenService jwtTokenService, JwtTokenParser jwtTokenParser, MemberJoinService memberJoinService, SnsInfo snsInfo, KakaoJwk kakaoJwk, GoogleJwk googleJwk) {
-        this.webService = webService;
-        this.jwtTokenService = jwtTokenService;
-        this.jwtTokenParser = jwtTokenParser;
-        this.memberJoinService = memberJoinService;
-        this.snsInfo = snsInfo;
-        this.kakaoJwk = kakaoJwk;
-        this.googleJwk = googleJwk;
-    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        System.out.println("토큰 생성/저장 필터");
+        log.info("토큰 생성/저장 필터");
         TokenResponse tokenResponse =
                 (TokenResponse) request.getAttribute("tokenResponse");
         String sns = String.valueOf(request.getAttribute("sns"));
-
-        System.out.println("sns = " + sns);
-        System.out.println("tokenResponse = " + tokenResponse);
 
         String memberId = "";
         String token = "";
@@ -110,7 +114,7 @@ public class OAuth2JwtTokenFilter extends OncePerRequestFilter {
                     } else if (kid.equals(kakaoJwk.getKidSecond())) {
                         kakaoJwk.jwkSetting("second");
                     } else {
-                        System.out.println("카카오 공개 키 안 맞음");
+                        log.info("error: 카카오 공개 키 안 맞음");
                     }
 
                     n = kakaoJwk.getN();
@@ -125,7 +129,7 @@ public class OAuth2JwtTokenFilter extends OncePerRequestFilter {
                     } else if (kid.equals(googleJwk.getKidSecond())) {
                         googleJwk.jwkSetting("second");
                     } else {
-                        System.out.println("구글 공개 키 안 맞음");
+                        log.info("error: 구글 공개 키 안 맞음");
                     }
 
                     n = googleJwk.getN();
@@ -148,7 +152,6 @@ public class OAuth2JwtTokenFilter extends OncePerRequestFilter {
             Member member = memberJoinService.findMyAccountMemberId(memberId);
             String accessToken = "";
             if (member != null) {
-
                 Map<String, String> tokens =
                         jwtTokenService.getTokens(memberId, member.getRole().getName());
                 accessToken = tokens.get("accessToken");
@@ -157,16 +160,39 @@ public class OAuth2JwtTokenFilter extends OncePerRequestFilter {
                 jwtTokenService.saveRefreshToken(memberId, refreshToken);
 
             }
-            String redirectUri = "/loginForm?redirect="+request.getRequestURI()+"&token="+accessToken;
-            response.sendRedirect(redirectUri);
 
             webService.sessionSetMember(member, request);
 
-        }
+            // authentication 생성 후, SpringContext에 저장하는 작업
+            ClientRegistration clientRegistration =
+                    clientRegistrationRepository.findByRegistrationId(sns.toLowerCase());
+            OAuth2AccessToken oAuth2AccessToken = getOAuth2AccessToken(tokenResponse);
 
+            OAuth2UserRequest oAuth2UserRequest = new OAuth2UserRequest(clientRegistration, oAuth2AccessToken);
+
+            accessToken = tokenResponse.getAccessToken();
+            Authentication authentication = getAuthentication(accessToken, oAuth2UserRequest);
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+
+            String redirectUri = "/loginForm?redirect="+request.getRequestURI()+"&token="+accessToken;
+            response.sendRedirect(redirectUri);
+
+        }
         filterChain.doFilter(request, response);
 
 
+    }
+
+    private OAuth2AccessToken getOAuth2AccessToken(TokenResponse tokenResponse) {
+        String accessToken = tokenResponse.getAccessToken();
+        long expiresIn = tokenResponse.getExpiresIn();
+        Instant expiresAt = Instant.now().plusSeconds(expiresIn);
+        return new OAuth2AccessToken(OAuth2AccessToken.TokenType.BEARER, accessToken, Instant.now(), expiresAt);
+    }
+
+    private Authentication getAuthentication(String accessToken, OAuth2UserRequest oAuth2UserRequest) {
+        OAuth2User oAuth2User = customDefaultOAuth2UserService.loadUser(oAuth2UserRequest);
+        return new UsernamePasswordAuthenticationToken(oAuth2User, accessToken, oAuth2User.getAuthorities());
     }
 
 }
