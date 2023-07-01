@@ -7,7 +7,6 @@ import org.junit.jupiter.api.Test;
 import java.security.Provider;
 import java.security.Security;
 import java.util.Base64;
-import java.util.Collections;
 import java.util.TreeSet;
 
 public class TokenTest {
