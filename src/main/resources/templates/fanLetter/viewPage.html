@@ -406,28 +406,7 @@
     $('#modifyBtn').click(function (){
       let jwt = localStorage.getItem('jwt');
       let letterNum = getLastPath();
-
-      $.ajax({
-        type: 'POST',
-        url: '/fanLetter/modify/'+letterNum,
-        contentType: 'application/json',
-        headers: { 'Authorization': 'Bearer '+ jwt },
-        success: function(result) {
-          window.location.href = '/fanLetter/modify/' + letterNum+'?token='+jwt;
-          },
-        error: function(xhr, status, error) {
-          if (xhr.responseText === "MEMBER_NOT_FOUND") {
-            alert("로그인을 해주세요");
-            window.location.href = '/loginForm?redirectUrl=/fanLetter';
-          }
-          if (xhr.responseText === "BOARD_NOT_FOUND") {
-            alert("해당하는 글이 없습니다");
-            window.location.href = '/fanLetter';
-          }
-
-        }
-      });
-
+      window.location.href = '/fanLetter/modify/' + letterNum+'?token='+jwt;
     });
 
     // $('#writeBtn').click(function () {

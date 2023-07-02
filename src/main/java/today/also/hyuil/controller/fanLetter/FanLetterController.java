@@ -1,6 +1,5 @@
 package today.also.hyuil.controller.fanLetter;
 
-import com.google.gson.JsonObject;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,7 +19,6 @@ import today.also.hyuil.domain.fanLetter.Comment;
 import today.also.hyuil.domain.fanLetter.FanBoard;
 import today.also.hyuil.domain.file.FileInfo;
 import today.also.hyuil.domain.member.Name;
-import today.also.hyuil.exception.BoardNotFoundException;
 import today.also.hyuil.exception.FileNumbersLimitExceededException;
 import today.also.hyuil.exception.MemberNotFoundException;
 import today.also.hyuil.exception.fanLetter.MimeTypeNotMatchException;
@@ -162,44 +160,29 @@ public class FanLetterController {
         return new ResponseEntity<>("WRITE_OK", HttpStatus.OK);
     }
 
-    @ResponseBody
-    @PostMapping("/modify/{num}")
-    public ResponseEntity<String> modifyRequest(@PathVariable Long num, HttpServletRequest request) {
+    @GetMapping("/modify/{num}")
+    public String modify(@PathVariable Long num, Model model, HttpServletRequest request) {
         try {
             Long id = webService.getIdInSession(request);
 //            Long id = 1L;
 
-            fanLetterService.findLetter(id, num);
-
-        } catch (MemberNotFoundException e) {
-            e.printStackTrace();
-            return webService.badResponseEntity("MEMBER_NOT_FOUND");
-        } catch (BoardNotFoundException e) {
-            e.printStackTrace();
-            return webService.badResponseEntity("BOARD_NOT_FOUND");
-        }
-        return okResponseEntity();
-    }
-
-    @GetMapping("/modify/{num}")
-    public String modify(@PathVariable Long num, Model model) {
-        try {
-            Map<String, Object> map = fanLetterService.getLetter(num);
+            Map<String, Object> map = fanLetterService.findLetter(id, num);
             modelInFanBoard(model, map);
 
             if (map.containsKey("fileInfoList")) {
                 modelInFileInfoList(model, map);
             }
 
-        } catch (BoardNotFoundException e) {
-            log.info("{} 번 게시글을 찾을 수 없습니다.", num);
-            return "redirect:/fanLetter";
+        } catch (MemberNotFoundException e) {
+            e.printStackTrace();
+            return "redirect:/loginForm?redirectUrl=/fanLetter";
         }
+
         return "fanLetter/modifyPage";
     }
 
     @ResponseBody
-    @PatchMapping(value = "/modify/{num}", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
+    @PostMapping(value = "/modify/{num}", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<String> modify(@PathVariable Long num, HttpServletRequest request,
                                          @RequestPart(value = "image", required = false) List<MultipartFile> files,
                                          @RequestPart(value = "fanLetterWriteDto") FanLetterWriteDto fanLetterWriteDto) {
@@ -292,10 +275,4 @@ public class FanLetterController {
         model.addAttribute("fanLetter", fanLetterWriteDto);
     }
 
-
-    private ResponseEntity<String> okResponseEntity() {
-        JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("data", "OK");
-        return webService.okResponseEntity(jsonObject);
-    }
 }
