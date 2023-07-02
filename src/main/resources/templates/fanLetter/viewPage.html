@@ -1,145 +1,146 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout/default_layout}">
 <th:block layout:fragment="content">
-<body>
-<div class="page-header page-caption">
-  <div class="container">
-    <div class="row">
-      <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-        <h1 class="page-title">팬레터</h1>
+  <body>
+  <div class="page-header page-caption">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+          <h1 class="page-title">팬레터</h1>
+        </div>
       </div>
     </div>
   </div>
-</div>
-<div class="space-medium">
-  <div class="container">
-    <div class="row">
-      <div class="col-lg-8 col-md-8">
-        <div class="row view-page">
-          <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 view-margin">
-            <div class="post-holder mb30">
-              <div class="post-content pinside30 outline">
-                <div class="mb60" th:object="${fanLetter}">
-                  <h1 class="mb20 heading-line" th:text="*{title}"></h1>
-                  <div class="form-group">
-                    <button id="modifyBtn" name="modifyBtn" class="btn btn-default viewPageBtn" th:unless="${writer == null}">수정</button>
-                    <button id="removeBtn" name="removeBtn" class="btn btn-default viewPageBtn" th:unless="${writer == null}">삭제</button>
+  <div class="space-medium">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-8 col-md-8">
+          <div class="row view-page">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 view-margin">
+              <div class="post-holder mb30">
+                <div class="post-content pinside30 outline">
+                  <div class="mb60" th:object="${fanLetter}">
+                    <h1 class="mb20 heading-line" th:text="*{title}"></h1>
+                    <div class="form-group">
+                      <button id="modifyBtn" name="modifyBtn" class="btn btn-default viewPageBtn" th:unless="${writer == null}">수정</button>
+                      <button id="removeBtn" name="removeBtn" class="btn btn-default viewPageBtn" th:unless="${writer == null}">삭제</button>
+                    </div>
+                    <div class="meta"> <span class="meta-date" th:text="'작성시간 : ' + *{uploadDate}">시간오류</span></span> <span class="meta-comment" th:text="'- ('+*{commentCnt}+') 댓글'">- (10) <a href="#" th:text="댓글">댓글</a></span>
+                      <span class="meta-author"> - 글쓴이 <a href="#" th:text="*{nickname}">X</a></span> <span class="meta-author"> - 조회수 <a href="#" th:text="*{view}">X</a></span> </div>
+                    <div class="post-image" th:each="file : ${filePath}"><img th:src="${file}" class="img-responsive view-page" alt=""></div>
+                    <br>
+                    <p th:text="*{content}">내용 없음</p>
                   </div>
-                  <div class="meta"> <span class="meta-date" th:text="'작성시간 : ' + *{uploadDate}">시간오류</span></span> <span class="meta-comment" th:text="'- ('+*{commentCnt}+') 댓글'">- (10) <a href="#" th:text="댓글">댓글</a></span>
-                    <span class="meta-author"> - 글쓴이 <a href="#" th:text="*{nickname}">X</a></span> <span class="meta-author"> - 조회수 <a href="#" th:text="*{view}">X</a></span> </div>
-                  <div class="post-image" th:each="file : ${filePath}"><img th:src="${file}" class="img-responsive view-page" alt=""></div>
-                  <br>
-                  <p th:text="*{content}">내용 없음</p>
-                </div>
 
-                <div class="bdr-btm"></div>
-                <div class="next-prev-post">
-                  <div class="row">
-                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
-                      <div class="prev-post">
-                        <h5 class="prev-link"><a class="btn-link title">이전글</a></h5>
-                        <h5 class="prev-link"><a th:href="@{/fanLetter/} + ${prev?.id}" class="btn-link title" th:unless="${prev == null}">이전글</a></h5>
-                        <h4 class="prev-next-title"><a th:href="@{/fanLetter/} + ${prev?.id}" class="title" th:text="${prev.title}" th:if="${prev != null}">휴일이짱</a></h4>
+                  <div class="bdr-btm"></div>
+                  <div class="next-prev-post">
+                    <div class="row">
+                      <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                        <div class="prev-post">
+                          <h5 class="prev-link"><a class="btn-link title">이전글</a></h5>
+                          <h5 class="prev-link"><a th:href="@{/fanLetter/} + ${prev?.id}" class="btn-link title" th:unless="${prev == null}">이전글</a></h5>
+                          <h4 class="prev-next-title"><a th:href="@{/fanLetter/} + ${prev?.id}" class="title" th:text="${prev.title}" th:if="${prev != null}">휴일이짱</a></h4>
+                        </div>
+                      </div>
+                      <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                        <div class="next-post">
+                          <h5 class="next-link"><a th:href="@{/fanLetter/} + ${next?.id}" class="btn-link title">다음글</a></h5>
+                          <h4 class="next-prev-title"><a th:href="@{/fanLetter/} + ${next?.id}" class="title" th:text="${next.title}" th:if="${next != null}">휴일굿</a></h4>
+                        </div>
                       </div>
                     </div>
-                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
-                      <div class="next-post">
-                        <h5 class="next-link"><a th:href="@{/fanLetter/} + ${next?.id}" class="btn-link title">다음글</a></h5>
-                        <h4 class="next-prev-title"><a th:href="@{/fanLetter/} + ${next?.id}" class="title" th:text="${next.title}" th:if="${next != null}">휴일굿</a></h4>
-                      </div>
-                    </div>
                   </div>
-                </div>
 
-                <div class="bdr-btm"></div>
-                <h1 class="comments-title mb30" th:text="댓글"></h1>
-                <div class="row commentDiv">
-                  <div class="col-lg-12 col-md-12  col-sm-12 col-xs-12 commentsDivs">
+                  <div class="bdr-btm"></div>
+                  <h1 class="comments-title mb30" th:text="댓글"></h1>
+                  <div class="row commentDiv">
+                    <div class="col-lg-12 col-md-12  col-sm-12 col-xs-12 commentsDivs">
 
-                    <!-- 댓글 수, 닉네임, 작성날짜, 내용 -->
-                    <div class="comments-area mb40" th:each="comment : ${comments}" th:if="${comment.replyId eq null}" th:unless="${comment.uploadDate == null && comment.replyId eq null}">
-                      <ul class="comment-list listnone">
-                        <li class="comment">
+                      <!-- 댓글 수, 닉네임, 작성날짜, 내용 -->
+                      <div class="comments-area mb40" th:each="comment : ${comments}" th:if="${comment.replyId eq null}" th:unless="${comment.uploadDate == null && comment.replyId eq null}">
+                        <ul class="comment-list listnone">
+                          <li class="comment">
 
-                          <!-- 코멘트 id -->
-                          <div class="comment-body" th:classappend="${comment.id}">
-                            <div class="">
-                              <div class="comment-header">
-                                <h4 class="user-title mb10" th:inline="text">
-                                  [[${comment.nickname}]]
-                                  <a class="reply replyBtn btn btn-default btn-sm removeComBtn" role="button" th:onclick="'removeCom('+${comment.id}+')'" th:unless="${session.nickname != comment.nickname}">삭제</a>
-                                </h4>
-                                <div class="comment-meta"><span class="comment-meta-date" th:text="'작성날짜 '+${comment.uploadDate}">작성날짜</span></div>
-                              </div>
-                              <div class="comment-content">
-                                <p th:text="${comment.content}"></p>
-                              </div>
-                              <div class="reply replyBtn" id="replyBtn" th:unless="${session.id == null}"><a class="btn btn-default btn-sm" role="button" th:onclick="'replyBtnOn('+${comment.id}+')'">Reply</a></div>
-                              <hr>
-                            </div>
-                          </div>
-
-                          <ul class="childern listnone" th:each="reply : ${comments}" th:if="${reply.replyId eq comment.id}">
-                            <li class="comment">
-                              <div class="comment-body">
-                                <div class="">
-                                  <div class="comment-header">
-                                    <input type="hidden" id="replyId" th:value="${reply.id}"/>
-                                    <h4 class="user-title mb10" th:inline="text">
-                                      [[${reply.nickname}]]
-                                      <a class="reply replyBtn btn btn-default btn-sm removeComBtn" role="button" th:onclick="'removeCom('+${reply.id}+')'" th:unless="${reply.uploadDate == null || session.nickname != reply.nickname}">삭제</a>
-                                    </h4>
-                                    <div class="comment-meta" th:unless="${reply.uploadDate == null}"><span class="comment-meta-date" th:text="'작성날짜 '+${reply.uploadDate}">작성날짜</span></div>
-                                  </div>
-                                  <div class="comment-content">
-                                    <p th:text="${reply.content}"></p>
-                                  </div>
-                                  <hr>
+                            <!-- 코멘트 id -->
+                            <div class="comment-body" th:classappend="${comment.id}">
+                              <div class="">
+                                <div class="comment-header">
+                                  <h4 class="user-title mb10" th:inline="text">
+                                    [[${comment.nickname}]]
+                                    <a class="reply replyBtn btn btn-default btn-sm removeComBtn" role="button" th:onclick="'removeCom('+${comment.id}+')'" th:unless="${session.nickname != comment.nickname}">삭제</a>
+                                  </h4>
+                                  <div class="comment-meta"><span class="comment-meta-date" th:text="'작성날짜 '+${comment.uploadDate}">작성날짜</span></div>
                                 </div>
+                                <div class="comment-content">
+                                  <p th:text="${comment.content}"></p>
+                                </div>
+                                <div class="reply replyBtn" id="replyBtn" th:unless="${session.id == null}"><a class="btn btn-default btn-sm" role="button" th:onclick="'replyBtnOn('+${comment.id}+')'">Reply</a></div>
+                                <hr>
                               </div>
-                            </li>
-                          </ul>
-                        </li>
-                        <div class="row replyArea" th:classappend="'re'+${comment.id}">
-                          <!--                <div class="row" th:if="${session.memberId != null}">-->
-                        </div>
-                      </ul>
+                            </div>
+
+                            <ul class="childern listnone" th:each="reply : ${comments}" th:if="${reply.replyId eq comment.id}">
+                              <li class="comment">
+                                <div class="comment-body">
+                                  <div class="">
+                                    <div class="comment-header">
+                                      <input type="hidden" id="replyId" th:value="${reply.id}"/>
+                                      <h4 class="user-title mb10" th:inline="text">
+                                        [[${reply.nickname}]]
+                                        <a class="reply replyBtn btn btn-default btn-sm removeComBtn" role="button" th:onclick="'removeCom('+${reply.id}+')'" th:unless="${reply.uploadDate == null || session.nickname != reply.nickname}">삭제</a>
+                                      </h4>
+                                      <div class="comment-meta" th:unless="${reply.uploadDate == null}"><span class="comment-meta-date" th:text="'작성날짜 '+${reply.uploadDate}">작성날짜</span></div>
+                                    </div>
+                                    <div class="comment-content">
+                                      <p th:text="${reply.content}"></p>
+                                    </div>
+                                    <hr>
+                                  </div>
+                                </div>
+                              </li>
+                            </ul>
+                          </li>
+                          <div class="row replyArea" th:classappend="'re'+${comment.id}">
+                            <!--                <div class="row" th:if="${session.memberId != null}">-->
+                          </div>
+                        </ul>
+                      </div>
+
+
                     </div>
-
-
                   </div>
-                </div>
 
 
 
-<!--                <div class="row" id="commentArea">                   -->
+                  <!--                <div class="row" id="commentArea">                   -->
                   <div class="row" th:if="${session.memberId != null}">
-                  <div class="col-lg-12 col-md-12 col-md-12 col-sm-12">
-                    <div class="leave-comments">
-                      <!-- leave comments -->
-                      <h1 class="reply-title  mb40">댓글 작성</h1>
-                      <form class="reply-form">
-                        <div class="row">
-                          <!-- Textarea -->
-                          <div class="form-group">
-                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                              <label class="control-label" for="textarea">내용 :</label>
-                              <textarea class="form-control" id="content" rows="6" placeholder=" "></textarea>
-                            </div>
-                          </div>
-
-                          <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                            <!-- Button -->
+                    <div class="col-lg-12 col-md-12 col-md-12 col-sm-12">
+                      <div class="leave-comments">
+                        <!-- leave comments -->
+                        <h1 class="reply-title  mb40">댓글 작성</h1>
+                        <form class="reply-form">
+                          <div class="row">
+                            <!-- Textarea -->
                             <div class="form-group">
-                              <button type="button" id="writeBtn" name="writeBtn" class="btn btn-default" onclick="replyWrite(-10)">등록</button>
+                              <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                <label class="control-label" for="textarea">내용 :</label>
+                                <textarea class="form-control" id="content" rows="6" placeholder=" "></textarea>
+                              </div>
+                            </div>
+
+                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                              <!-- Button -->
+                              <div class="form-group">
+                                <button type="button" id="writeBtn" name="writeBtn" class="btn btn-default" onclick="replyWrite(-10)">등록</button>
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      </form>
+                        </form>
+                      </div>
                     </div>
                   </div>
-                </div>
 
+                </div>
               </div>
             </div>
           </div>
@@ -147,234 +148,10 @@
       </div>
     </div>
   </div>
-</div>
-<script th:inline="javascript">
+  <script th:inline="javascript">
 
-  function removeCom(id) {
-    let jwt = localStorage.getItem('jwt');
-
-    if (confirm('정말 삭제하시겠습니까?') == false) {
-      return false;
-    }
-
-    $.ajax({
-      type: 'POST',
-      url: '/fanLetter/comment/remove?id='+id,
-      contentType: 'application/json',
-      headers: { 'Authorization': 'Bearer '+ jwt },
-      success: function(result) {
-        alert('삭제 완료');
-        $('.commentDiv').load(location.href+' .commentDiv');
-      },
-      error: function(xhr, status, error) {
-        console.log('error - '+xhr.status+'. 메시지 : '+xhr.statusText)
-        if (xhr.responseText === 'MEMBER_NOT_FOUND') {
-          alert('로그인을 하세요');
-          window.location.href = '/loginForm';
-        } else if (xhr.responseText === 'NOT_YOUR_COMMENT') {
-          alert('본인 댓글이 아닙니다');
-        } else {
-          alert(error)
-        }
-      }
-    });
-
-  }
-
-  function replyBtnOn(commentId) {
-    let replyArea = $('.re'+commentId);
-
-    if (replyArea.children().length == 0) {
-      replyArea.html(replyBtnHtml(commentId));
-    } else {
-      replyArea.empty();
-    }
-  }
-
-  function replyWrite(commentId) {
-
-    let jwt = localStorage.getItem('jwt');
-    let content = '';
-    let commentNum = null;
-    if (commentId == -10) {
-    content = document.getElementById('content').value;
-    } else {
-    content = document.getElementById('content'+commentId).value;
-    commentNum = commentId;
-    }
-
-    // 글 번호와 엄마 댓글 번호
-    let letterNum = getLastPath();
-
-    if (content === '' || content === ' ') {
-      alert('내용을 입력하세요');
-      document.getElementById('content').focus();
-      return false;
-    }
-
-    let data = JSON.stringify({content: content, letterNum: letterNum, commentNum: commentNum});
-
-    $.ajax({
-      type: 'POST',
-      url: '/fanLetter/comment/write',
-      contentType: 'application/json',
-      data: data,
-      headers: { 'Authorization': 'Bearer '+ jwt },
-      dataType: 'json',
-      success: function(result) {
-        if (result.data === 'WRITE_OK') {
-          alert('작성 완료');
-          $('.commentDiv').load(location.href+' .commentDiv');
-        } else if (result.data === 'MEMBER_NOT_FOUND') {
-          alert('로그인을 하세요');
-          window.location.href = '/loginForm';
-        } else {
-          alert(result)
-        }
-      },
-      error: function(xhr, status, error) {
-        alert('error - '+xhr.status+'. 메시지 : '+xhr.statusText)
-        console.error(error);
-      }
-    });
-  }
-
-  function getLastPath() {
-    var parts = window.location.href.split('/');
-    var lastSegment = parts.pop() || parts.pop(); // 마지막 게시글번호 이후 uri 만 남김
-    var letterNum = lastSegment.replace(/[^\d]+.*$/, ""); // 게시글 번호 이후 uri 다 삭제
-
-    return letterNum;
-  }
-
-  function showReplyList() {
-    let letterNum = getLastPath();
-
-    $.ajax({
-      url: '/fanLetter/comment/' + letterNum,
-      type: 'GET',
-      success: function (result) {
-        commentsForm(result);
-
-      },
-      error: function(xhr, status, error) {
-        alert('error - '+xhr.status+'. 메시지 : '+xhr.statusText)
-        console.error(error);
-      }
-    });
-
-  }
-
-  function replyBtnHtml(commentId) {
-    return  "                          <div class=\"col-lg-12 col-md-12 col-md-12 col-sm-12\">\n" +
-            "                            <div class=\"leave-comments\">\n" +
-            "                              <!-- leave comments -->\n" +
-            "                              <h1 class=\"reply-title  mb40\">댓글 작성</h1>\n" +
-            "                              <form class=\"reply-form\">\n" +
-            "                                <div class=\"row\">\n" +
-            "                                  <!-- Textarea -->\n" +
-            "                                  <div class=\"form-group\">\n" +
-            "                                    <div class=\"col-lg-12 col-md-12 col-sm-12 col-xs-12\">\n" +
-            "                                      <label class=\"control-label\" for=\"textarea\">내용 :</label>\n" +
-            "                                      <textarea class=\"form-control\" id=\"content"+commentId+"\" rows=\"6\" placeholder=\" \"></textarea>\n" +
-            "                                    </div>\n" +
-            "                                  </div>\n" +
-            "\n" +
-            "                                  <div class=\"col-lg-12 col-md-12 col-sm-12 col-xs-12\">\n" +
-            "                                    <!-- Button -->\n" +
-            "                                    <div class=\"form-group\">\n" +
-            "                                      <button type=\"button\" id=\"reWriteBtn"+commentId+"\" name=\"writeBtn\" class=\"btn btn-default\" onclick=\"replyWrite("+commentId+")\">등록</button>\n" +
-            "                                    </div>\n" +
-            "                                  </div>\n" +
-            "                                </div>\n" +
-            "                              </form>\n" +
-            "                            </div>\n" +
-            "                          </div>\n";
-
-  }
-
-  function commentsForm(result) {
-
-    let listHtml = "";
-
-    for (let i in result) {
-      let id = result[i].id;
-      let replyId = result[i].replyId;
-      let content = result[i].content;
-      let nickname = result[i].nickname;
-      let uploadDate = result[i].uploadDate;
-
-      if (replyId == null) {
-        listHtml +=  "                    <div class=\"comments-area mb40\">\n" +
-                "                      <ul class=\"comment-list listnone\">\n" +
-                "                        <li class=\"comment\">\n" +
-                "\n" +
-                "                          <!-- 코멘트 id -->\n" +
-                "                          <div class=\"comment-body\">\n" +
-                "                            <div class=\"\">\n" +
-                "                              <div class=\"comment-header\">\n" +
-                "                                <h4 class=\"user-title mb10\" th:text=\""+nickname+"\"></h4>\n" +
-                "                                <div class=\"comment-meta\"><span class=\"comment-meta-date\" th:text=\"'작성날짜 '+"+uploadDate+"\">작성날짜</span></div>\n" +
-                "                              </div>\n" +
-                "                              <div class=\"comment-content\">\n" +
-                "                                <p th:text=\""+content+"\"></p>\n" +
-                "                              </div>\n" +
-                "<!--                              <div class=\"reply\" id=\"replyBtn\" th:if=\"${session.memberId != null}\"><a class=\"btn btn-default btn-sm\">Reply</a></div>-->\n" +
-                "                              <div class=\"reply replyBtn\" id=\"replyBtn_"+id+"\"><a class=\"btn btn-default btn-sm\">Reply</a></div>\n" +
-                "                              <hr>\n" +
-                "                            </div>\n" +
-                "                          </div>\n" +
-                "\n";
-      }
-      if (replyId === id) {
-        listHtml += "                          <ul class=\"childern listnone\"\">\n" +
-                "                            <li class=\"comment\">\n" +
-                "                              <div class=\"comment-body\">\n" +
-                "                                <div class=\"\">\n" +
-                "                                  <div class=\"comment-header\">\n" +
-                "                                    <input type=\"hidden\" id=\"commentId\" th:value=\""+id+"/>\n" +
-                "                                    <h4 class=\"user-title mb10\" th:text=\""+nickname+"\"></h4>\n" +
-                "                                    <div class=\"comment-meta\"><span class=\"comment-meta-date\" th:text=\"'작성날짜 '+"+uploadDate+"\">작성날짜</span></div>\n" +
-                "                                  </div>\n" +
-                "                                  <div class=\"comment-content\">\n" +
-                "                                    <p th:text=\""+content+"\"></p>\n" +
-                "                                  </div>\n" +
-                "                                </div>\n" +
-                "                              </div>\n" +
-                "                            </li>\n" +
-                "                          </ul>\n" +
-                "                        </li>\n" +
-                "                        <div class=\"row replyArea\""+id+">\n" +
-                "                          <!--                <div class=\"row\" th:if=\"${session.memberId != null}\">-->\n" +
-                "                        </div>\n" +
-                "                      </ul>\n" +
-                "                    </div>";
-
-      }
-
-      console.log(listHtml);
-
-      $('.commentsDivs').html(listHtml);
-
-      $('#replyBtn_' + id).click(function () {
-        let allCommentDiv = $('.commentDiv');
-        let commentDiv = $(this).closest('.commentDiv');
-        let replyArea = commentDiv.find('.replyArea'+id);
-
-        allCommentDiv.remove();
-        replyArea.html(replyBtnHtml());
-      });
-
-    }
-  }
-
-  // showReplyList();
-
-  $( document ).ready( function() {
-
-    $('#removeBtn').click(function (){
+    function removeCom(id) {
       let jwt = localStorage.getItem('jwt');
-      let letterNum = getLastPath();
 
       if (confirm('정말 삭제하시겠습니까?') == false) {
         return false;
@@ -382,142 +159,344 @@
 
       $.ajax({
         type: 'POST',
-        url: '/fanLetter/remove/'+letterNum,
+        url: '/fanLetter/comment/remove?id='+id,
         contentType: 'application/json',
         headers: { 'Authorization': 'Bearer '+ jwt },
         success: function(result) {
-          if (result === 'REMOVE_OK') {
-            alert('삭제 완료');
-            window.location.href = '/fanLetter';
+          alert('삭제 완료');
+          $('.commentDiv').load(location.href+' .commentDiv');
+        },
+        error: function(xhr, status, error) {
+          console.log('error - '+xhr.status+'. 메시지 : '+xhr.statusText)
+          if (xhr.responseText === 'MEMBER_NOT_FOUND') {
+            alert('로그인을 하세요');
+            window.location.href = '/loginForm';
+          } else if (xhr.responseText === 'NOT_YOUR_COMMENT') {
+            alert('본인 댓글이 아닙니다');
+          } else {
+            alert(error)
+          }
+        }
+      });
+
+    }
+
+    function replyBtnOn(commentId) {
+      let replyArea = $('.re'+commentId);
+
+      if (replyArea.children().length == 0) {
+        replyArea.html(replyBtnHtml(commentId));
+      } else {
+        replyArea.empty();
+      }
+    }
+
+    function replyWrite(commentId) {
+
+      let jwt = localStorage.getItem('jwt');
+      let content = '';
+      let commentNum = null;
+      if (commentId == -10) {
+        content = document.getElementById('content').value;
+      } else {
+        content = document.getElementById('content'+commentId).value;
+        commentNum = commentId;
+      }
+
+      // 글 번호와 엄마 댓글 번호
+      let letterNum = getLastPath();
+
+      if (content === '' || content === ' ') {
+        alert('내용을 입력하세요');
+        document.getElementById('content').focus();
+        return false;
+      }
+
+      let data = JSON.stringify({content: content, letterNum: letterNum, commentNum: commentNum});
+
+      $.ajax({
+        type: 'POST',
+        url: '/fanLetter/comment/write',
+        contentType: 'application/json',
+        data: data,
+        headers: { 'Authorization': 'Bearer '+ jwt },
+        dataType: 'json',
+        success: function(result) {
+          if (result.data === 'WRITE_OK') {
+            alert('작성 완료');
+            $('.commentDiv').load(location.href+' .commentDiv');
+          } else if (result.data === 'MEMBER_NOT_FOUND') {
+            alert('로그인을 하세요');
+            window.location.href = '/loginForm';
+          } else {
+            alert(result)
           }
         },
         error: function(xhr, status, error) {
           alert('error - '+xhr.status+'. 메시지 : '+xhr.statusText)
           console.error(error);
-          if (error === 'MEMBER_NOT_FOUND') {
-            alert('로그인을 하세요');
-            window.location.href = '/loginForm';
-          } else if (error === 'NOT_YOUR_LETTER') {
-            alert('본인 글만 삭제 가능합니다');
-          }
         }
       });
-    });
-    $('#modifyBtn').click(function (){
-      let jwt = localStorage.getItem('jwt');
+    }
+
+    function getLastPath() {
+      var parts = window.location.href.split('/');
+      var lastSegment = parts.pop() || parts.pop(); // 마지막 게시글번호 이후 uri 만 남김
+      var letterNum = lastSegment.replace(/[^\d]+.*$/, ""); // 게시글 번호 이후 uri 다 삭제
+
+      return letterNum;
+    }
+
+    function showReplyList() {
       let letterNum = getLastPath();
 
       $.ajax({
-        type: 'POST',
-        url: '/fanLetter/modify/'+letterNum,
-        contentType: 'application/json',
-        headers: { 'Authorization': 'Bearer '+ jwt },
-        success: function(result) {
-          window.location.href = '/fanLetter/modify/' + letterNum+'?token='+jwt;
-          },
-        error: function(xhr, status, error) {
-          if (xhr.responseText === "MEMBER_NOT_FOUND") {
-            alert("로그인을 해주세요");
-            window.location.href = '/loginForm?redirectUrl=/fanLetter';
-          }
-          if (xhr.responseText === "BOARD_NOT_FOUND") {
-            alert("해당하는 글이 없습니다");
-            window.location.href = '/fanLetter';
-          }
+        url: '/fanLetter/comment/' + letterNum,
+        type: 'GET',
+        success: function (result) {
+          commentsForm(result);
 
+        },
+        error: function(xhr, status, error) {
+          alert('error - '+xhr.status+'. 메시지 : '+xhr.statusText)
+          console.error(error);
         }
       });
 
-    });
+    }
 
-    // $('#writeBtn').click(function () {
-    //   let jwt = localStorage.getItem('jwt');
-    //   let content = document.getElementById('content').value;
-    //
-    //   // 글 번호와 엄마 댓글 번호
-    //   let letterNum = getLastPath();
-    //
-    //   alert(getLastPath());
-    //
-    //   if (content === '' || content === ' ') {
-    //     alert('내용을 입력하세요');
-    //     document.getElementById('content').focus();
-    //     return false;
-    //   }
-    //
-    //   let data = JSON.stringify({content: content, letterNum: letterNum});
-    //
-    //   $.ajax({
-    //     type: 'POST',
-    //     url: '/fanLetter/comment/write',
-    //     contentType: 'application/json',
-    //     data: data,
-    //     headers: { 'Authorization': 'Bearer '+ jwt },
-    //     dataType: 'json',
-    //     success: function(result) {
-    //       if (result.data === 'WRITE_OK') {
-    //         alert('작성 완료');
-    //         $('.commentDiv').load(location.href+' .commentDiv');
-    //       } else if (result.data === 'MEMBER_NOT_FOUND') {
-    //         alert('로그인을 하세요');
-    //         window.location.href = '/loginForm';
-    //       } else {
-    //         alert(result)
-    //       }
-    //     },
-    //     error: function(xhr, status, error) {
-    //       alert('error - '+xhr.status+'. 메시지 : '+xhr.statusText)
-    //       console.error(error);
-    //     }
-    //   });
-    //
-    // })
+    function replyBtnHtml(commentId) {
+      return  "                          <div class=\"col-lg-12 col-md-12 col-md-12 col-sm-12\">\n" +
+              "                            <div class=\"leave-comments\">\n" +
+              "                              <!-- leave comments -->\n" +
+              "                              <h1 class=\"reply-title  mb40\">댓글 작성</h1>\n" +
+              "                              <form class=\"reply-form\">\n" +
+              "                                <div class=\"row\">\n" +
+              "                                  <!-- Textarea -->\n" +
+              "                                  <div class=\"form-group\">\n" +
+              "                                    <div class=\"col-lg-12 col-md-12 col-sm-12 col-xs-12\">\n" +
+              "                                      <label class=\"control-label\" for=\"textarea\">내용 :</label>\n" +
+              "                                      <textarea class=\"form-control\" id=\"content"+commentId+"\" rows=\"6\" placeholder=\" \"></textarea>\n" +
+              "                                    </div>\n" +
+              "                                  </div>\n" +
+              "\n" +
+              "                                  <div class=\"col-lg-12 col-md-12 col-sm-12 col-xs-12\">\n" +
+              "                                    <!-- Button -->\n" +
+              "                                    <div class=\"form-group\">\n" +
+              "                                      <button type=\"button\" id=\"reWriteBtn"+commentId+"\" name=\"writeBtn\" class=\"btn btn-default\" onclick=\"replyWrite("+commentId+")\">등록</button>\n" +
+              "                                    </div>\n" +
+              "                                  </div>\n" +
+              "                                </div>\n" +
+              "                              </form>\n" +
+              "                            </div>\n" +
+              "                          </div>\n";
 
-    // $('#reWriteBtn').click(function () {
-    //   let jwt = localStorage.getItem('jwt');
-    //   let content = document.getElementById('reContent').value;
-    //
-    //   // 글 번호와 엄마 댓글 번호
-    //   let letterNum = getLastPath();
-    //   let commentNum = document.getElementById('commentId').value;
-    //
-    //   if (content === '' || content === ' ') {
-    //     alert('내용을 입력하세요');
-    //     document.getElementById('content').focus();
-    //     return false;
-    //   }
-    //
-    //   let data = JSON.stringify({content: content, letterNum: letterNum, commentNum:commentNum});
-    //
-    //   $.ajax({
-    //     type: 'POST',
-    //     url: '/fanLetter/comment/write',
-    //     contentType: 'application/json',
-    //     data: data,
-    //     // headers: { 'Authorization': 'Bearer '+ jwt },
-    //     dataType: 'json',
-    //     success: function(result) {
-    //       if (result.data === 'WRITE_OK') {
-    //         alert('작성 완료');
-    //         $('.commentDiv').load(location.href+' .commentDiv');
-    //       } else if (result.data === 'MEMBER_NOT_FOUND') {
-    //         alert('로그인을 하세요');
-    //         window.location.href = '/loginForm';
-    //       } else {
-    //         alert(result)
-    //       }
-    //     },
-    //     error: function(xhr, status, error) {
-    //       alert('error - '+xhr.status+'. 메시지 : '+xhr.statusText)
-    //       console.error(error);
-    //     }
-    //   });
-    //
-    // })
+    }
 
-  })
+    function commentsForm(result) {
 
-</script>
-</body>
+      let listHtml = "";
+
+      for (let i in result) {
+        let id = result[i].id;
+        let replyId = result[i].replyId;
+        let content = result[i].content;
+        let nickname = result[i].nickname;
+        let uploadDate = result[i].uploadDate;
+
+        if (replyId == null) {
+          listHtml +=  "                    <div class=\"comments-area mb40\">\n" +
+                  "                      <ul class=\"comment-list listnone\">\n" +
+                  "                        <li class=\"comment\">\n" +
+                  "\n" +
+                  "                          <!-- 코멘트 id -->\n" +
+                  "                          <div class=\"comment-body\">\n" +
+                  "                            <div class=\"\">\n" +
+                  "                              <div class=\"comment-header\">\n" +
+                  "                                <h4 class=\"user-title mb10\" th:text=\""+nickname+"\"></h4>\n" +
+                  "                                <div class=\"comment-meta\"><span class=\"comment-meta-date\" th:text=\"'작성날짜 '+"+uploadDate+"\">작성날짜</span></div>\n" +
+                  "                              </div>\n" +
+                  "                              <div class=\"comment-content\">\n" +
+                  "                                <p th:text=\""+content+"\"></p>\n" +
+                  "                              </div>\n" +
+                  "<!--                              <div class=\"reply\" id=\"replyBtn\" th:if=\"${session.memberId != null}\"><a class=\"btn btn-default btn-sm\">Reply</a></div>-->\n" +
+                  "                              <div class=\"reply replyBtn\" id=\"replyBtn_"+id+"\"><a class=\"btn btn-default btn-sm\">Reply</a></div>\n" +
+                  "                              <hr>\n" +
+                  "                            </div>\n" +
+                  "                          </div>\n" +
+                  "\n";
+        }
+        if (replyId === id) {
+          listHtml += "                          <ul class=\"childern listnone\"\">\n" +
+                  "                            <li class=\"comment\">\n" +
+                  "                              <div class=\"comment-body\">\n" +
+                  "                                <div class=\"\">\n" +
+                  "                                  <div class=\"comment-header\">\n" +
+                  "                                    <input type=\"hidden\" id=\"commentId\" th:value=\""+id+"/>\n" +
+                  "                                    <h4 class=\"user-title mb10\" th:text=\""+nickname+"\"></h4>\n" +
+                  "                                    <div class=\"comment-meta\"><span class=\"comment-meta-date\" th:text=\"'작성날짜 '+"+uploadDate+"\">작성날짜</span></div>\n" +
+                  "                                  </div>\n" +
+                  "                                  <div class=\"comment-content\">\n" +
+                  "                                    <p th:text=\""+content+"\"></p>\n" +
+                  "                                  </div>\n" +
+                  "                                </div>\n" +
+                  "                              </div>\n" +
+                  "                            </li>\n" +
+                  "                          </ul>\n" +
+                  "                        </li>\n" +
+                  "                        <div class=\"row replyArea\""+id+">\n" +
+                  "                          <!--                <div class=\"row\" th:if=\"${session.memberId != null}\">-->\n" +
+                  "                        </div>\n" +
+                  "                      </ul>\n" +
+                  "                    </div>";
+
+        }
+
+        console.log(listHtml);
+
+        $('.commentsDivs').html(listHtml);
+
+        $('#replyBtn_' + id).click(function () {
+          let allCommentDiv = $('.commentDiv');
+          let commentDiv = $(this).closest('.commentDiv');
+          let replyArea = commentDiv.find('.replyArea'+id);
+
+          allCommentDiv.remove();
+          replyArea.html(replyBtnHtml());
+        });
+
+      }
+    }
+
+    // showReplyList();
+
+    $( document ).ready( function() {
+
+      $('#removeBtn').click(function (){
+        let jwt = localStorage.getItem('jwt');
+        let letterNum = getLastPath();
+
+        if (confirm('정말 삭제하시겠습니까?') == false) {
+          return false;
+        }
+
+        $.ajax({
+          type: 'POST',
+          url: '/fanLetter/remove/'+letterNum,
+          contentType: 'application/json',
+          headers: { 'Authorization': 'Bearer '+ jwt },
+          success: function(result) {
+            if (result === 'REMOVE_OK') {
+              alert('삭제 완료');
+              window.location.href = '/fanLetter';
+            }
+          },
+          error: function(xhr, status, error) {
+            alert('error - '+xhr.status+'. 메시지 : '+xhr.statusText)
+            console.error(error);
+            if (error === 'MEMBER_NOT_FOUND') {
+              alert('로그인을 하세요');
+              window.location.href = '/loginForm';
+            } else if (error === 'NOT_YOUR_LETTER') {
+              alert('본인 글만 삭제 가능합니다');
+            }
+          }
+        });
+      });
+      $('#modifyBtn').click(function (){
+        let jwt = localStorage.getItem('jwt');
+        let letterNum = getLastPath();
+        window.location.href = '/fanLetter/modify/' + letterNum+'?token='+jwt;
+      });
+
+      // $('#writeBtn').click(function () {
+      //   let jwt = localStorage.getItem('jwt');
+      //   let content = document.getElementById('content').value;
+      //
+      //   // 글 번호와 엄마 댓글 번호
+      //   let letterNum = getLastPath();
+      //
+      //   alert(getLastPath());
+      //
+      //   if (content === '' || content === ' ') {
+      //     alert('내용을 입력하세요');
+      //     document.getElementById('content').focus();
+      //     return false;
+      //   }
+      //
+      //   let data = JSON.stringify({content: content, letterNum: letterNum});
+      //
+      //   $.ajax({
+      //     type: 'POST',
+      //     url: '/fanLetter/comment/write',
+      //     contentType: 'application/json',
+      //     data: data,
+      //     headers: { 'Authorization': 'Bearer '+ jwt },
+      //     dataType: 'json',
+      //     success: function(result) {
+      //       if (result.data === 'WRITE_OK') {
+      //         alert('작성 완료');
+      //         $('.commentDiv').load(location.href+' .commentDiv');
+      //       } else if (result.data === 'MEMBER_NOT_FOUND') {
+      //         alert('로그인을 하세요');
+      //         window.location.href = '/loginForm';
+      //       } else {
+      //         alert(result)
+      //       }
+      //     },
+      //     error: function(xhr, status, error) {
+      //       alert('error - '+xhr.status+'. 메시지 : '+xhr.statusText)
+      //       console.error(error);
+      //     }
+      //   });
+      //
+      // })
+
+      // $('#reWriteBtn').click(function () {
+      //   let jwt = localStorage.getItem('jwt');
+      //   let content = document.getElementById('reContent').value;
+      //
+      //   // 글 번호와 엄마 댓글 번호
+      //   let letterNum = getLastPath();
+      //   let commentNum = document.getElementById('commentId').value;
+      //
+      //   if (content === '' || content === ' ') {
+      //     alert('내용을 입력하세요');
+      //     document.getElementById('content').focus();
+      //     return false;
+      //   }
+      //
+      //   let data = JSON.stringify({content: content, letterNum: letterNum, commentNum:commentNum});
+      //
+      //   $.ajax({
+      //     type: 'POST',
+      //     url: '/fanLetter/comment/write',
+      //     contentType: 'application/json',
+      //     data: data,
+      //     // headers: { 'Authorization': 'Bearer '+ jwt },
+      //     dataType: 'json',
+      //     success: function(result) {
+      //       if (result.data === 'WRITE_OK') {
+      //         alert('작성 완료');
+      //         $('.commentDiv').load(location.href+' .commentDiv');
+      //       } else if (result.data === 'MEMBER_NOT_FOUND') {
+      //         alert('로그인을 하세요');
+      //         window.location.href = '/loginForm';
+      //       } else {
+      //         alert(result)
+      //       }
+      //     },
+      //     error: function(xhr, status, error) {
+      //       alert('error - '+xhr.status+'. 메시지 : '+xhr.statusText)
+      //       console.error(error);
+      //     }
+      //   });
+      //
+      // })
+
+    })
+
+  </script>
+  </body>
 </th:block>
 </html>

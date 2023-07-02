@@ -125,7 +125,7 @@ public class FanLetterController {
     @PostMapping(value = "/write", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<String> write(@RequestPart(value = "image", required = false) List<MultipartFile> files,
                                         @RequestPart(value = "fanLetterWriteDto") FanLetterWriteDto fanLetterWriteDto,
-                                HttpServletRequest request) {
+                                        HttpServletRequest request) {
 
         try {
             // 세션에서 memberId 가져오기
