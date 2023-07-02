@@ -1,6 +1,5 @@
 package today.also.hyuil.service.fanLetter;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -8,6 +7,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import today.also.hyuil.domain.fanLetter.BoardRemover;
 import today.also.hyuil.domain.fanLetter.FanBoard;
 import today.also.hyuil.domain.file.FileInfo;
@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Transactional
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -37,7 +38,8 @@ public class FanLetterServiceImpl implements FanLetterService {
     private final MemberJoinService memberJoinService;
     private final FileService fileService;
 
-    @Transactional
+    // TODO 리포지토리 / 서비스 리팩토링
+
     @Override
     public FanBoard writeLetter(Long id, FanBoard fanBoard, List<FileInfo> fileInfoList) throws MemberNotFoundException {
         Member findMember = memberJoinService.findMyAccount(id);
@@ -46,17 +48,17 @@ public class FanLetterServiceImpl implements FanLetterService {
         }
         fanBoard.writeMember(findMember);
 
-        fanBoard = fanLetterJpaRepository.save(fanBoard);
+        FanBoard insertFanBoard = fanLetterJpaRepository.save(fanBoard);
         for (FileInfo fileInfo : fileInfoList) {
-            fileInfo.fanBoardFile(fanBoard);
+            fileInfo.fanBoardFile(insertFanBoard);
             fileService.saveFileInfo(fileInfo);
         }
 
-        return fanBoard;
+        return insertFanBoard;
     }
 
     @Override
-    public FanBoard findLetter(Long id, Long fanLetterNum) throws MemberNotFoundException, BoardNotFoundException {
+    public Map<String, Object> findLetter(Long id, Long fanLetterNum) throws MemberNotFoundException, BoardNotFoundException {
         FanBoard fanBoard = fanLetterJpaRepository.findById(fanLetterNum).orElse(null);
 
         if (fanBoard == null) {
@@ -68,7 +70,16 @@ public class FanLetterServiceImpl implements FanLetterService {
             throw new MemberNotFoundException("해당 멤버가 쓴 글이 아닙니다");
         }
 
-        return fanBoard;
+        Map<String, Object> map = new HashMap<>();
+        map.put("fanLetter", fanBoard);
+
+        List<FileInfo> fileInfoList = fileService.fileInfoListForFanBoard(fanLetterNum);
+
+        if (fileInfoList.size() != 0) {
+            map.put("fileInfoList", fileInfoList);
+        }
+
+        return map;
     }
 
     @Override
@@ -84,10 +95,11 @@ public class FanLetterServiceImpl implements FanLetterService {
         return map;
     }
 
-    @Transactional
     @Override
     public void modifyLetter(Map<String, Object> map) throws FileNumbersLimitExceededException {
         FanBoard fanBoard = (FanBoard) map.get("fanLetter");
+
+        fanLetterRepository.modifyFanBoard(fanBoard);
 
         /**
          * 파일 찾고, 갯수가 5개 이하일 경우만
@@ -110,10 +122,10 @@ public class FanLetterServiceImpl implements FanLetterService {
             }
         }
 
-        fanLetterJpaRepository.save(fanBoard);
+        fanLetterRepository.modifyFanBoard(fanBoard);
+
     }
 
-    @Transactional
     @Override
     public void removeLetter(Long num, Name who, Long id) throws MemberNotFoundException, AccessDeniedException {
 
@@ -129,6 +141,7 @@ public class FanLetterServiceImpl implements FanLetterService {
                 throw new MemberNotFoundException("해당 멤버 아이디를 찾을 수 없어요");
             }
             if (!fanBoard.getMember().getId().equals(id)) {
+                log.info("본인 글이 아닙니다.");
                 throw new AccessDeniedException("본인 글이 아닙니다");
             }
             boardRemover.memberRemove(member);
@@ -143,8 +156,7 @@ public class FanLetterServiceImpl implements FanLetterService {
 //        }
 
         BoardRemover remover = fanLetterRepository.insertBoardRemover(boardRemover);
-        fanBoard.deleteFanLetter(remover);
-        fanLetterJpaRepository.save(fanBoard);
+        fanLetterRepository.updateLetterRemover(num, remover);
     }
 
     @Override
@@ -163,8 +175,8 @@ public class FanLetterServiceImpl implements FanLetterService {
         Long prev = id - 1;
         Long next = id + 1;
 
-        FanBoard prevLetter = fanLetterJpaRepository.findById(prev).orElse(null);
-        FanBoard nextLetter = fanLetterJpaRepository.findById(next).orElse(null);
+        FanBoard prevLetter = fanLetterRepository.selectFanBoard(prev);
+        FanBoard nextLetter = fanLetterRepository.selectFanBoard(next);
 
         Map<String, FanBoard> map = new HashMap<>();
 
