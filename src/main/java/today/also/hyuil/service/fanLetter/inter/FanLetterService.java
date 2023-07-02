@@ -16,7 +16,7 @@ import java.util.Map;
 public interface FanLetterService {
 
     FanBoard writeLetter(Long id, FanBoard fanBoard, List<FileInfo> fileInfoList) throws MemberNotFoundException;
-    FanBoard findLetter(Long id, Long fanLetterNum) throws MemberNotFoundException, BoardNotFoundException;
+    Map<String, Object> findLetter(Long id, Long fanLetterNum) throws MemberNotFoundException, BoardNotFoundException;
     Map<String, Object> readLetter(Long num);
     void modifyLetter(Map<String, Object> map) throws FileNumbersLimitExceededException;
     void removeLetter(Long num, Name who, Long id) throws MemberNotFoundException, AccessDeniedException;
