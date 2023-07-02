@@ -11,6 +11,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import today.also.hyuil.config.security.jwt.JwtTokenService;
+import today.also.hyuil.config.security.jwt.TokenName;
 import today.also.hyuil.domain.dto.member.LoginDto;
 import today.also.hyuil.domain.member.Member;
 import today.also.hyuil.exception.MemberNotFoundException;
@@ -65,10 +66,10 @@ public class MemberLoginController {
             return webService.badResponseEntity("MEMBER_NOT_FOUND");
         }
         Member member = memberJoinService.findMyAccountMemberId(loginDto.getMemberId());
-        Map<String, String> tokens = jwtTokenService.getTokens(
+        Map<TokenName, String> tokens = jwtTokenService.getTokens(
                 member.getMemberId(), member.getRole().getName());
-        String refreshToken = tokens.get("refreshToken");
-        String accessToken = tokens.get("accessToken");
+        String refreshToken = tokens.get(TokenName.REFRESH_TOKEN);
+        String accessToken = tokens.get(TokenName.ACCESS_TOKEN);
 
         // 각 토큰 저장
         jwtTokenService.saveRefreshToken(member.getMemberId(), refreshToken);

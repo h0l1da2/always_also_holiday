@@ -27,27 +27,27 @@ public class JwtTokenService {
     private final JwtTokenProvider jwtTokenProvider;
     private final JwtTokenRepository jwtTokenRepository;
 
-    public Map<String, String> getTokens(String memberId, Name role) {
+    public Map<TokenName, String> getTokens(String memberId, Name role) {
         log.info("토큰 생성 = {}", memberId);
 
         String refreshToken = jwtTokenProvider.createRefreshToken();
         String accessToken = jwtTokenProvider.createAccessToken(
                 memberId, getAuthorities(String.valueOf(role)));
 
-        Map<String, String> map = new HashMap<>();
-        map.put("accessToken", accessToken);
-        map.put("refreshToken", refreshToken);
+        Map<TokenName, String> map = new HashMap<>();
+        map.put(TokenName.ACCESS_TOKEN, accessToken);
+        map.put(TokenName.REFRESH_TOKEN, refreshToken);
         return map;
     }
 
-    public Map<String, String> getReCreateTokens(String token) {
+    public Map<TokenName, String> getReCreateTokens(String token) {
         log.info("토큰 재생성");
         String refreshT = jwtTokenProvider.createRefreshToken();
         String accessT = jwtTokenProvider.reCreateJwtToken(token);
 
-        Map<String, String> map = new HashMap<>();
-        map.put("accessToken", accessT);
-        map.put("refreshToken", refreshT);
+        Map<TokenName, String> map = new HashMap<>();
+        map.put(TokenName.ACCESS_TOKEN, accessT);
+        map.put(TokenName.REFRESH_TOKEN, refreshT);
         return map;
     }
 

@@ -27,6 +27,7 @@ import today.also.hyuil.config.security.auth.tokenresponse.TokenResponse;
 import today.also.hyuil.config.security.auth.userinfo.SnsInfo;
 import today.also.hyuil.config.security.jwt.JwtTokenParser;
 import today.also.hyuil.config.security.jwt.JwtTokenService;
+import today.also.hyuil.config.security.jwt.TokenName;
 import today.also.hyuil.domain.member.Member;
 import today.also.hyuil.domain.member.Sns;
 import today.also.hyuil.service.member.inter.MemberJoinService;
@@ -152,11 +153,11 @@ public class OAuth2JwtTokenFilter extends OncePerRequestFilter {
             Member member = memberJoinService.findMyAccountMemberId(memberId);
             String accessToken = "";
             if (member != null) {
-                Map<String, String> tokens =
+                Map<TokenName, String> tokens =
                         jwtTokenService.getTokens(memberId, member.getRole().getName());
-                accessToken = tokens.get("accessToken");
-                String refreshToken = tokens.get("refreshToken");
-                request.setAttribute("accessToken", accessToken);
+                accessToken = tokens.get(TokenName.ACCESS_TOKEN);
+                String refreshToken = tokens.get(TokenName.REFRESH_TOKEN);
+                request.setAttribute(TokenName.ACCESS_TOKEN.name(), accessToken);
                 jwtTokenService.saveRefreshToken(memberId, refreshToken);
 
             }

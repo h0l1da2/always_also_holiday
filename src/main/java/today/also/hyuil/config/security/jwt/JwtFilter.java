@@ -82,10 +82,10 @@ public class JwtFilter extends OncePerRequestFilter {
         // 토큰s 재발급 후, 저장~
         String memberId = jwtTokenParser.tokenInMemberId(token);
 
-        Map<String, String> reTokens = jwtTokenService.getReCreateTokens(token);
+        Map<TokenName, String> reTokens = jwtTokenService.getReCreateTokens(token);
 
-        String accessT = reTokens.get("accessToken");
-        String refreshT = reTokens.get("refreshToken");
+        String accessT = reTokens.get(TokenName.ACCESS_TOKEN);
+        String refreshT = reTokens.get(TokenName.REFRESH_TOKEN);
 
         // 기존 리프레쉬 토큰이랑 바꿔치기 or 새로 insert
         Token refreshToken = jwtTokenService.saveRefreshInDB(new Token(memberId, refreshT));
