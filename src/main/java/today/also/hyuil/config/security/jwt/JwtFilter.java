@@ -3,6 +3,8 @@ package today.also.hyuil.config.security.jwt;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.MalformedJwtException;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -23,27 +25,22 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
 
-// TODO JWT 관련 코드들 리팩토링 필요
+@Slf4j
+@RequiredArgsConstructor
 public class JwtFilter extends OncePerRequestFilter {
 
     private final UserDetailsService userDetailsService;
     private final JwtTokenParser jwtTokenParser;
     private final JwtTokenService jwtTokenService;
 
-    public JwtFilter(UserDetailsService userDetailsService, JwtTokenParser jwtTokenParser, JwtTokenService jwtTokenService) {
-        this.userDetailsService = userDetailsService;
-        this.jwtTokenParser = jwtTokenParser;
-        this.jwtTokenService = jwtTokenService;
-    }
-
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        System.out.println("JWT 검증 필터");
+        log.info("JWT 검증 필터 시작");
         String token = jwtTokenParser.getTokenHeader(request);
         if (!tokenNullCheck(token)) {
             String tokenUrl = jwtTokenParser.getTokenUrl(request);
             if (!tokenNullCheck(tokenUrl)) {
-                System.out.println("토큰이 없어요");
+                log.info("토큰이 없음 - 인증 실패");
                 filterChain.doFilter(request, response);
                 return;
             }
@@ -51,63 +48,63 @@ public class JwtFilter extends OncePerRequestFilter {
             token = tokenUrl;
         }
 
-        boolean tokenValid = false;
         try {
-            tokenValid = jwtTokenParser.validToken(token, false);
+            boolean tokenValid = jwtTokenParser.validToken(token, false);
             if (!tokenValid) {
                 Token refreshToken = jwtTokenParser.getRefreshToken(token);
                 if (refreshToken == null) {
-                    System.out.println("리프레쉬 토큰 없음");
+                    log.info("리프레쉬 토큰이 없음 - 인증 실패");
                     filterChain.doFilter(request, response);
                     return;
                 }
                 boolean refreshValid = jwtTokenParser.validToken(refreshToken.getToken(), true);
                 if (!refreshValid) {
-                    System.out.println("리프레쉬 토큰 인증 실패");
+                    log.info("인증 실패 : 리프레쉬 토큰 시간 만료");
                     filterChain.doFilter(request, response);
                     return;
                 }
             }
         } catch (ExpiredJwtException e) {
-            System.out.println("토큰이 만료됨 : 인증 실패");
+            log.info("인증 실패 : 토큰 만료");
             filterChain.doFilter(request, response);
             return;
         } catch (MalformedJwtException e) {
-            System.out.println("토큰 값이 올바르지 않음");
+            log.info("인증 실패 : 토큰 값이 올바르지 않음. 비정상적인 토큰");
             filterChain.doFilter(request, response);
             return;
         }
 
 
         // 토큰s 재발급 후, 저장~
-        String memberId = jwtTokenParser.tokenInMemberId(token);
+        Long id = jwtTokenParser.tokenInMemberId(token);
 
-        Map<String, String> reTokens = jwtTokenService.getReCreateTokens(token);
+        Map<TokenName, String> reTokens = jwtTokenService.getReCreateTokens(token);
 
-        String accessT = reTokens.get("accessToken");
-        String refreshT = reTokens.get("refreshToken");
+        String accessT = reTokens.get(TokenName.ACCESS_TOKEN);
+        String refreshT = reTokens.get(TokenName.REFRESH_TOKEN);
 
         // 기존 리프레쉬 토큰이랑 바꿔치기 or 새로 insert
-        Token refreshToken = jwtTokenService.saveRefreshInDB(new Token(memberId, refreshT));
+        jwtTokenService.saveRefreshInDB(new Token(id, refreshT));
 
         // 인증 완료!
-        Authentication authentication = extractAuthentication(memberId, accessT);
+        Authentication authentication = extractAuthentication(id, accessT);
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        System.out.println("인증 완료!!");
-        setSessionId(request, memberId);
+        log.info("인증 완료 !");
+        // TODO 토큰에 memberId -> id 들어가도록 변경
+        setSessionId(request, id);
 
         filterChain.doFilter(request, response);
     }
 
-    private void setSessionId(HttpServletRequest request, String memberId) {
+    private void setSessionId(HttpServletRequest request, Long id) {
         HttpSession session = request.getSession();
-        session.setAttribute("memberId", memberId);
+        session.setAttribute("id", id);
     }
 
-    private Authentication extractAuthentication(String memberId, String accessToken) {
+    private Authentication extractAuthentication(Long id, String accessToken) {
         try {
             Collection<GrantedAuthority> authorities = jwtTokenParser.getAuthorities(accessToken);
-            UserDetails userDetails = userDetailsService.loadUserByUsername(memberId);
+            UserDetails userDetails = userDetailsService.loadUserByUsername(String.valueOf(id));
 
             return new UsernamePasswordAuthenticationToken(userDetails, accessToken, authorities);
         } catch (JwtException | IllegalArgumentException | NullPointerException exception) {
@@ -128,7 +125,7 @@ public class JwtFilter extends OncePerRequestFilter {
             }
             return true;
         } catch (NullPointerException e) {
-            System.out.println("토큰이 널이에요.");
+            log.info("토큰이 없음");
             return false;
         }
     }

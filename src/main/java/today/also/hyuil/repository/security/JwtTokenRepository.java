@@ -6,10 +6,6 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import today.also.hyuil.domain.security.Token;
 
-import java.util.Optional;
-
-import static today.also.hyuil.domain.security.QToken.token1;
-
 @Transactional
 @Repository
 public class JwtTokenRepository {
@@ -28,13 +24,10 @@ public class JwtTokenRepository {
         return token;
     }
 
-    public Token findByMemberId(String memberId) {
-        Optional<Token> token = query
-                .select(token1)
-                .from(token1)
-                .where(token1.memberId.eq(memberId))
-                .stream().findFirst();
-        return token.orElse(null);
+    public Token findById(Long id) {
+        Token token = em.find(Token.class, id);
+        em.close();
+        return token;
     }
 
     public Token updateNewToken(Token token) {

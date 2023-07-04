@@ -36,10 +36,10 @@ public class JwtTokenProvider {
         this.jwtParser = Jwts.parserBuilder().setSigningKey(key).build();
     }
 
-    public String createAccessToken(String memberId, Collection<? extends GrantedAuthority> role) {
+    public String createAccessToken(Long id, Collection<? extends GrantedAuthority> role) {
         Claims claims = getNewClaims(accessToken, tokenValidTime);
 
-        claims.put("memberId", memberId);
+        claims.put("id", id);
         claims.put("role", role);
 
         return Jwts.builder()
@@ -71,10 +71,10 @@ public class JwtTokenProvider {
     public String reCreateJwtToken(String token) {
         Claims claims = getOldClaims(token);
 
-        String memberId = claims.get("memberId", String.class);
+        Long id = claims.get("id", Long.class);
         String role = getRoleToString(claims);
         if (StringUtils.hasText(role)) {
-            return createAccessToken(memberId, getAuthorities(role));
+            return createAccessToken(id, getAuthorities(role));
         }
         return null;
     }

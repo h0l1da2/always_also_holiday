@@ -27,6 +27,7 @@ import today.also.hyuil.config.security.auth.tokenresponse.TokenResponse;
 import today.also.hyuil.config.security.auth.userinfo.SnsInfo;
 import today.also.hyuil.config.security.jwt.JwtTokenParser;
 import today.also.hyuil.config.security.jwt.JwtTokenService;
+import today.also.hyuil.config.security.jwt.TokenName;
 import today.also.hyuil.domain.member.Member;
 import today.also.hyuil.domain.member.Sns;
 import today.also.hyuil.service.member.inter.MemberJoinService;
@@ -152,16 +153,14 @@ public class OAuth2JwtTokenFilter extends OncePerRequestFilter {
             Member member = memberJoinService.findMyAccountMemberId(memberId);
             String accessToken = "";
             if (member != null) {
-                Map<String, String> tokens =
-                        jwtTokenService.getTokens(memberId, member.getRole().getName());
-                accessToken = tokens.get("accessToken");
-                String refreshToken = tokens.get("refreshToken");
-                request.setAttribute("accessToken", accessToken);
-                jwtTokenService.saveRefreshToken(memberId, refreshToken);
+                Map<TokenName, String> tokens =
+                        jwtTokenService.getTokens(member.getId(), member.getRole().getName());
+                accessToken = tokens.get(TokenName.ACCESS_TOKEN);
+                String refreshToken = tokens.get(TokenName.REFRESH_TOKEN);
+                request.setAttribute(TokenName.ACCESS_TOKEN.name(), accessToken);
+                jwtTokenService.saveRefreshToken(member.getId(), refreshToken);
 
             }
-
-            webService.sessionSetMember(member, request);
 
             // authentication 생성 후, SpringContext에 저장하는 작업
             ClientRegistration clientRegistration =
@@ -170,12 +169,12 @@ public class OAuth2JwtTokenFilter extends OncePerRequestFilter {
 
             OAuth2UserRequest oAuth2UserRequest = new OAuth2UserRequest(clientRegistration, oAuth2AccessToken);
 
-            accessToken = tokenResponse.getAccessToken();
             Authentication authentication = getAuthentication(accessToken, oAuth2UserRequest);
             SecurityContextHolder.getContext().setAuthentication(authentication);
-
             String redirectUri = "/loginForm?redirect="+request.getRequestURI()+"&token="+accessToken;
             response.sendRedirect(redirectUri);
+
+            webService.sessionSetMember(member, request);
 
         }
         filterChain.doFilter(request, response);

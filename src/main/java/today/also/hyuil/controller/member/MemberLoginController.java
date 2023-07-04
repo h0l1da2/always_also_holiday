@@ -11,6 +11,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import today.also.hyuil.config.security.jwt.JwtTokenService;
+import today.also.hyuil.config.security.jwt.TokenName;
 import today.also.hyuil.domain.dto.member.LoginDto;
 import today.also.hyuil.domain.member.Member;
 import today.also.hyuil.exception.MemberNotFoundException;
@@ -65,13 +66,13 @@ public class MemberLoginController {
             return webService.badResponseEntity("MEMBER_NOT_FOUND");
         }
         Member member = memberJoinService.findMyAccountMemberId(loginDto.getMemberId());
-        Map<String, String> tokens = jwtTokenService.getTokens(
-                member.getMemberId(), member.getRole().getName());
-        String refreshToken = tokens.get("refreshToken");
-        String accessToken = tokens.get("accessToken");
+        Map<TokenName, String> tokens = jwtTokenService.getTokens(
+                member.getId(), member.getRole().getName());
+        String refreshToken = tokens.get(TokenName.REFRESH_TOKEN);
+        String accessToken = tokens.get(TokenName.ACCESS_TOKEN);
 
         // 각 토큰 저장
-        jwtTokenService.saveRefreshToken(member.getMemberId(), refreshToken);
+        jwtTokenService.saveRefreshToken(member.getId(), refreshToken);
 
         // TODO 자동로그인 기능 쿠키 생성 나중에 추가
         jsonObject.addProperty("JWT", accessToken);

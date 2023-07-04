@@ -4,6 +4,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.core.GrantedAuthority;
@@ -23,6 +24,7 @@ import java.security.spec.RSAPublicKeySpec;
 import java.util.*;
 
 @Component
+@Slf4j
 public class JwtTokenParser {
 
     private final JwtParser jwtParser;
@@ -47,8 +49,8 @@ public class JwtTokenParser {
     public Token getRefreshToken(String accessToken) {
         Claims claims = getClaims(accessToken);
         if (claims.getSubject() != null) {
-            String memberId = claims.get("memberId", String.class);
-            Token refreshToken = jwtTokenRepository.findByMemberId(memberId);
+            Long id = claims.get("id", Long.class);
+            Token refreshToken = jwtTokenRepository.findById(id);
             return refreshToken;
         }
         return null;
@@ -79,14 +81,13 @@ public class JwtTokenParser {
         BigInteger exponent = new BigInteger(1, Base64.getUrlDecoder().decode(e));
         RSAPublicKeySpec spec = new RSAPublicKeySpec(modulus, exponent);
         try {
-            System.out.println("kty = ????? "+kty);
             KeyFactory factory = KeyFactory.getInstance(kty);
             return factory.generatePublic(spec);
         } catch (NoSuchAlgorithmException ex) {
-            System.out.println("알고리즘을 못 찾아씀");
+            log.info("알고리즘을 못 찾겠음");
             throw new RuntimeException(ex);
         } catch (InvalidKeySpecException ex) {
-            System.out.println("잘못 된 키 스펙");
+            log.info("잘못된 키 스펙");
             throw new RuntimeException(ex);
         }
     }
@@ -128,13 +129,13 @@ public class JwtTokenParser {
 
             return verifier.verify(Base64.getUrlDecoder().decode(jwt[2]));
         } catch (NoSuchAlgorithmException e) {
-            System.out.println("알고리즘을 못 찾음");
+            log.info("알고리즘을 못 찾겠음");
             throw new RuntimeException(e);
         } catch (InvalidKeyException e) {
-            System.out.println("키 스펙이 잘못 됨");
+            log.info("잘못된 키 스펙");
             throw new RuntimeException(e);
         } catch (SignatureException e) {
-            System.out.println("서명이 잘못 됨");
+            log.info("잘못된 서명");
             throw new RuntimeException(e);
         }
     }
@@ -153,9 +154,9 @@ public class JwtTokenParser {
                 .getBody();
     }
 
-    public String tokenInMemberId(String token) throws MalformedJwtException {
+    public Long tokenInMemberId(String token) throws MalformedJwtException {
         Claims claims = getClaims(token);
-        return String.valueOf(claims.get("memberId"));
+        return claims.get("id", Long.class);
     }
 
     public String getTokenHeader(HttpServletRequest request) {
