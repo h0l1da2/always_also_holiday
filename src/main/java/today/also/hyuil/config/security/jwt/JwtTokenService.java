@@ -27,12 +27,12 @@ public class JwtTokenService {
     private final JwtTokenProvider jwtTokenProvider;
     private final JwtTokenRepository jwtTokenRepository;
 
-    public Map<TokenName, String> getTokens(String memberId, Name role) {
-        log.info("토큰 생성 = {}", memberId);
+    public Map<TokenName, String> getTokens(Long id, Name role) {
+        log.info("토큰 생성 = {}", id);
 
         String refreshToken = jwtTokenProvider.createRefreshToken();
         String accessToken = jwtTokenProvider.createAccessToken(
-                memberId, getAuthorities(String.valueOf(role)));
+                id, getAuthorities(String.valueOf(role)));
 
         Map<TokenName, String> map = new HashMap<>();
         map.put(TokenName.ACCESS_TOKEN, accessToken);
@@ -53,7 +53,7 @@ public class JwtTokenService {
 
     public Token saveRefreshInDB(Token refreshToken) {
         // 기존 토큰이 있으면 바꿔치기, 없으면 새로 insert
-        Token findToken = jwtTokenRepository.findByMemberId(refreshToken.getMemberId());
+        Token findToken = jwtTokenRepository.findById(refreshToken.getMemberId());
         if (findToken == null) {
             return jwtTokenRepository.insertRefreshToken(refreshToken);
         }
@@ -61,13 +61,13 @@ public class JwtTokenService {
         return jwtTokenRepository.updateNewToken(findToken);
     }
 
-    public void saveRefreshToken(String memberId, String refreshToken) {
-        Token token = duplicationTokenDB(memberId);
+    public void saveRefreshToken(Long id, String refreshToken) {
+        Token token = duplicationTokenDB(id);
 
         if (token != null) {
-            setNewToken(new Token(token.getId(), memberId, refreshToken));
+            setNewToken(new Token(token.getId(), id, refreshToken));
         } else {
-            saveRefreshInDB(new Token(memberId, refreshToken));
+            saveRefreshInDB(new Token(id, refreshToken));
         }
     }
 
@@ -78,8 +78,8 @@ public class JwtTokenService {
         return authorities;
     }
 
-    private Token duplicationTokenDB(String memberId) {
-        return jwtTokenRepository.findByMemberId(memberId);
+    private Token duplicationTokenDB(Long id) {
+        return jwtTokenRepository.findById(id);
     }
 
     private Token setNewToken(Token token) {

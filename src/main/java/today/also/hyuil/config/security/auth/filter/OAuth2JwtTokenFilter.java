@@ -154,15 +154,13 @@ public class OAuth2JwtTokenFilter extends OncePerRequestFilter {
             String accessToken = "";
             if (member != null) {
                 Map<TokenName, String> tokens =
-                        jwtTokenService.getTokens(memberId, member.getRole().getName());
+                        jwtTokenService.getTokens(member.getId(), member.getRole().getName());
                 accessToken = tokens.get(TokenName.ACCESS_TOKEN);
                 String refreshToken = tokens.get(TokenName.REFRESH_TOKEN);
                 request.setAttribute(TokenName.ACCESS_TOKEN.name(), accessToken);
-                jwtTokenService.saveRefreshToken(memberId, refreshToken);
+                jwtTokenService.saveRefreshToken(member.getId(), refreshToken);
 
             }
-
-            webService.sessionSetMember(member, request);
 
             // authentication 생성 후, SpringContext에 저장하는 작업
             ClientRegistration clientRegistration =
@@ -171,12 +169,12 @@ public class OAuth2JwtTokenFilter extends OncePerRequestFilter {
 
             OAuth2UserRequest oAuth2UserRequest = new OAuth2UserRequest(clientRegistration, oAuth2AccessToken);
 
-            accessToken = tokenResponse.getAccessToken();
             Authentication authentication = getAuthentication(accessToken, oAuth2UserRequest);
             SecurityContextHolder.getContext().setAuthentication(authentication);
-
             String redirectUri = "/loginForm?redirect="+request.getRequestURI()+"&token="+accessToken;
             response.sendRedirect(redirectUri);
+
+            webService.sessionSetMember(member, request);
 
         }
         filterChain.doFilter(request, response);

@@ -67,12 +67,12 @@ public class MemberLoginController {
         }
         Member member = memberJoinService.findMyAccountMemberId(loginDto.getMemberId());
         Map<TokenName, String> tokens = jwtTokenService.getTokens(
-                member.getMemberId(), member.getRole().getName());
+                member.getId(), member.getRole().getName());
         String refreshToken = tokens.get(TokenName.REFRESH_TOKEN);
         String accessToken = tokens.get(TokenName.ACCESS_TOKEN);
 
         // 각 토큰 저장
-        jwtTokenService.saveRefreshToken(member.getMemberId(), refreshToken);
+        jwtTokenService.saveRefreshToken(member.getId(), refreshToken);
 
         // TODO 자동로그인 기능 쿠키 생성 나중에 추가
         jsonObject.addProperty("JWT", accessToken);

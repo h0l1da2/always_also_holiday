@@ -13,20 +13,20 @@ public class Token {
 
     @Id @GeneratedValue
     private Long id;
-    private String memberId;
+    private Long memberId;
     private String token;
     private Date createDate;
     private Date updateDate;
 
     protected Token() {}
 
-    public Token(String memberId, String token) {
+    public Token(Long memberId, String token) {
         this.memberId = memberId;
         this.token = token;
         this.createDate = new Date();
         this.updateDate = new Date();
     }
-    public Token(Long id, String memberId, String token) {
+    public Token(Long id, Long memberId, String token) {
         this.id = id;
         this.memberId = memberId;
         this.token = token;

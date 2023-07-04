@@ -32,12 +32,12 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
 
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
         Member findMember = memberJoinService.findMyAccountMemberId(userDetails.getUsername());
-        Map<TokenName, String> tokens = jwtTokenService.getTokens(findMember.getMemberId(), findMember.getRole().getName());
+        Map<TokenName, String> tokens = jwtTokenService.getTokens(findMember.getId(), findMember.getRole().getName());
 
         String accessToken = tokens.get(TokenName.ACCESS_TOKEN);
         String refreshToken = tokens.get(TokenName.REFRESH_TOKEN);
 
-        jwtTokenService.saveRefreshToken(findMember.getMemberId(), refreshToken);
+        jwtTokenService.saveRefreshToken(findMember.getId(), refreshToken);
         response.setHeader("Authorization", "Bearer "+accessToken);
 
         String redirectUrl = request.getParameter("redirectUrl");
