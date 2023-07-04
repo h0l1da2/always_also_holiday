@@ -1,41 +1,25 @@
 package today.also.hyuil.repository.market;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import jakarta.persistence.EntityManager;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
-import today.also.hyuil.domain.market.*;
+import today.also.hyuil.domain.market.MarketSell;
+import today.also.hyuil.domain.market.MarketSellCom;
+import today.also.hyuil.domain.market.MarketSellComRemover;
+import today.also.hyuil.domain.market.MarketSellRemover;
 import today.also.hyuil.repository.market.inter.MarketSellRepository;
 
-import jakarta.persistence.EntityManager;
 import java.util.List;
 
-import static today.also.hyuil.domain.market.QMarketSellCom.*;
+import static today.also.hyuil.domain.market.QMarketSellCom.marketSellCom;
 import static today.also.hyuil.domain.member.QMember.member;
 
-@Transactional
 @Repository
+@RequiredArgsConstructor
 public class MarketSellRepositoryImpl implements MarketSellRepository {
     private final EntityManager em;
     private final JPAQueryFactory query;
-
-    public MarketSellRepositoryImpl(EntityManager em, JPAQueryFactory query) {
-        this.em = em;
-        this.query = query;
-    }
-
-    @Override
-    public MarketSell insertMarket(MarketSell market) {
-        em.persist(market);
-        em.close();
-        return market;
-    }
-
-    @Override
-    public MarketSell seleteMarket(Long id) {
-        MarketSell market = em.find(MarketSell.class, id);
-        em.close();
-        return market;
-    }
 
     @Override
     public List<MarketSellCom> selectMarketComments(Long id) {
@@ -58,7 +42,7 @@ public class MarketSellRepositoryImpl implements MarketSellRepository {
     @Override
     public MarketSellCom findByIdMarketCom(Long commentId) {
         MarketSellCom comment = em.find(MarketSellCom.class, commentId);
-        comment.getMember();
+        comment.getMember().getId();
         em.close();
         return comment;
     }
@@ -71,32 +55,12 @@ public class MarketSellRepositoryImpl implements MarketSellRepository {
     }
 
     @Override
-    public void updateMarketComRemover(Long id, MarketSellComRemover remover) {
-        MarketSellCom marketSellCom = em.find(MarketSellCom.class, id);
-        marketSellCom.itRemove(remover);
-        em.close();
-    }
-
-    @Override
     public MarketSell seleteAndViewCntMarket(Long id) {
         MarketSell market = em.find(MarketSell.class, id);
-        market.getMember();
+        market.getMember().getId();
         market.updateViewCnt();
+        em.close();
         return market;
-    }
-
-    @Override
-    public void updateMarket(Long id, MarketSell market) {
-        MarketSell findMarket = em.find(MarketSell.class, id);
-        findMarket.updateNewMarket(market);
-        em.close();
-    }
-
-    @Override
-    public void updateMarketForRemove(Long marketId, MarketSellRemover marketRemover) {
-        MarketSell market = em.find(MarketSell.class, marketId);
-        market.itRemove(marketRemover);
-        em.close();
     }
 
     @Override

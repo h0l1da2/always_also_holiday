@@ -1,43 +1,26 @@
 package today.also.hyuil.repository.market;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import jakarta.persistence.EntityManager;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
-import today.also.hyuil.domain.market.*;
+import today.also.hyuil.domain.market.Market;
+import today.also.hyuil.domain.market.MarketCom;
+import today.also.hyuil.domain.market.MarketComRemover;
+import today.also.hyuil.domain.market.MarketRemover;
 import today.also.hyuil.repository.market.inter.MarketRepository;
 
-import jakarta.persistence.EntityManager;
 import java.util.List;
 
 import static today.also.hyuil.domain.market.QMarketCom.marketCom;
 import static today.also.hyuil.domain.member.QMember.member;
 
-// TODO 서비스에 붙여봐 ?
-@Transactional
 @Repository
+@RequiredArgsConstructor
 public class MarketRepositoryImpl implements MarketRepository {
 
     private final EntityManager em;
     private final JPAQueryFactory query;
-
-    public MarketRepositoryImpl(EntityManager em, JPAQueryFactory query) {
-        this.em = em;
-        this.query = query;
-    }
-
-    @Override
-    public Market insertMarket(Market market) {
-        em.persist(market);
-        em.close();
-        return market;
-    }
-
-    @Override
-    public Market seleteMarket(Long id) {
-        Market market = em.find(Market.class, id);
-        em.close();
-        return market;
-    }
 
     @Override
     public List<MarketCom> selectMarketComments(Long id) {
@@ -60,7 +43,7 @@ public class MarketRepositoryImpl implements MarketRepository {
     @Override
     public MarketCom findByIdMarketCom(Long commentId) {
         MarketCom comment = em.find(MarketCom.class, commentId);
-        comment.getMember();
+        comment.getMember().getId();
         em.close();
         return comment;
     }
@@ -73,32 +56,12 @@ public class MarketRepositoryImpl implements MarketRepository {
     }
 
     @Override
-    public void updateMarketComRemover(Long id, MarketComRemover remover) {
-        MarketCom MarketCom = em.find(MarketCom.class, id);
-        MarketCom.itRemove(remover);
-        em.close();
-    }
-
-    @Override
     public Market seleteAndViewCntMarket(Long id) {
         Market market = em.find(Market.class, id);
-        market.getMember();
+        market.getMember().getId();
         market.updateViewCnt();
+        em.close();
         return market;
-    }
-
-    @Override
-    public void updateMarket(Long id, Market market) {
-        Market findMarket = em.find(Market.class, id);
-        findMarket.updateNewMarket(market);
-        em.close();
-    }
-
-    @Override
-    public void updateMarketForRemove(Long marketId, MarketRemover marketRemover) {
-        Market market = em.find(Market.class, marketId);
-        market.itRemove(marketRemover);
-        em.close();
     }
 
     @Override
