@@ -5,13 +5,13 @@ import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import today.also.hyuil.domain.file.FileInfo;
 import today.also.hyuil.domain.file.Files;
@@ -28,9 +28,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-@Transactional
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class FileServiceImpl implements FileService {
 
     private final FileRepository fileRepository;
@@ -45,7 +45,7 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public FileInfo saveFileInfo(FileInfo fileInfo) {
-        return fileRepository.insertFileInfo(fileInfo);
+        return fileJpaRepository.save(fileInfo);
     }
 
     @Override

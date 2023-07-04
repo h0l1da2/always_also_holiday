@@ -1,6 +1,7 @@
 package today.also.hyuil.service.market;
 
 import com.amazonaws.services.kms.model.NotFoundException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -17,42 +18,35 @@ import today.also.hyuil.domain.member.Member;
 import today.also.hyuil.exception.ThisEntityIsNull;
 import today.also.hyuil.repository.market.inter.MarketSellJpaRepository;
 import today.also.hyuil.repository.market.inter.MarketSellRepository;
-import today.also.hyuil.repository.member.MemberRepository;
 import today.also.hyuil.service.file.inter.FileService;
 import today.also.hyuil.service.market.inter.MarketSellService;
+import today.also.hyuil.service.member.inter.MemberJoinService;
 
 import java.nio.file.AccessDeniedException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@Transactional
 @Service
+@RequiredArgsConstructor
 public class MarketSellServiceImpl implements MarketSellService {
 
     private final MarketSellRepository marketRepository;
     private final MarketSellJpaRepository marketJpaRepository;
-    private final MemberRepository memberRepository;
+    private final MemberJoinService memberJoinService;
     private final FileService fileService;
-
-    public MarketSellServiceImpl(MarketSellRepository marketRepository, MarketSellJpaRepository marketJpaRepository, MemberRepository memberRepository, FileService fileService) {
-        this.marketRepository = marketRepository;
-        this.marketJpaRepository = marketJpaRepository;
-        this.memberRepository = memberRepository;
-        this.fileService = fileService;
-    }
 
     @Override
     public MarketSell writeBuy(MarketSell market) {
-        return marketRepository.insertMarket(market);
+        return marketJpaRepository.save(market);
     }
 
     @Override
     public Map<String, MarketSell> prevNextMarket(Long id) {
         Long prev = id - 1;
         Long next = id + 1;
-        MarketSell prevMarket = marketRepository.seleteMarket(prev);
-        MarketSell nextMarket = marketRepository.seleteMarket(next);
+        MarketSell prevMarket = marketJpaRepository.findById(prev).orElse(null);
+        MarketSell nextMarket = marketJpaRepository.findById(next).orElse(null);
 
         Map<String, MarketSell> map = new HashMap<>();
         map.put("prev", prevMarket);
@@ -60,6 +54,7 @@ public class MarketSellServiceImpl implements MarketSellService {
         return map;
     }
 
+    @Transactional
     @Override
     public MarketSell read(Long id) throws ThisEntityIsNull {
         MarketSell market = marketRepository.seleteAndViewCntMarket(id);
@@ -80,6 +75,7 @@ public class MarketSellServiceImpl implements MarketSellService {
         return marketRepository.insertBuyComment(comment);
     }
 
+    @Transactional
     @Override
     public void removeBuyComment(Long commentId, Long memberId, Who who) throws NotFoundException, AccessDeniedException {
         MarketSellCom comment = marketRepository.findByIdMarketCom(commentId);
@@ -95,7 +91,8 @@ public class MarketSellServiceImpl implements MarketSellService {
         MarketSellComRemover remover = marketRepository.insertMarketComRemover(
                 new MarketSellComRemover(comment.getMember(), who));
 
-        marketRepository.updateMarketComRemover(comment.getId(), remover);
+        comment.itRemove(remover);
+        marketRepository.insertBuyComment(comment);
     }
 
     @Override
@@ -109,17 +106,18 @@ public class MarketSellServiceImpl implements MarketSellService {
 
     @Override
     public void modifyMarket(Long id, MarketSell market) {
-        marketRepository.updateMarket(id, market);
+        marketJpaRepository.save(market);
     }
 
+    @Transactional
     @Override
     public void removeMarket(Long marketId, Who who, Long memberId) throws NotFoundException, AccessDeniedException {
-        MarketSell findMarket = marketRepository.seleteMarket(marketId);
+        MarketSell findMarket = marketJpaRepository.findById(marketId).orElse(null);
 
         if (findMarket == null) {
             throw new NotFoundException("해당 글은 없는 글입니다");
         }
-        Member findMember = memberRepository.findById(memberId);
+        Member findMember = memberJoinService.findMyAccount(memberId);
 
         if (!findMember.getId().equals(findMarket.getMember().getId())) {
             throw new AccessDeniedException("본인 글만 삭제 가능합니다");
@@ -128,16 +126,17 @@ public class MarketSellServiceImpl implements MarketSellService {
         MarketSellRemover marketRemover = new MarketSellRemover(findMember, who);
 
         MarketSellRemover remover = marketRepository.insertMarketRemover(marketRemover);
-
-        marketRepository.updateMarketForRemove(marketId, remover);
+        findMarket.itRemove(remover);
+        marketJpaRepository.save(findMarket);
     }
 
+    @Transactional
     @Override
     public MarketSell writeSell(Long memberId, MarketSell market, List<FileInfo> fileInfoList) {
-        Member member = memberRepository.findById(memberId);
+        Member member = memberJoinService.findMyAccount(memberId);
 
         market.iAmSeller(member);
-        MarketSell writeMarket = marketRepository.insertMarket(market);
+        MarketSell writeMarket = marketJpaRepository.save(market);
 
         for (FileInfo fileInfo : fileInfoList) {
             fileInfo.marketSellFile(writeMarket);

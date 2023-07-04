@@ -2,26 +2,20 @@ package today.also.hyuil.repository.member;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 import today.also.hyuil.domain.member.Member;
 
 import java.util.Optional;
 
 import static today.also.hyuil.domain.member.QMember.member;
 
-@Transactional
 @Repository
+@RequiredArgsConstructor
 public class MemberRepository {
 
     private final EntityManager em;
     private final JPAQueryFactory query;
-
-
-    public MemberRepository(EntityManager em, JPAQueryFactory query) {
-        this.em = em;
-        this.query = query;
-    }
 
     public Member findByMemberIdRole(String memberId) {
         Optional<Member> findMember =
@@ -40,11 +34,6 @@ public class MemberRepository {
     public Member findByIdRole(Long id) {
         Member member = em.find(Member.class, id);
         member.getRole().getName();
-        return member;
-    }
-
-    public Member findById(Long id) {
-        Member member = em.find(Member.class, id);
         em.close();
         return member;
     }
