@@ -1,6 +1,10 @@
 package today.also.hyuil.config.security.auth.filter;
 
 import io.jsonwebtoken.Claims;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpEntity;
@@ -8,7 +12,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
@@ -19,6 +22,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.filter.OncePerRequestFilter;
+import today.also.hyuil.config.security.CustomUserDetails;
 import today.also.hyuil.config.security.auth.CustomDefaultOAuth2UserService;
 import today.also.hyuil.config.security.auth.jwk.GoogleJwk;
 import today.also.hyuil.config.security.auth.jwk.KakaoJwk;
@@ -33,10 +37,6 @@ import today.also.hyuil.domain.member.Sns;
 import today.also.hyuil.service.member.inter.MemberJoinService;
 import today.also.hyuil.service.web.WebService;
 
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.security.PublicKey;
 import java.time.Instant;
@@ -148,9 +148,19 @@ public class OAuth2JwtTokenFilter extends OncePerRequestFilter {
 
             }
 
-            // 이 아래부터 공통 작업(토큰 만드는 작업)
-            memberId = sns+sub;
-            Member member = memberJoinService.findMyAccountMemberId(memberId);
+
+
+            // authentication 생성 후, SpringContext에 저장하는 작업
+            ClientRegistration clientRegistration =
+                    clientRegistrationRepository.findByRegistrationId(sns.toLowerCase());
+            OAuth2AccessToken oAuth2AccessToken = getOAuth2AccessToken(tokenResponse);
+
+            OAuth2UserRequest oAuth2UserRequest = new OAuth2UserRequest(clientRegistration, oAuth2AccessToken);
+
+            OAuth2User oAuth2User = customDefaultOAuth2UserService.loadUser(oAuth2UserRequest);
+            CustomUserDetails cu = (CustomUserDetails) oAuth2User;
+            Member member = memberJoinService.findMyAccount(cu.getId());
+
             String accessToken = "";
             if (member != null) {
                 Map<TokenName, String> tokens =
@@ -162,15 +172,8 @@ public class OAuth2JwtTokenFilter extends OncePerRequestFilter {
 
             }
 
-            // authentication 생성 후, SpringContext에 저장하는 작업
-            ClientRegistration clientRegistration =
-                    clientRegistrationRepository.findByRegistrationId(sns.toLowerCase());
-            OAuth2AccessToken oAuth2AccessToken = getOAuth2AccessToken(tokenResponse);
+            setAuthenticationSpringContext(oAuth2User, accessToken);
 
-            OAuth2UserRequest oAuth2UserRequest = new OAuth2UserRequest(clientRegistration, oAuth2AccessToken);
-
-            Authentication authentication = getAuthentication(accessToken, oAuth2UserRequest);
-            SecurityContextHolder.getContext().setAuthentication(authentication);
             String redirectUri = "/loginForm?redirect="+request.getRequestURI()+"&token="+accessToken;
             response.sendRedirect(redirectUri);
 
@@ -179,7 +182,12 @@ public class OAuth2JwtTokenFilter extends OncePerRequestFilter {
         }
         filterChain.doFilter(request, response);
 
+    }
 
+    private void setAuthenticationSpringContext(OAuth2User oAuth2User, String accessToken) {
+        UsernamePasswordAuthenticationToken authentication =
+                new UsernamePasswordAuthenticationToken(oAuth2User, accessToken, oAuth2User.getAuthorities());
+        SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 
     private OAuth2AccessToken getOAuth2AccessToken(TokenResponse tokenResponse) {
@@ -187,11 +195,6 @@ public class OAuth2JwtTokenFilter extends OncePerRequestFilter {
         long expiresIn = tokenResponse.getExpiresIn();
         Instant expiresAt = Instant.now().plusSeconds(expiresIn);
         return new OAuth2AccessToken(OAuth2AccessToken.TokenType.BEARER, accessToken, Instant.now(), expiresAt);
-    }
-
-    private Authentication getAuthentication(String accessToken, OAuth2UserRequest oAuth2UserRequest) {
-        OAuth2User oAuth2User = customDefaultOAuth2UserService.loadUser(oAuth2UserRequest);
-        return new UsernamePasswordAuthenticationToken(oAuth2User, accessToken, oAuth2User.getAuthorities());
     }
 
 }
