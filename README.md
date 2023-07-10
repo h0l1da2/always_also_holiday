@@ -2,12 +2,16 @@
 <img src="https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2Fpdyvo%2FbtshHMQ3AGA%2FjyJlOfloclRuI5ZtAi7qRK%2Fimg.png">
 세상에서 제일 멋진 휴일이의 팬들을 위한<br>
 휴일이 팬 사이트
+<br>
+
 
 <h2>주소</h2>
-오늘도 휴일 (http://alwaysalsoholiday.com)<br>
-<br>
+오늘도 휴일 (http://alwaysalsoholiday.com)<br><br>
 *현재 해당 주소 접속 불가로,<br>티스토리(https://hyuil.tistory.com/199) 에서 페이지를 확인해주세요!<br>
-- aws 용량 초과로 돈이 나가서 중지시켜놨습니다..<br>
+- aws 용량 초과로 돈이 나가서 중지시켜놨습니다..<br><br>
+
+프로젝트 상세 소개 (https://hyuil.notion.site/hyuil/cf625f8928c84daf96a7f2a8cf6104c1?p=8bc1b63fc2264d6f8cdaecb412394b9c&pm=c)
+
 
 <h2>작업자</h2>
 강휴일 1인 개발
