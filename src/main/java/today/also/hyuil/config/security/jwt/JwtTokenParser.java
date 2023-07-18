@@ -56,7 +56,7 @@ public class JwtTokenParser {
         return null;
     }
 
-    public Collection<GrantedAuthority> getAuthorities(String accessToken) {
+    public Collection<GrantedAuthority> getAuthoritiesForService(String accessToken) {
         Claims claims = getClaims(accessToken);
         String role = getRoleToString(claims);
 
