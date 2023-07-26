@@ -4,7 +4,7 @@
 휴일이 팬 사이트
 <br><br>
 
-<img src="src/main/resources/static/images/readmeMain.png">
+<img src="src/main/resources/readme/readmeMain.png">
 
 <aside>
 🤩 1인으로 진행한 토이 프로젝트입니다. 오늘도 휴일은 휴일이의 팬들을 위한 서비스입니다. 휴일이의 지난 업적을 살펴보거나 팬레터를 작성할 수 있고, 굿즈 중고 장터에서 물건을 사고 팔 수 있습니다.
