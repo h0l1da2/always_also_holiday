@@ -9,10 +9,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.web.servlet.MockMvc;
-import today.also.hyuil.domain.dto.member.PwdDto;
-import today.also.hyuil.domain.member.*;
-import today.also.hyuil.repository.member.MemberJpaRepository;
-import today.also.hyuil.service.member.inter.MemberJoinService;
+import today.also.hyuil.member.dto.PwdDto;
+import today.also.hyuil.member.domain.*;
+import today.also.hyuil.member.domain.type.Name;
+import today.also.hyuil.member.domain.type.Sns;
+import today.also.hyuil.member.repository.MemberJpaRepository;
+import today.also.hyuil.member.service.MemberJoinService;
 
 import java.util.Date;
 
