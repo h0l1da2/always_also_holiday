@@ -45,3 +45,4 @@ out/
 /settings.gradle
 /src/main/generated/
 /src/main/META-INF/
+.DS_Store
