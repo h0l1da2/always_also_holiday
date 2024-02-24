@@ -9,8 +9,8 @@ import today.also.hyuil.fanletter.domain.CommentRemover;
 
 import java.util.List;
 
-import static today.also.hyuil.domain.fanLetter.QComment.comment;
-import static today.also.hyuil.domain.member.QMember.member;
+import static today.also.hyuil.fanletter.domain.QComment.comment;
+import static today.also.hyuil.member.domain.QMember.member;
 
 @Transactional
 @Repository

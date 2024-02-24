@@ -10,7 +10,6 @@ import today.also.hyuil.common.config.security.auth.userinfo.GoogleUserInfo;
 import today.also.hyuil.common.config.security.auth.userinfo.KakaoUserInfo;
 import today.also.hyuil.common.config.security.auth.userinfo.NaverUserInfo;
 import today.also.hyuil.common.config.security.auth.userinfo.SnsUserInfo;
-import today.also.hyuil.config.security.auth.userinfo.*;
 import today.also.hyuil.member.domain.*;
 import today.also.hyuil.member.domain.type.Name;
 import today.also.hyuil.member.domain.type.Sns;

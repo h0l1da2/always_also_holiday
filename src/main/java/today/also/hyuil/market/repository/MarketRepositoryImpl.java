@@ -11,8 +11,8 @@ import today.also.hyuil.market.domain.MarketRemover;
 
 import java.util.List;
 
-import static today.also.hyuil.domain.market.QMarketCom.marketCom;
-import static today.also.hyuil.domain.member.QMember.member;
+import static today.also.hyuil.market.domain.QMarketCom.marketCom;
+import static today.also.hyuil.member.domain.QMember.member;
 
 @Repository
 @RequiredArgsConstructor

@@ -7,8 +7,8 @@ import today.also.hyuil.file.domain.FileInfo;
 
 import java.util.List;
 
-import static today.also.hyuil.domain.file.QFileInfo.fileInfo;
-import static today.also.hyuil.domain.file.QFiles.files;
+import static today.also.hyuil.file.domain.QFileInfo.fileInfo;
+import static today.also.hyuil.file.domain.QFiles.files;
 
 @Repository
 @RequiredArgsConstructor

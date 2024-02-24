@@ -7,7 +7,7 @@ import today.also.hyuil.member.domain.Admin;
 
 import jakarta.persistence.EntityManager;
 
-import static today.also.hyuil.domain.member.QAdmin.admin;
+import static today.also.hyuil.member.domain.QAdmin.admin;
 
 @Transactional
 @Repository

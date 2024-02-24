@@ -8,7 +8,7 @@ import today.also.hyuil.member.domain.Member;
 
 import java.util.Optional;
 
-import static today.also.hyuil.domain.member.QMember.member;
+import static today.also.hyuil.member.domain.QMember.member;
 
 @Repository
 @RequiredArgsConstructor
