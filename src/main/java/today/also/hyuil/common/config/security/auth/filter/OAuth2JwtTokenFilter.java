@@ -148,8 +148,6 @@ public class OAuth2JwtTokenFilter extends OncePerRequestFilter {
 
             }
 
-
-
             // authentication 생성 후, SpringContext에 저장하는 작업
             ClientRegistration clientRegistration =
                     clientRegistrationRepository.findByRegistrationId(sns.toLowerCase());

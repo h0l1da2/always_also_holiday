@@ -2,7 +2,6 @@ package today.also.hyuil.common.config.security.auth.tokenresponse;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
-import lombok.ToString;
 
 @Getter
 public class NaverProfileApiResponse {
@@ -47,9 +46,5 @@ public class NaverProfileApiResponse {
         private String birthYear;
 
     }
-
-
-
-
 
 }

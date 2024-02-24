@@ -57,7 +57,7 @@ public class CustomUserDetails implements UserDetails, OAuth2User {
 
     @Override
     public boolean isAccountNonLocked() {
-        return member.getStopDate() == null ? true : false;
+        return member.getStopDate() == null;
     }
 
     @Override
@@ -67,7 +67,7 @@ public class CustomUserDetails implements UserDetails, OAuth2User {
 
     @Override
     public boolean isEnabled() {
-        return member.getRemoveDate() == null ? true : false;
+        return member.getRemoveDate() == null;
     }
 
     @Override

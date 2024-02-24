@@ -85,8 +85,7 @@ public class JwtTokenProvider {
     }
 
     public Claims getOldClaims(String token) {
-        Claims claims = jwtParser.parseClaimsJws(token).getBody();
-        return claims;
+        return jwtParser.parseClaimsJws(token).getBody();
     }
 
     private Collection<GrantedAuthority> getAuthorities(String role) {

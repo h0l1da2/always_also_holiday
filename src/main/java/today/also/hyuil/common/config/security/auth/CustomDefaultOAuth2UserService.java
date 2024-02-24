@@ -1,5 +1,7 @@
 package today.also.hyuil.common.config.security.auth;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
@@ -19,18 +21,16 @@ import java.util.Date;
 import java.util.Map;
 import java.util.UUID;
 
+@Slf4j
 @Service
+@RequiredArgsConstructor
 public class CustomDefaultOAuth2UserService extends DefaultOAuth2UserService {
 
     private final MemberJoinService memberJoinService;
 
-    public CustomDefaultOAuth2UserService(MemberJoinService memberJoinService) {
-        this.memberJoinService = memberJoinService;
-    }
-
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
-        System.out.println("유저서비스시작");
+        log.debug("유저서비스시작");
 
         OAuth2User oAuth2User = super.loadUser(userRequest);
         String client = userRequest.getClientRegistration().getRegistrationId();
@@ -45,7 +45,6 @@ public class CustomDefaultOAuth2UserService extends DefaultOAuth2UserService {
 
         // 기존 가입 멤버가 아니라면 ?
         if (member == null) {
-            System.out.println("멤버를 가입시키자");
             String nickname = userInfo.getSnsName()+"_"+pkey.substring(0, 6);
             String password = pkey+ UUID.randomUUID();
             String name = userInfo.getName();
@@ -58,6 +57,7 @@ public class CustomDefaultOAuth2UserService extends DefaultOAuth2UserService {
                             (memberId, nickname, password, name, email, phone, sns, now);
 
             member = memberJoinService.joinMember(newMember);
+            log.info("SNS 멤버 가입 : {}", email);
         }
         return new CustomUserDetails(member, oAuth2User.getAttributes());
     }

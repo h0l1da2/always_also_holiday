@@ -16,7 +16,6 @@ public class AppConfig {
     private final MemberRepository memberRepository;
     private final MemberJpaRepository memberJpaRepository;
 
-    // TODO 시큐리티 컨피그에 옮기면?
     @Bean
     public BCryptPasswordEncoder bCryptPasswordEncoder() {
         return new BCryptPasswordEncoder();

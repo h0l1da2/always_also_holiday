@@ -11,7 +11,6 @@ public class JpaConfig {
 
     private final EntityManager entityManager;
 
-
     public JpaConfig(EntityManager entityManager) {
         this.entityManager = entityManager;
     }

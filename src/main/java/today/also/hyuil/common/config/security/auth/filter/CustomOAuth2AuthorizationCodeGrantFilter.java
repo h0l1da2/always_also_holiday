@@ -41,13 +41,13 @@ public class CustomOAuth2AuthorizationCodeGrantFilter extends OAuth2Authorizatio
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        log.info("그랜트 필터 시작");
+        log.debug("그랜트 필터 시작");
 
         // https://alwaysalsoholiday.com/fanLetter?code={code}&state={state}
         String code = request.getParameter("code");
 
         if (!StringUtils.hasText(code)) {
-            log.info("코드 없음");
+            log.error("코드 없음");
             filterChain.doFilter(request, response);
             return;
         }
@@ -78,6 +78,7 @@ public class CustomOAuth2AuthorizationCodeGrantFilter extends OAuth2Authorizatio
                 String tokenUri = snsInfo.tokenUri(sns);
                 MultiValueMap<String, String> parameters =
                         setParameters(code, clientId, clientSecret, requestURI);
+
                 // 헤더 세팅
                 HttpHeaders headers = new HttpHeaders();
                 headers.setBasicAuth(sns, snsInfo.clientSecret(sns));
@@ -97,7 +98,7 @@ public class CustomOAuth2AuthorizationCodeGrantFilter extends OAuth2Authorizatio
                         restTemplate.exchange(tokenUri, HttpMethod.POST, entity, TokenResponse.class);
 
                 // (토큰) 응답 받기
-                // 카카오, 네이버, 구글이 다 다름 TokenResponse 가
+                // 카카오, 네이버, 구글이 TokenResponse 가 다 다름.
                 TokenResponse tokenResponse = responseEntity.getBody();
                 request.setAttribute("tokenResponse", tokenResponse);
                 request.setAttribute("sns", sns);
@@ -106,11 +107,7 @@ public class CustomOAuth2AuthorizationCodeGrantFilter extends OAuth2Authorizatio
             }
         }
 
-
-
         filterChain.doFilter(request, response);
-
-
     }
 
     private void removeSessionAttr(HttpSession session, String originState) {
@@ -119,14 +116,14 @@ public class CustomOAuth2AuthorizationCodeGrantFilter extends OAuth2Authorizatio
     }
 
     private MultiValueMap<String, String> setParameters(String code, String clientId, String clientSecret, String requestURI) {
+        log.debug("redirectUri = " + requestURI);
+
         MultiValueMap<String, String> parameters = new LinkedMultiValueMap<>();
-        String redirectUri = requestURI;
-        System.out.println("redirectUri = " + redirectUri);
         parameters.add("grant_type", "authorization_code");
         parameters.add("code", code);
         parameters.add("client_id", clientId);
         parameters.add("client_secret", clientSecret);
-        parameters.add("redirect_uri", redirectUri);
+        parameters.add("redirect_uri", requestURI);
         return parameters;
     }
 }

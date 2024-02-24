@@ -11,6 +11,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
+import today.also.hyuil.common.exception.BadRequestException;
+import today.also.hyuil.common.exception.Error;
 import today.also.hyuil.common.security.type.Token;
 import today.also.hyuil.common.security.jwt.JwtTokenRepository;
 
@@ -50,8 +52,7 @@ public class JwtTokenParser {
         Claims claims = getClaims(accessToken);
         if (claims.getSubject() != null) {
             Long id = claims.get("id", Long.class);
-            Token refreshToken = jwtTokenRepository.findById(id);
-            return refreshToken;
+            return jwtTokenRepository.findById(id);
         }
         return null;
     }
@@ -84,11 +85,11 @@ public class JwtTokenParser {
             KeyFactory factory = KeyFactory.getInstance(kty);
             return factory.generatePublic(spec);
         } catch (NoSuchAlgorithmException ex) {
-            log.info("알고리즘을 못 찾겠음");
-            throw new RuntimeException(ex);
+            log.error("알고리즘을 못 찾겠음");
+            throw new BadRequestException(Error.ACCESS_DENIED);
         } catch (InvalidKeySpecException ex) {
             log.info("잘못된 키 스펙");
-            throw new RuntimeException(ex);
+            throw new BadRequestException(Error.ACCESS_DENIED);
         }
     }
 
@@ -129,14 +130,14 @@ public class JwtTokenParser {
 
             return verifier.verify(Base64.getUrlDecoder().decode(jwt[2]));
         } catch (NoSuchAlgorithmException e) {
-            log.info("알고리즘을 못 찾겠음");
-            throw new RuntimeException(e);
+            log.error("알고리즘을 못 찾겠음");
+            throw new BadRequestException(Error.ACCESS_DENIED);
         } catch (InvalidKeyException e) {
-            log.info("잘못된 키 스펙");
-            throw new RuntimeException(e);
+            log.error("잘못된 키 스펙");
+            throw new BadRequestException(Error.ACCESS_DENIED);
         } catch (SignatureException e) {
-            log.info("잘못된 서명");
-            throw new RuntimeException(e);
+            log.error("잘못된 서명");
+            throw new BadRequestException(Error.ACCESS_DENIED);
         }
     }
 

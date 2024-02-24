@@ -37,7 +37,7 @@ public class CustomOAuth2AuthorizationRequestResolver implements OAuth2Authoriza
 
     @Override
     public OAuth2AuthorizationRequest resolve(HttpServletRequest request, String clientRegistrationId) {
-        log.info("리졸버 시작");
+        log.debug("리졸버 시작");
         String sns = clientRegistrationId.toUpperCase();
         String state = UUID.randomUUID().toString();
 
@@ -48,7 +48,7 @@ public class CustomOAuth2AuthorizationRequestResolver implements OAuth2Authoriza
         String authUri = snsInfo.authUri(sns);
         String redirectUri = getRedirectUri(request, sns);
         String responseType = snsInfo.responseType();
-        String[] scopes = snsInfo.scope(sns).stream().toArray(String[]::new);
+        String[] scopes = snsInfo.scope(sns).toArray(String[]::new);
 
         Map<String, Object> map = new HashMap<>();
         map.put(OAuth2ParameterNames.RESPONSE_TYPE, responseType);

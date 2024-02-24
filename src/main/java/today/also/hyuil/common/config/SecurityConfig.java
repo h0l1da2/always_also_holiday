@@ -94,7 +94,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    public WebSecurityCustomizer configure() throws Exception {
+    public WebSecurityCustomizer configure() {
         return (web) -> web
                 .ignoring()
                 .requestMatchers("/static/**", "/favicon.ico");

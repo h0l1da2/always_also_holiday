@@ -1,18 +1,17 @@
 package today.also.hyuil.common.config.security.jwt;
 
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
-import today.also.hyuil.member.domain.type.Name;
-import today.also.hyuil.common.security.type.Token;
-import today.also.hyuil.common.exception.HaveNotToken;
-import today.also.hyuil.common.exception.TokenTimeOverException;
+import today.also.hyuil.common.exception.BadRequestException;
+import today.also.hyuil.common.exception.Error;
 import today.also.hyuil.common.security.jwt.JwtTokenRepository;
+import today.also.hyuil.common.security.type.Token;
+import today.also.hyuil.member.domain.type.Name;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -33,12 +32,13 @@ public class JwtTokenService {
     private final JwtTokenRepository jwtTokenRepository;
     private final JwtTokenParser jwtTokenParser;
 
-    public String getToken(HttpServletRequest request) throws HaveNotToken {
+    public String getToken(HttpServletRequest request) {
         String token = jwtTokenParser.getTokenHeader(request);
         if (!tokenNullCheck(token)) {
             String tokenUrl = jwtTokenParser.getTokenUrl(request);
             if (!tokenNullCheck(tokenUrl)) {
-                throw new HaveNotToken("토큰이 없음 - 인증 실패");
+                log.error("인증 실패 : Token NULL");
+                throw new BadRequestException(Error.ACCESS_DENIED);
             }
             // url 파라미터에 토큰이 있을 경우
             token = tokenUrl;
@@ -60,17 +60,19 @@ public class JwtTokenService {
         return map;
     }
 
-    public void tokenValid(String token, HttpServletRequest request, HttpServletResponse response) throws HaveNotToken, TokenTimeOverException {
+    public void tokenValid(String token) {
         boolean tokenValid = jwtTokenParser.validToken(token, false);
         if (!tokenValid) {
             Token refreshToken = jwtTokenParser.getRefreshToken(token);
             if (refreshToken == null) {
-                throw new HaveNotToken("리프레쉬 토큰이 없음 - 인증 실패");
+                log.error("인증 실패 : 리프레쉬 토큰 NULL");
+                throw new BadRequestException(Error.ACCESS_DENIED);
             }
+
             boolean refreshValid = jwtTokenParser.validToken(refreshToken.getToken(), true);
             if (!refreshValid) {
-                log.info("인증 실패 : 리프레쉬 토큰 시간 만료");
-                throw new TokenTimeOverException("인증 실패 : 리프레쉬 토큰 시간 만료");
+                log.error("인증 실패 : 리프레쉬 토큰 시간 만료");
+                throw new BadRequestException(Error.ACCESS_DENIED);
             }
         }
     }
@@ -80,7 +82,8 @@ public class JwtTokenService {
 
         String refreshToken = jwtTokenProvider.createRefreshToken();
         String accessToken = jwtTokenProvider.createAccessToken(
-                id, getAuthoritiesFromRole(String.valueOf(role)));
+                id, getAuthoritiesFromRole(String.valueOf(role))
+        );
 
         Map<TokenName, String> map = new HashMap<>();
         map.put(TokenName.ACCESS_TOKEN, accessToken);
@@ -121,8 +124,7 @@ public class JwtTokenService {
 
     private Collection<? extends GrantedAuthority> getAuthoritiesFromRole(String role) {
         Collection<GrantedAuthority> authorities = new ArrayList<>();
-        authorities.add(
-                new SimpleGrantedAuthority(role));
+        authorities.add(new SimpleGrantedAuthority(role));
         return authorities;
     }
 
@@ -146,7 +148,7 @@ public class JwtTokenService {
             }
             return true;
         } catch (NullPointerException e) {
-            log.info("토큰이 없음");
+            log.error("토큰이 없음");
             return false;
         }
     }
